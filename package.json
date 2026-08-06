@@ -1,0 +1,63 @@
+{
+  "name": "lp-decision-os",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "bash scripts/start-local.sh",
+    "build": "next build",
+    "build:frontend": "vite build --config apps/frontend/vite.config.ts",
+    "start": "bash scripts/start-local.sh",
+    "backend": "tsx apps/backend/src/server.ts",
+    "backend:dev": "tsx watch apps/backend/src/server.ts",
+    "frontend:dev": "vite --config apps/frontend/vite.config.ts",
+    "indexer": "tsx scripts/indexer-worker.ts",
+    "worker:indexer": "tsx scripts/indexer-worker.ts",
+    "worker:backfill": "tsx scripts/backfill-worker.ts",
+    "worker:metrics": "tsx scripts/metrics-worker.ts",
+    "workers": "bash scripts/supervisor.sh start",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node --test tests/*.test.mjs && tsx --test tests/*.test.ts",
+    "test": "npm run build && npm run build:frontend && npm run test:unit",
+    "test:e2e": "node tests/playwright.e2e.mjs",
+    "test:e2e:backend": "node tests/backend.e2e.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern '**/dist/**' --ignore-pattern .next",
+    "db:generate": "drizzle-kit generate",
+    "db:integrity": "tsx scripts/doctor.ts --database",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run test:e2e && npm run test:e2e:backend"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/static": "^8.2.0",
+    "@fastify/websocket": "^11.2.0",
+    "decimal.js": "^10.6.0",
+    "drizzle-orm": "0.45.2",
+    "fastify": "^5.6.1",
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^5.0.2",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.2.6",
+    "playwright": "^1.62.1",
+    "tailwindcss": "4.2.1",
+    "tsx": "^4.20.5",
+    "typescript": "5.9.3",
+    "vite": "^7.1.3"
+  },
+  "type": "module"
+}

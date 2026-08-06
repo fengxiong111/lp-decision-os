@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$project_root"
+
+action="${1:-start}"
+
+case "$action" in
+  start)
+    runtime_port="${LP_BACKEND_PORT:-${LP_PORT:-3838}}"
+    if command -v lsof >/dev/null 2>&1 && lsof -nP -iTCP:"$runtime_port" -sTCP:LISTEN >/dev/null 2>&1; then
+      echo "端口 $runtime_port 已被占用；请先运行 ./run stop 或设置 LP_PORT" >&2
+      exit 1
+    fi
+    if [ ! -f apps/frontend/dist/index.html ]; then npm run build:frontend; fi
+    echo "LP Alpha Terminal backend: http://localhost:$runtime_port"
+    if [ "${LP_ENABLE_LAN:-0}" = "1" ]; then echo "LAN 模式已启用：仅允许私有网段，具体地址见 supervisor 日志"; fi
+    exec bash scripts/supervisor.sh start
+    ;;
+  stop)
+    exec bash scripts/supervisor.sh stop
+    ;;
+  doctor)
+    exec node --import tsx scripts/doctor.ts --database
+    ;;
+  update)
+    backup_dir=".local-data/backups/$(date -u '+%Y%m%dT%H%M%SZ')-update"
+    source_backup="$project_root/$backup_dir/source"
+    frontend_backup="$project_root/$backup_dir/frontend-dist"
+    mkdir -p "$source_backup"
+    node --import tsx scripts/backup-database.ts --target "$backup_dir"
+    if ! command -v rsync >/dev/null 2>&1; then
+      echo "更新失败：需要 rsync 创建源码快照" >&2
+      exit 1
+    fi
+    rsync -a \
+      --exclude '.git/' \
+      --exclude '.local-data/' \
+      --exclude 'node_modules/' \
+      --exclude '.next/' \
+      --exclude '.vinext/' \
+      --exclude '.wrangler/' \
+      --exclude 'apps/frontend/dist/' \
+      --exclude 'dist/' \
+      "$project_root/" "$source_backup/"
+    if [ -d "$project_root/apps/frontend/dist" ]; then cp -a "$project_root/apps/frontend/dist" "$frontend_backup"; fi
+
+    start_supervisor_background() {
+      mkdir -p "$project_root/.local-data/logs"
+      nohup bash scripts/supervisor.sh start >> "$project_root/.local-data/logs/supervisor.log" 2>&1 </dev/null &
+      echo $!
+    }
+
+    wait_for_health() {
+      local deadline=$((SECONDS + 45))
+      local health_url="http://127.0.0.1:${LP_BACKEND_PORT:-${LP_PORT:-3838}}/api/health"
+      while [ "$SECONDS" -lt "$deadline" ]; do
+        if curl -fsS --max-time 2 "$health_url" >/dev/null 2>&1; then return 0; fi
+        sleep 1
+      done
+      return 1
+    }
+
+    rollback_update() {
+      echo "更新失败，恢复源码快照与前端产物：$backup_dir" >&2
+      bash scripts/supervisor.sh stop >/dev/null 2>&1 || true
+      rsync -a --delete \
+        --exclude '.git/' \
+        --exclude '.local-data/' \
+        --exclude 'node_modules/' \
+        --exclude '.next/' \
+        --exclude '.vinext/' \
+        --exclude '.wrangler/' \
+        --exclude 'apps/frontend/dist/' \
+        --exclude 'dist/' \
+        "$source_backup/" "$project_root/"
+      if [ -d "$frontend_backup" ]; then
+        rm -rf "$project_root/apps/frontend/dist"
+        cp -a "$frontend_backup" "$project_root/apps/frontend/dist"
+      fi
+      start_supervisor_background >/dev/null || true
+      wait_for_health || echo "恢复后的 health 仍不可用，请查看 .local-data/logs/" >&2
+    }
+
+    if ! npm install; then
+      rollback_update
+      exit 1
+    fi
+    if ! npm run verify; then
+      rollback_update
+      exit 1
+    fi
+    bash scripts/supervisor.sh stop || true
+    if ! npm run build:frontend; then
+      rollback_update
+      exit 1
+    fi
+    new_supervisor_pid="$(start_supervisor_background)"
+    if ! wait_for_health; then
+      kill -TERM "$new_supervisor_pid" 2>/dev/null || true
+      rollback_update
+      exit 1
+    fi
+    echo "更新完成：Fastify health 已就绪，数据库备份：$backup_dir"
+    ;;
+  *)
+    echo "用法：./run [start|stop|update|doctor]" >&2
+    exit 2
+    ;;
+esac

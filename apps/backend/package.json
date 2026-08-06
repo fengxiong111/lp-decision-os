@@ -1,0 +1,8 @@
+{
+  "name": "@lp-alpha/backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/server.ts"
+  }
+}
