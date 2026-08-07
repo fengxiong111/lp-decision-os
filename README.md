@@ -10,6 +10,14 @@
 
 > GitHub 仓库用于在手机上查看代码、文档和界面快照。系统依赖常驻后端、Solana/Raydium 数据源与 SQLite，因此不是可直接托管在 GitHub Pages 的纯静态页面。
 
+## 手机近实时看板
+
+[https://fengxiong111.github.io/lp-decision-os/](https://fengxiong111.github.io/lp-decision-os/)
+
+看板由 GitHub Actions 每 15 分钟读取 Raydium 官方 API 并刷新，展示 1,000U / 10,000U 的 24h 前三名与 Top 20。这是无需常驻服务器的近实时公开数据版；1h/6h/12h 逐笔回补仍需要运行本项目的后台 worker。
+
+Telegram 每小时前三名推送可在仓库 Actions secrets 中配置 `TELEGRAM_BOT_TOKEN` 和 `TELEGRAM_CHAT_ID` 后启用。
+
 ## 当前真实数据链路
 
 产品分成两个互不阻塞的模式：

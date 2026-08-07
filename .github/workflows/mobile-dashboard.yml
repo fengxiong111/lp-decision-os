@@ -1,0 +1,40 @@
+name: Mobile dashboard and Telegram Top 3
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+    - cron: "2 * * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Build mobile dashboard
+        run: node scripts/build-mobile-dashboard.mjs
+      - name: Push Telegram Top 3 hourly
+        if: github.event.schedule == '2 * * * *'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/build-mobile-dashboard.mjs --telegram
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: mobile-dashboard
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
