@@ -1,4 +1,4 @@
-import { WINDOW_KEYS, type EventWindowCoverage, type LastSwap, type RpcPoolSnapshot, type ServiceHealth, type SwapEventRecord, type WindowKey } from "@/packages/models/src";
+import { WINDOW_KEYS, type EventWindowCoverage, type LastSwap, type RpcPoolSnapshot, type ServiceHealth, type SwapErrorCategory, type SwapEventRecord, type TransactionClassification, type WindowKey } from "@/packages/models/src";
 import { exponentialBackoffMs, mapWithConcurrency, postJson } from "@/services/shared/http";
 import {
   RAYDIUM_PROGRAM_IDS,
@@ -86,7 +86,10 @@ function markEndpointFailure(provider: RpcProvider, error: string) {
   const state = endpointState(provider);
   state.failures += 1;
   state.lastError = error;
-  const cooldownMs = Math.min(120_000, 5_000 * (2 ** Math.max(0, state.failures - 1)));
+  // 429 明确冷却 60 秒；其它网络错误仍使用指数熔断。
+  const cooldownMs = /(?:HTTP\s*)?429/i.test(error)
+    ? 60_000
+    : Math.min(120_000, 5_000 * (2 ** Math.max(0, state.failures - 1)));
   state.cooldownUntil = Date.now() + cooldownMs;
 }
 
@@ -359,6 +362,7 @@ export type RecentSwapEvent = SwapEventRecord;
 type TokenBalance = {
   accountIndex?: number;
   mint?: string;
+  owner?: string;
   uiTokenAmount?: { amount?: string; decimals?: number };
 };
 
@@ -492,23 +496,30 @@ export type SwapCollectionResult = {
 export type ProgramBackfillPool = {
   id: string;
   programId: string;
+  poolKind: "CLMM" | "CPMM" | "AMM v4" | null;
   vaultA: string | null;
   vaultB: string | null;
   assetMint: string;
   quoteMint: string;
   currentPrice: number | null;
+  feeRate: number | null;
+  hasDynamicFee: boolean;
 };
 
 export type HistoricalTransaction = {
   slot?: number;
   blockTime?: number | null;
-  transaction?: { message?: { accountKeys?: unknown[] } };
+  transaction?: {
+    version?: string | number | null;
+    message?: { accountKeys?: unknown[]; instructions?: unknown[]; addressTableLookups?: unknown[] };
+  };
   meta?: {
     err?: unknown;
     logMessages?: string[] | null;
     preTokenBalances?: TokenBalance[] | null;
     postTokenBalances?: TokenBalance[] | null;
     loadedAddresses?: { writable?: string[]; readonly?: string[] };
+    innerInstructions?: unknown[] | null;
   };
 };
 
@@ -537,10 +548,7 @@ export type ProgramBackfillResult = {
   provider: string | null;
 };
 
-function swapLogIndex(logs: string[]): number {
-  const index = logs.findIndex((log) => /instruction:\s*swap|raydium.*swap|swap.?event/i.test(log));
-  return index >= 0 ? index : 0;
-}
+const PARSER_VERSION = "raydium-swap-parser-v2";
 
 function transactionAccounts(transaction: HistoricalTransaction): string[] {
   const staticKeys = (transaction.transaction?.message?.accountKeys ?? []).map(keyAtIndex).filter((key): key is string => Boolean(key));
@@ -548,63 +556,466 @@ function transactionAccounts(transaction: HistoricalTransaction): string[] {
   return [...staticKeys, ...(loaded?.writable ?? []), ...(loaded?.readonly ?? [])];
 }
 
-export function parseProgramTransaction(pool: ProgramBackfillPool, signature: string, transaction: HistoricalTransaction, receivedAt: string): { event: RecentSwapEvent | null; matched: boolean; unknown: boolean } {
-  if (typeof transaction.slot !== "number" || typeof transaction.blockTime !== "number") return { event: null, matched: false, unknown: false };
-  const keys = transactionAccounts(transaction);
-  const matched = keys.includes(pool.id);
-  if (!matched) return { event: null, matched: false, unknown: false };
-  const logs = transaction.meta?.logMessages ?? [];
-  const isSwap = logs.some((log) => /instruction:\s*swap|raydium.*swap|swap.?event/i.test(log));
-  if (!isSwap) return { event: null, matched: true, unknown: true };
+type ParsedInstruction = {
+  index: number;
+  programId: string | null;
+  accounts: string[];
+  data: string | null;
+};
+
+type SwapParseContext = {
+  pool: ProgramBackfillPool;
+  signature: string;
+  transaction: HistoricalTransaction;
+  receivedAt: string;
+  keys: string[];
+  instruction: ParsedInstruction;
+  discriminator: string | null;
+  accountCount: number;
+  transferDeltas?: Map<string, bigint>;
+};
+
+type SwapParseOutput = {
+  event: RecentSwapEvent | null;
+  classification: TransactionClassification;
+};
+
+function transactionVersion(transaction: HistoricalTransaction): string | number | null {
+  const version = transaction.transaction?.version;
+  return typeof version === "string" || typeof version === "number" ? version : null;
+}
+
+function instructionRecord(value: unknown, index: number, keys: string[]): ParsedInstruction {
+  if (typeof value !== "object" || value === null) return { index, programId: null, accounts: [], data: null };
+  const item = value as Record<string, unknown>;
+  const programId = typeof item.programId === "string" ? item.programId : null;
+  const accounts = Array.isArray(item.accounts)
+    ? item.accounts.flatMap((account) => {
+      if (typeof account === "number") return keys[account] ? [keys[account]] : [];
+      return keyAtIndex(account) ? [keyAtIndex(account) as string] : [];
+    })
+    : [];
+  const data = typeof item.data === "string" ? item.data : null;
+  return { index, programId, accounts, data };
+}
+
+function transactionInstructions(transaction: HistoricalTransaction, keys: string[]): ParsedInstruction[] {
+  const values = transaction.transaction?.message?.instructions ?? [];
+  return values.map((value, index) => instructionRecord(value, index, keys));
+}
+
+function innerInstructions(transaction: HistoricalTransaction, keys: string[]): ParsedInstruction[] {
+  const rows = transaction.meta?.innerInstructions ?? [];
+  return rows.flatMap((row, rowIndex) => {
+    if (typeof row !== "object" || row === null) return [];
+    const source = row as Record<string, unknown>;
+    const instructions = source.instructions;
+    if (!Array.isArray(instructions)) return [];
+    const parentIndex = typeof source.index === "number" ? source.index : rowIndex;
+    return instructions.map((value, instructionIndex) => instructionRecord(value, 1_000 + parentIndex * 100 + instructionIndex, keys));
+  });
+}
+
+function innerInstructionAccounts(transaction: HistoricalTransaction, keys: string[]): string[] {
+  return innerInstructions(transaction, keys).flatMap((item) => item.accounts);
+}
+
+function base58Bytes(value: string): number[] {
+  const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  const digits = [0];
+  for (const char of value) {
+    const index = alphabet.indexOf(char);
+    if (index < 0) return [];
+    let carry = index;
+    for (let position = 0; position < digits.length; position += 1) {
+      const next = digits[position] * 58 + carry;
+      digits[position] = next & 0xff;
+      carry = next >> 8;
+    }
+    while (carry > 0) {
+      digits.push(carry & 0xff);
+      carry >>= 8;
+    }
+  }
+  for (const char of value) if (char === "1") digits.push(0);
+  return digits.reverse();
+}
+
+function discriminatorFor(instruction: ParsedInstruction, logs: string[]): string | null {
+  const log = logs.find((item) => /instruction:\s*(swap|route)|raydium.*swap|swap.?event/i.test(item));
+  if (log) {
+    const match = log.match(/instruction:\s*([A-Za-z0-9_]+)/i);
+    if (match?.[1]) return match[1];
+    return log.replace(/^Program log:\s*/i, "").slice(0, 120);
+  }
+  if (instruction.data) {
+    const bytes = base58Bytes(instruction.data).slice(0, 8);
+    if (bytes.length > 0) return `0x${bytes.map((item) => item.toString(16).padStart(2, "0")).join("")}`;
+  }
+  return null;
+}
+
+function classify(
+  pool: ProgramBackfillPool,
+  signature: string,
+  transaction: HistoricalTransaction,
+  receivedAt: string,
+  errorCategory: SwapErrorCategory,
+  errorCode: string,
+  errorMessage: string,
+  extra: Partial<Pick<TransactionClassification, "programId" | "instructionIndex" | "discriminator" | "accountCount">> = {},
+): TransactionClassification {
+  return {
+    signature,
+    slot: typeof transaction.slot === "number" ? transaction.slot : null,
+    blockTime: typeof transaction.blockTime === "number" ? transaction.blockTime : null,
+    poolAddress: pool.id,
+    programId: extra.programId ?? pool.programId,
+    transactionVersion: transactionVersion(transaction),
+    errorCategory,
+    errorCode,
+    errorMessage,
+    retryable: false,
+    attemptCount: 1,
+    firstSeenAt: receivedAt,
+    lastAttemptAt: receivedAt,
+    rawTransactionPath: `sqlite://raw_transactions/${signature}`,
+    parserVersion: PARSER_VERSION,
+    instructionIndex: extra.instructionIndex ?? null,
+    discriminator: extra.discriminator ?? null,
+    accountCount: extra.accountCount ?? null,
+  };
+}
+
+type BalanceAggregate = { found: boolean; missingDecimals: boolean; deltaAtomic: bigint; decimals: number | null };
+
+function balanceValue(balance: TokenBalance | undefined): { atomic: bigint; decimals: number } | null {
+  const amount = balance?.uiTokenAmount?.amount;
+  const decimals = balance?.uiTokenAmount?.decimals;
+  if (typeof amount !== "string") return null;
+  if (typeof decimals !== "number" || !Number.isInteger(decimals) || decimals < 0) return { atomic: 0n, decimals: -1 };
+  try {
+    return { atomic: BigInt(amount), decimals };
+  } catch {
+    return null;
+  }
+}
+
+function aggregateBalanceDelta(
+  pool: ProgramBackfillPool,
+  keys: string[],
+  pre: TokenBalance[],
+  post: TokenBalance[],
+  mint: string,
+): BalanceAggregate {
+  const addresses = [pool.vaultA, pool.vaultB].filter((value): value is string => Boolean(value));
+  let indices = addresses.map((address) => keys.indexOf(address)).filter((index) => index >= 0);
+  const hasVaultRows = [...pre, ...post].some((row) => typeof row.accountIndex === "number" && indices.includes(row.accountIndex) && row.mint === mint);
+  if (!hasVaultRows) {
+    indices = [...new Set([...pre, ...post]
+      .filter((row) => row.mint === mint && row.owner === pool.id && typeof row.accountIndex === "number")
+      .map((row) => row.accountIndex as number))];
+  }
+  if (indices.length === 0) return { found: false, missingDecimals: false, deltaAtomic: 0n, decimals: null };
+  let deltaAtomic = 0n;
+  let decimals: number | null = null;
+  let found = false;
+  let missingDecimals = false;
+  for (const index of indices) {
+    const before = pre.find((row) => row.accountIndex === index && row.mint === mint);
+    const after = post.find((row) => row.accountIndex === index && row.mint === mint);
+    const beforeValue = balanceValue(before);
+    const afterValue = balanceValue(after);
+    if (!beforeValue && !afterValue) continue;
+    found = true;
+    if (beforeValue?.decimals === -1 || afterValue?.decimals === -1) missingDecimals = true;
+    const currentDecimals = beforeValue?.decimals !== undefined && beforeValue.decimals >= 0 ? beforeValue.decimals : afterValue?.decimals;
+    if (typeof currentDecimals === "number" && currentDecimals >= 0) decimals = decimals ?? currentDecimals;
+    deltaAtomic += (afterValue?.atomic ?? 0n) - (beforeValue?.atomic ?? 0n);
+  }
+  return { found, missingDecimals, deltaAtomic, decimals };
+}
+
+function transferDeltaForPool(transaction: HistoricalTransaction, pool: ProgramBackfillPool): Map<string, bigint> {
+  const vaults = new Set([pool.vaultA, pool.vaultB].filter((value): value is string => Boolean(value)));
+  const result = new Map<string, bigint>();
+  if (vaults.size === 0) return result;
+  const rows = transaction.meta?.innerInstructions ?? [];
+  for (const row of rows) {
+    if (typeof row !== "object" || row === null) continue;
+    const instructions = (row as Record<string, unknown>).instructions;
+    if (!Array.isArray(instructions)) continue;
+    for (const value of instructions) {
+      if (typeof value !== "object" || value === null) continue;
+      const instruction = value as Record<string, unknown>;
+      const parsed = typeof instruction.parsed === "object" && instruction.parsed !== null ? instruction.parsed as Record<string, unknown> : null;
+      const info = parsed && typeof parsed.info === "object" && parsed.info !== null ? parsed.info as Record<string, unknown> : null;
+      const instructionType = parsed && typeof parsed.type === "string" ? parsed.type : "";
+      if (!info || !/transfer/i.test(instructionType)) continue;
+      const mint = typeof info.mint === "string" ? info.mint : null;
+      const source = keyAtIndex(info.source);
+      const destination = keyAtIndex(info.destination);
+      const amountValue = typeof info.tokenAmount === "object" && info.tokenAmount !== null
+        ? (info.tokenAmount as Record<string, unknown>).amount
+        : info.amount;
+      if (!mint || !source || !destination || typeof amountValue !== "string") continue;
+      let amount: bigint;
+      try { amount = BigInt(amountValue); } catch { continue; }
+      const sign = vaults.has(destination) && !vaults.has(source) ? 1n : vaults.has(source) && !vaults.has(destination) ? -1n : 0n;
+      if (sign === 0n) continue;
+      result.set(mint, (result.get(mint) ?? 0n) + sign * amount);
+    }
+  }
+  return result;
+}
+
+/**
+ * 复合交易可能同时包含 Decrease/IncreaseLiquidity、SwapV2 和建仓动作。
+ * 全交易 Vault delta 会把这些动作相加，无法再代表某一条 Swap。这里按
+ * inner instruction 的父级 CPI 段切分，只汇总目标 Raydium instruction
+ * 之后、下一条目标 instruction 之前的 SPL Token transfer。
+ */
+function transferDeltaForPoolInstruction(transaction: HistoricalTransaction, pool: ProgramBackfillPool, instructionIndex: number, keys: string[]): Map<string, bigint> {
+  const vaults = new Set([pool.vaultA, pool.vaultB].filter((value): value is string => Boolean(value)));
+  const result = new Map<string, bigint>();
+  if (vaults.size === 0) return result;
+  const rows = transaction.meta?.innerInstructions ?? [];
+  const isOuterInstruction = instructionIndex < 1_000;
+  for (const [rowIndex, row] of rows.entries()) {
+    if (typeof row !== "object" || row === null) continue;
+    const source = row as Record<string, unknown>;
+    const instructions = source.instructions;
+    if (!Array.isArray(instructions)) continue;
+    const parentIndex = typeof source.index === "number" ? source.index : rowIndex;
+    let collecting = isOuterInstruction && parentIndex === instructionIndex;
+    for (const [childIndex, value] of instructions.entries()) {
+      const childInstructionIndex = 1_000 + parentIndex * 100 + childIndex;
+      const parsedInstruction = instructionRecord(value, childInstructionIndex, keys);
+      if (!isOuterInstruction && parsedInstruction.programId === pool.programId) {
+        if (childInstructionIndex === instructionIndex) {
+          collecting = true;
+          continue;
+        }
+        if (collecting) break;
+        continue;
+      }
+      if (!collecting || typeof value !== "object" || value === null) continue;
+      const instruction = value as Record<string, unknown>;
+      const parsed = typeof instruction.parsed === "object" && instruction.parsed !== null ? instruction.parsed as Record<string, unknown> : null;
+      const info = parsed && typeof parsed.info === "object" && parsed.info !== null ? parsed.info as Record<string, unknown> : null;
+      const instructionType = parsed && typeof parsed.type === "string" ? parsed.type : "";
+      if (!info || !/transfer/i.test(instructionType)) continue;
+      const mint = typeof info.mint === "string" ? info.mint : null;
+      const sourceAddress = keyAtIndex(info.source);
+      const destinationAddress = keyAtIndex(info.destination);
+      const amountValue = typeof info.tokenAmount === "object" && info.tokenAmount !== null
+        ? (info.tokenAmount as Record<string, unknown>).amount
+        : info.amount;
+      if (!mint || !sourceAddress || !destinationAddress || typeof amountValue !== "string") continue;
+      let amount: bigint;
+      try { amount = BigInt(amountValue); } catch { continue; }
+      const sign = vaults.has(destinationAddress) && !vaults.has(sourceAddress)
+        ? 1n
+        : vaults.has(sourceAddress) && !vaults.has(destinationAddress)
+          ? -1n
+          : 0n;
+      if (sign === 0n) continue;
+      result.set(mint, (result.get(mint) ?? 0n) + sign * amount);
+    }
+  }
+  return result;
+}
+
+// Raydium CLMM 的指令数据前缀来自真实 RPC raw transaction。只有在一笔
+// 交易同时出现多个目标指令时才使用它缩小候选范围，避免把流动性动作
+// 或 Token-2022 建仓动作当成 Swap。wZRp7wZ3 是旧版 Swap，ASCsAbe1 是
+// 当前 SwapV2。
+const RAYDIUM_CLMM_SWAP_DATA_PREFIXES = ["ASCsAbe1", "wZRp7wZ3"] as const;
+
+function isRaydiumSwapInstruction(instruction: ParsedInstruction): boolean {
+  return typeof instruction.data === "string"
+    && RAYDIUM_CLMM_SWAP_DATA_PREFIXES.some((prefix) => instruction.data?.startsWith(prefix));
+}
+
+function atomicToUnits(value: bigint, decimals: number | null): number | null {
+  if (decimals === null || decimals < 0) return null;
+  const result = Number(value) / 10 ** decimals;
+  return Number.isFinite(result) ? result : null;
+}
+
+function feeAtomic(value: bigint, rate: number | null): string | null {
+  if (rate === null || !Number.isFinite(rate) || rate < 0) return null;
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue)) return null;
+  return BigInt(Math.max(0, Math.round(numberValue * rate))).toString();
+}
+
+function parseRaydiumSwap(context: SwapParseContext): SwapParseOutput {
+  const { pool, signature, transaction, receivedAt, keys, instruction, discriminator, accountCount } = context;
   const pre = transaction.meta?.preTokenBalances ?? [];
   const post = transaction.meta?.postTokenBalances ?? [];
-  const vaultIndexes = [pool.vaultA, pool.vaultB]
-    .filter((address): address is string => Boolean(address))
-    .map((address) => ({ index: keys.indexOf(address), address }))
-    .filter((item) => item.index >= 0);
-  if (vaultIndexes.length === 0) return { event: null, matched: true, unknown: true };
-  const quoteDelta = vaultIndexes.reduce((total, item) => total + balanceDelta(pre, post, item.index, pool.quoteMint), 0);
-  const assetDelta = vaultIndexes.reduce((total, item) => total + balanceDelta(pre, post, item.index, pool.assetMint), 0);
-  const quoteDeltaAtomic = vaultIndexes.reduce((total, item) => total + balanceDeltaAtomic(pre, post, item.index, pool.quoteMint), 0n);
-  const assetDeltaAtomic = vaultIndexes.reduce((total, item) => total + balanceDeltaAtomic(pre, post, item.index, pool.assetMint), 0n);
-  const volume = Math.abs(quoteDelta) > 0 ? Math.abs(quoteDelta) : Math.abs(assetDelta) * (pool.currentPrice ?? 0);
-  if (!Number.isFinite(volume) || volume <= 0) return { event: null, matched: true, unknown: true };
-  const inputIsQuote = quoteDeltaAtomic > 0n;
-  const inputAtomic = inputIsQuote ? quoteDeltaAtomic : assetDeltaAtomic;
-  const outputAtomic = inputIsQuote ? assetDeltaAtomic : quoteDeltaAtomic;
+  const quote = aggregateBalanceDelta(pool, keys, pre, post, pool.quoteMint);
+  const asset = aggregateBalanceDelta(pool, keys, pre, post, pool.assetMint);
+  const extra = { programId: instruction.programId, instructionIndex: instruction.index, discriminator, accountCount };
+  if (!quote.found || !asset.found) return { event: null, classification: classify(pool, signature, transaction, receivedAt, "TOKEN_BALANCE_MISSING", "TOKEN_BALANCE_MISSING", "目标 Pool 的两侧 Vault 缺少 pre/post Token Balance", extra) };
+  if (quote.missingDecimals || asset.missingDecimals || quote.decimals === null || asset.decimals === null) return { event: null, classification: classify(pool, signature, transaction, receivedAt, "TOKEN_DECIMALS_MISSING", "TOKEN_DECIMALS_MISSING", "Token Balance 缺少 decimals，无法进行原子单位换算", extra) };
+  const transferDeltas = context.transferDeltas ?? transferDeltaForPool(transaction, pool);
+  const quoteTransfer = transferDeltas.get(pool.quoteMint);
+  const assetTransfer = transferDeltas.get(pool.assetMint);
+  const quoteDelta = context.transferDeltas?.has(pool.quoteMint) ? context.transferDeltas.get(pool.quoteMint) as bigint : quote.deltaAtomic;
+  const assetDelta = context.transferDeltas?.has(pool.assetMint) ? context.transferDeltas.get(pool.assetMint) as bigint : asset.deltaAtomic;
+  if (context.transferDeltas && (quoteTransfer === undefined || assetTransfer === undefined)) {
+    return {
+      event: null,
+      classification: classify(pool, signature, transaction, receivedAt, "AMOUNT_RECONCILIATION_FAILED", "SWAP_SEGMENT_TRANSFER_MISSING", `Swap 指令段缺少两侧 Token transfer：quote=${quoteTransfer?.toString() ?? "null"} asset=${assetTransfer?.toString() ?? "null"}`, extra),
+    };
+  }
+  if ((quoteTransfer !== undefined && quoteTransfer !== quoteDelta) || (assetTransfer !== undefined && assetTransfer !== assetDelta)) {
+    return {
+      event: null,
+      classification: classify(pool, signature, transaction, receivedAt, "AMOUNT_RECONCILIATION_FAILED", "VAULT_TRANSFER_DELTA_MISMATCH", `Vault delta 与 Token transfer delta 不一致：quote=${quoteDelta.toString()}/${quoteTransfer?.toString() ?? "null"} asset=${assetDelta.toString()}/${assetTransfer?.toString() ?? "null"}`, extra),
+    };
+  }
+  const quoteIn = quoteDelta > 0n && assetDelta < 0n;
+  const assetIn = assetDelta > 0n && quoteDelta < 0n;
+  if (!quoteIn && !assetIn) return { event: null, classification: classify(pool, signature, transaction, receivedAt, "AMOUNT_RECONCILIATION_FAILED", "VAULT_DIRECTION_INVALID", `Vault delta 方向无法形成 Swap：quote=${quoteDelta.toString()} asset=${assetDelta.toString()}`, extra) };
+  const inputMint = quoteIn ? pool.quoteMint : pool.assetMint;
+  const outputMint = quoteIn ? pool.assetMint : pool.quoteMint;
+  const inputAtomic = quoteIn ? quoteDelta : assetDelta;
+  const outputAtomic = quoteIn ? -assetDelta : -quoteDelta;
+  const quoteUnits = atomicToUnits(quoteDelta < 0n ? -quoteDelta : quoteDelta, quote.decimals);
+  const assetUnits = atomicToUnits(assetDelta < 0n ? -assetDelta : assetDelta, asset.decimals);
+  const volume = quoteUnits !== null && quoteUnits > 0 ? quoteUnits : assetUnits !== null && assetUnits > 0 && pool.currentPrice !== null ? assetUnits * pool.currentPrice : null;
+  if (volume === null || !Number.isFinite(volume) || volume <= 0) return { event: null, classification: classify(pool, signature, transaction, receivedAt, "AMOUNT_RECONCILIATION_FAILED", "VOLUME_NOT_DERIVABLE", "无法由 quote 或 asset Vault delta 推导 USD 成交额", extra) };
+  const feeStatus: SwapErrorCategory = pool.hasDynamicFee ? "FEE_VERSION_UNSUPPORTED" : pool.feeRate === null ? "FEE_CONFIG_MISSING" : "PARSED_SWAP";
+  const grossFeeAtomic = feeAtomic(inputAtomic, pool.feeRate);
+  const inputUnits = atomicToUnits(inputAtomic, quoteIn ? quote.decimals : asset.decimals);
+  const feeUsd = pool.feeRate === null || inputUnits === null ? null : inputUnits * (quoteIn ? 1 : pool.currentPrice ?? 0) * pool.feeRate;
   const event: RecentSwapEvent = {
     poolId: pool.id,
     signature,
-    instructionIndex: swapLogIndex(logs),
+    instructionIndex: instruction.index,
     trader: keys[0] ?? null,
-    slot: transaction.slot,
-    blockTime: new Date(transaction.blockTime * 1000).toISOString(),
+    slot: transaction.slot as number,
+    blockTime: new Date((transaction.blockTime as number) * 1000).toISOString(),
     receivedAt,
     volume,
-    // 逐笔 LP Fee 只有在 PoolState / SwapEvent 解析器提供原子值时才填入。
-    fee: null,
+    fee: feeUsd,
     parsedAt: new Date().toISOString(),
     persistedAt: null,
     parseLatencyMs: null,
     persistenceLatencyMs: null,
     source: "rpc-replay",
     programVersion: pool.programId,
-    inputMint: inputIsQuote ? pool.quoteMint : pool.assetMint,
-    outputMint: inputIsQuote ? pool.assetMint : pool.quoteMint,
-    actualAmountInAtomic: inputAtomic > 0n ? inputAtomic.toString() : null,
-    actualAmountOutAtomic: outputAtomic < 0n ? (-outputAtomic).toString() : outputAtomic > 0n ? outputAtomic.toString() : null,
-    baseFeeRate: null,
-    dynamicFeeRate: null,
-    effectiveFeeRate: null,
-    grossTradeFeeAtomic: null,
+    inputMint,
+    outputMint,
+    actualAmountInAtomic: inputAtomic.toString(),
+    actualAmountOutAtomic: outputAtomic.toString(),
+    baseFeeRate: pool.feeRate,
+    dynamicFeeRate: pool.hasDynamicFee ? null : pool.feeRate,
+    effectiveFeeRate: pool.feeRate,
+    grossTradeFeeAtomic: grossFeeAtomic,
     protocolFeeAtomic: null,
     fundFeeAtomic: null,
-    lpFeeAtomic: null,
+    lpFeeAtomic: grossFeeAtomic,
     token2022TransferFeeAtomic: null,
     priceUsd: pool.currentPrice,
-    feeUsd: null,
+    feeUsd,
   };
-  return { event, matched: true, unknown: false };
+  return {
+    event,
+    classification: classify(pool, signature, transaction, receivedAt, feeStatus, feeStatus, feeStatus === "PARSED_SWAP" ? "Swap 已按 Vault pre/post balance 解析" : "Swap 已解析，但 Fee 配置尚未支持逐笔确认", extra),
+  };
+}
+
+export function parseClmmSwap(context: SwapParseContext): SwapParseOutput {
+  return parseRaydiumSwap(context);
+}
+
+export function parseCpmmSwap(context: SwapParseContext): SwapParseOutput {
+  return parseRaydiumSwap(context);
+}
+
+export function parseAmmV4Swap(context: SwapParseContext): SwapParseOutput {
+  return parseRaydiumSwap(context);
+}
+
+export type ParsedProgramTransaction = {
+  event: RecentSwapEvent | null;
+  events: RecentSwapEvent[];
+  matched: boolean;
+  unknown: boolean;
+  classifications: TransactionClassification[];
+};
+
+export function parseProgramTransaction(pool: ProgramBackfillPool, signature: string, transaction: HistoricalTransaction, receivedAt: string): ParsedProgramTransaction {
+  const keys = transactionAccounts(transaction);
+  const outer = transactionInstructions(transaction, keys);
+  const inner = innerInstructions(transaction, keys);
+  const allInstructions = [...outer, ...inner];
+  const referenced = new Set([...keys, ...allInstructions.flatMap((item) => item.accounts), ...innerInstructionAccounts(transaction, keys)]);
+  if (transaction.meta?.err) {
+    const classification = classify(pool, signature, transaction, receivedAt, "ONCHAIN_TRANSACTION_FAILED", "ONCHAIN_TRANSACTION_FAILED", "交易 meta.err 非空，链上执行失败");
+    return { event: null, events: [], matched: referenced.has(pool.id), unknown: false, classifications: [classification] };
+  }
+  if (!referenced.has(pool.id)) {
+    const classification = classify(pool, signature, transaction, receivedAt, "NOT_TARGET_POOL", "NOT_TARGET_POOL", "完整静态账户、ALT账户与指令账户中不包含目标 Pool 地址");
+    return { event: null, events: [], matched: false, unknown: false, classifications: [classification] };
+  }
+  if (typeof transaction.slot !== "number" || typeof transaction.blockTime !== "number") {
+    const classification = classify(pool, signature, transaction, receivedAt, "PARSE_EXCEPTION", "TRANSACTION_METADATA_MISSING", "slot 或 blockTime 缺失");
+    return { event: null, events: [], matched: true, unknown: true, classifications: [classification] };
+  }
+  const logs = transaction.meta?.logMessages ?? [];
+  const supportedInstructions = allInstructions.filter((item) => item.programId && RAYDIUM_PROGRAM_IDS.has(item.programId));
+  const targetProgramInstructions = supportedInstructions.filter((item) => item.programId === pool.programId);
+  // 一个多跳交易可能包含多个 Raydium instruction；只有 instruction 自身
+  // 的账户集合引用该目标 Pool 才能使用它，不能把同一笔交易的其它 hop
+  // 的余额差重复记到当前 Pool。
+  const poolInstructions = targetProgramInstructions.filter((item) => item.accounts.includes(pool.id));
+  const resolvedPoolInstructions = poolInstructions.length > 0 ? poolInstructions : targetProgramInstructions;
+  if (supportedInstructions.length === 0) {
+    const hasSwapSignal = logs.some((log) => /instruction:\s*(swap|route)|raydium.*swap|swap.?event/i.test(log));
+    const category: SwapErrorCategory = hasSwapSignal ? "PROGRAM_UNSUPPORTED" : "NOT_RAYDIUM_SWAP";
+    const classification = classify(pool, signature, transaction, receivedAt, category, category, hasSwapSignal ? "交易包含 Swap 信号但没有受支持的 Raydium Program ID" : "目标 Pool 交易不是 Raydium Swap", { programId: null, accountCount: referenced.size });
+    return { event: null, events: [], matched: true, unknown: category === "PROGRAM_UNSUPPORTED", classifications: [classification] };
+  }
+  if (targetProgramInstructions.length === 0) {
+    const classification = classify(pool, signature, transaction, receivedAt, "NOT_RAYDIUM_SWAP", "POOL_PROGRAM_MISMATCH", "目标 Pool 被引用，但没有目标 Raydium Program 的 outer instruction", { programId: supportedInstructions[0]?.programId ?? null, accountCount: referenced.size });
+    return { event: null, events: [], matched: true, unknown: false, classifications: [classification] };
+  }
+  const hasSwapSignal = logs.some((log) => /instruction:\s*(swap|route)|raydium.*swap|swap.?event/i.test(log));
+  if (!hasSwapSignal) {
+    const instruction = resolvedPoolInstructions[0];
+    const nonSwapInstruction = logs.some((log) => /instruction:\s*(collect|increase|decrease|open|close|initialize|create|update|set|transfer)/i.test(log));
+    const category: SwapErrorCategory = nonSwapInstruction ? "NOT_RAYDIUM_SWAP" : "INSTRUCTION_DISCRIMINATOR_UNKNOWN";
+    const classification = classify(pool, signature, transaction, receivedAt, category, category, nonSwapInstruction ? "目标 Pool 交易是 Raydium 非 Swap 指令" : "目标 Raydium instruction 未出现已知 Swap 日志", { programId: instruction.programId, instructionIndex: instruction.index, discriminator: discriminatorFor(instruction, logs), accountCount: referenced.size });
+    return { event: null, events: [], matched: true, unknown: category === "INSTRUCTION_DISCRIMINATOR_UNKNOWN", classifications: [classification] };
+  }
+  const swapInstructions = resolvedPoolInstructions.filter(isRaydiumSwapInstruction);
+  const instructionsToParse = swapInstructions.length > 0 ? swapInstructions : resolvedPoolInstructions;
+  const outputs = instructionsToParse.map((instruction) => {
+    const discriminator = discriminatorFor(instruction, logs);
+    const context: SwapParseContext = {
+      pool,
+      signature,
+      transaction,
+      receivedAt,
+      keys,
+      instruction,
+      discriminator,
+      accountCount: referenced.size,
+      transferDeltas: isRaydiumSwapInstruction(instruction)
+        ? transferDeltaForPoolInstruction(transaction, pool, instruction.index, keys)
+        : undefined,
+    };
+    if (pool.poolKind === "CPMM") return parseCpmmSwap(context);
+    if (pool.poolKind === "AMM v4") return parseAmmV4Swap(context);
+    return parseClmmSwap(context);
+  });
+  const events = outputs.flatMap((item) => item.event ? [item.event] : []);
+  const classifications = outputs.map((item) => item.classification);
+  return { event: events[0] ?? null, events, matched: true, unknown: events.length === 0, classifications };
 }
 
 function coverageForProgramWindow(pool: ProgramBackfillPool, window: WindowKey, now: Date, sinceMs: number, signatures: SignatureInfo[], fetched: Map<string, { transaction: HistoricalTransaction | null; error: string | null }>, events: RecentSwapEvent[], matchedSignatures: Set<string>, unknownInstructions: Set<string>, scanComplete: boolean): EventWindowCoverage {
@@ -679,12 +1090,15 @@ export async function collectProgramWideRwaSwapEvents(provider: RpcProvider | nu
   const maxTransactions = options.maxTransactions ?? (configuredMaxTransactions ? Math.max(100, Number(configuredMaxTransactions)) : Number.POSITIVE_INFINITY);
   const batchSize = Math.min(100, Math.max(1, options.batchSize ?? Number(process.env.LP_INDEXER_BATCH_SIZE ?? 25)));
   const poolTier = options.poolTier ?? 3;
-  const programs = [...new Set(targetPools.map((pool) => pool.programId))];
   const signatures: SignatureInfo[] = [];
   const errors: string[] = [];
   let scanComplete = true;
-  for (const programId of programs) {
-    const checkpointKey = `rwa:${targetWindow}:tier${poolTier}:${programId}`;
+  // 目标发现必须按 Pool 地址进行。按 Program ID 扫描会把该协议的所有
+  // 交易混入候选，随后又被错误计为 parser failure。
+  for (const pool of targetPools) {
+    const poolAddress = pool.id;
+    const programId = pool.programId;
+    const checkpointKey = `rwa:${targetWindow}:tier${poolTier}:pool:${poolAddress}`;
     const checkpoint = readBackfillCheckpoint(checkpointKey);
     let before: string | undefined = checkpoint?.status === "COMPLETE" ? undefined : checkpoint?.beforeSignature ?? undefined;
     let page = checkpoint?.status === "COMPLETE" ? maxPages : checkpoint?.page ?? 0;
@@ -695,9 +1109,9 @@ export async function collectProgramWideRwaSwapEvents(provider: RpcProvider | nu
     for (; page < maxPages && !reachedWindow; page += 1) {
       const params: Record<string, unknown> = { limit: pageLimit, commitment: "confirmed" };
       if (before) params.before = before;
-      const response = await rpcRequest<SignatureInfo[]>(provider, "getSignaturesForAddress", [programId, params], 20_000);
+      const response = await rpcRequest<SignatureInfo[]>(provider, "getSignaturesForAddress", [poolAddress, params], 20_000);
       if (response.error) {
-        errors.push(`${programId} 签名扫描：${response.error}`);
+        errors.push(`${poolAddress} 签名扫描：${response.error}`);
         scanComplete = false;
         persistBackfillCheckpoint({ checkpointKey, windowKey: targetWindow, programId, beforeSignature: before ?? null, page, signaturesDiscovered: signatures.length, transactionsFetched: 0, status: "FAILED", poolTier, updatedAt: now.toISOString() });
         break;
@@ -781,10 +1195,10 @@ export async function collectProgramWideRwaSwapEvents(provider: RpcProvider | nu
     const unknown = unknownByPool.get(pool.id) ?? new Set<string>();
     coverage[pool.id] = Object.fromEntries(reportWindows.map((window) => [window, coverageForProgramWindow(pool, window, now, sinceMs, uniqueSignatures, fetched, events, matched, unknown, scanComplete)])) as Record<WindowKey, EventWindowCoverage>;
   }
-  for (const programId of programs) {
-    const checkpointKey = `rwa:${targetWindow}:tier${poolTier}:${programId}`;
+  for (const pool of targetPools) {
+    const checkpointKey = `rwa:${targetWindow}:tier${poolTier}:pool:${pool.id}`;
     const checkpoint = readBackfillCheckpoint(checkpointKey);
-    if (checkpoint && checkpoint.status !== "COMPLETE") persistBackfillCheckpoint({ ...checkpoint, signaturesDiscovered: uniqueSignatures.length, transactionsFetched: fetched.size, status: scanComplete ? "COMPLETE" : "RUNNING", updatedAt: now.toISOString() });
+    if (checkpoint && checkpoint.status !== "COMPLETE") persistBackfillCheckpoint({ ...checkpoint, programId: pool.programId, signaturesDiscovered: uniqueSignatures.length, transactionsFetched: fetched.size, status: scanComplete ? "COMPLETE" : "RUNNING", updatedAt: now.toISOString() });
   }
   return {
     events,

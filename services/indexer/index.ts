@@ -37,7 +37,9 @@ function writeStatus(status: StreamStatus) {
   persistIndexerState("stream.status", status);
 }
 
-function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void): StreamConnection {
+let activeStreamGeneration = 0;
+
+function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void, poolIds: string[], generation: number): StreamConnection {
   let stopped = false;
   let socket: WebSocket | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -47,16 +49,18 @@ function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void): Str
   let gapCount = 0;
   let gapSlots = 0;
   let reconnectCount = 0;
+  let lastEventAt: string | null = null;
   let connected = false;
   const subscriptions = new Map<number, string>();
 
   const publish = (status: string, detail: string) => {
+    if (generation !== activeStreamGeneration) return;
     writeStatus({
       status,
       connected: connected ? 1 : 0,
       configured: 1,
       lastSlot,
-      lastEventAt: status === "CONNECTED" ? new Date().toISOString() : null,
+      lastEventAt,
       gapCount,
       gapSlots,
       reconnectCount,
@@ -99,13 +103,14 @@ function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void): Str
       connected = true;
       retry = 0;
       socket.send(JSON.stringify({ jsonrpc: "2.0", id: 1, method: "slotSubscribe" }));
-      [...RAYDIUM_PROGRAM_IDS].forEach((programId, index) => {
-        socket?.send(JSON.stringify({ jsonrpc: "2.0", id: index + 2, method: "logsSubscribe", params: [{ mentions: [programId] }, { commitment: "confirmed" }] }));
+      const mentions = poolIds.length > 0 ? poolIds : [...RAYDIUM_PROGRAM_IDS];
+      mentions.forEach((mention, index) => {
+        socket?.send(JSON.stringify({ jsonrpc: "2.0", id: index + 2, method: "logsSubscribe", params: [{ mentions: [mention] }, { commitment: "confirmed" }] }));
       });
       heartbeat = setInterval(() => {
         if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ jsonrpc: "2.0", id: Date.now(), method: "slotSubscribe" }));
       }, 20_000);
-      publish("CONNECTED", `logsSubscribe ${RAYDIUM_PROGRAM_IDS.size} programs`);
+      publish("CONNECTED", `${poolIds.length > 0 ? `合格 Universe ${poolIds.length} 个 Pool` : `Raydium ${RAYDIUM_PROGRAM_IDS.size} 个程序`} · WS endpoint`);
     });
     socket.addEventListener("message", (message) => {
       if (typeof message.data !== "string") return;
@@ -130,6 +135,8 @@ function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void): Str
         lastSlot = Math.max(lastSlot ?? slot, slot);
         const isRaydiumEvent = value.logs.some((log) => /swap|liquidity|position|initialize/i.test(log));
         if (!isRaydiumEvent) return;
+        lastEventAt = new Date().toISOString();
+        publish("CONNECTED", `${poolIds.length > 0 ? `合格 Universe ${poolIds.length} 个 Pool` : `Raydium ${RAYDIUM_PROGRAM_IDS.size} 个程序`} · 最近事件 ${lastEventAt}`);
         const event: ChainEvent = { slot, signature: value.signature ?? null, programId: null, logs: value.logs, observedAt: new Date().toISOString(), sourceUrl: url };
         persistIndexerState("stream.last_event", event);
         onEvent(event);
@@ -163,11 +170,13 @@ function connectEndpoint(url: string, onEvent: (event: ChainEvent) => void): Str
   };
 }
 
-export function startRaydiumTransactionStream(onEvent: (event: ChainEvent) => void): IndexerHandle {
+export function startRaydiumTransactionStream(onEvent: (event: ChainEvent) => void, options: { poolIds?: string[] } = {}): IndexerHandle {
+  const poolIds = [...new Set(options.poolIds ?? [])];
   const urls = [...new Set(getRpcProviders().map((provider) => provider.wsUrl).filter((url): url is string => Boolean(url)))];
-  const connections = urls.map((url) => connectEndpoint(url, onEvent));
+  const generation = ++activeStreamGeneration;
+  const connections = urls.map((url) => connectEndpoint(url, onEvent, poolIds, generation));
   const provider = urls.join(",") || "未配置 SOLANA_WS_URLS";
-  writeStatus({ status: connections.length > 0 ? "CONNECTING" : "NOT_CONFIGURED", connected: 0, configured: connections.length, lastSlot: null, lastEventAt: null, gapCount: 0, gapSlots: 0, reconnectCount: 0, detail: connections.length > 0 ? `WS Pool ${connections.length} endpoints` : "等待 SOLANA_WS_URLS / RPC Provider" });
+  writeStatus({ status: connections.length > 0 ? "CONNECTING" : "NOT_CONFIGURED", connected: 0, configured: connections.length, lastSlot: null, lastEventAt: null, gapCount: 0, gapSlots: 0, reconnectCount: 0, detail: connections.length > 0 ? `${poolIds.length > 0 ? `合格 Universe ${poolIds.length} 个 Pool` : `Raydium ${RAYDIUM_PROGRAM_IDS.size} 个程序`} · WS Pool ${connections.length} endpoints` : "等待 SOLANA_WS_URLS / RPC Provider" });
   return {
     provider,
     stop: () => connections.forEach((connection) => connection.stop()),

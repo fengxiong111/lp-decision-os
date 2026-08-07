@@ -15,6 +15,7 @@ export type MetricValue = z.infer<typeof MetricValueSchema>;
 export const RankingQuerySchema = z.object({
   capital: z.enum(["1000", "10000"]).default("1000"),
   window: z.enum(["1h", "6h", "12h", "24h"]).default("24h"),
+  includeOfficialOnly: z.enum(["0", "1", "true", "false"]).default("0").transform((value) => value === "1" || value === "true"),
 });
 
 export const WalletRequestSchema = z.object({
@@ -52,4 +53,3 @@ export function normalizeNullSemantics<T>(input: T): T {
   };
   return visit(input) as T;
 }
-

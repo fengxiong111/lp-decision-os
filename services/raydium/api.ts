@@ -1,13 +1,15 @@
-import type { ServiceStatus, SourceRef } from "@/packages/models/src";
+import type { ResearchUniverse, ServiceStatus, SourceRef } from "@/packages/models/src";
 import { mapWithConcurrency, getJson } from "@/services/shared/http";
 import {
   RAYDIUM_API_BASE,
   RAYDIUM_RWA_PAGE,
   RAYDIUM_PROGRAM_IDS,
+  TOKEN_PROGRAM_IDS,
   USDC_MINT,
   poolKindFromProgram,
 } from "@/services/raydium/config";
 import { persistIndexerState, readIndexerState } from "@/services/storage/event-index";
+import { evaluateResearchUniverse } from "@/services/indexer/universe";
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -31,6 +33,8 @@ export type RaydiumPoolInfo = {
   mintAmountA: number | null;
   mintAmountB: number | null;
   feeRate: number | null;
+  isActive: boolean | null;
+  identityConflict: string | null;
   openTime: string | null;
   tvl: number | null;
   day: {
@@ -59,6 +63,7 @@ export type RaydiumPoolInfo = {
 
 export type RwaDiscoveryResult = {
   pools: RaydiumPoolInfo[];
+  universe: ResearchUniverse;
   rwaAssetCount: number | null;
   candidatePoolCount: number;
   pairCount: number;
@@ -87,6 +92,19 @@ const numberValue = (value: unknown): number | null => {
 
 const booleanValue = (value: unknown): boolean | null =>
   typeof value === "boolean" ? value : null;
+
+function explicitPoolActive(value: UnknownRecord): boolean | null {
+  for (const key of ["tradeEnable", "tradingEnabled", "isOpen", "open", "active", "enable"]) {
+    const candidate = value[key];
+    if (typeof candidate === "boolean") return candidate;
+  }
+  const status = [value.status, value.state, value.poolState].find((candidate) => typeof candidate === "string");
+  if (typeof status !== "string") return null;
+  const normalized = status.toLowerCase();
+  if (["active", "open", "enabled", "trading", "tradeable", "tradable"].some((word) => normalized.includes(word))) return true;
+  if (["inactive", "closed", "disabled", "halted", "frozen", "paused"].some((word) => normalized.includes(word))) return false;
+  return null;
+}
 
 function asArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
@@ -131,6 +149,11 @@ function parsePool(value: unknown): RaydiumPoolInfo | null {
   const day = isRecord(value.day) ? value.day : {};
   const week = isRecord(value.week) ? value.week : {};
   const config = isRecord(value.config) ? value.config : null;
+  const identityConflict = mintA.address === mintB.address
+    ? "Pool 两侧 Mint 相同"
+    : [mintA, mintB].some((mint) => mint.programId !== null && !TOKEN_PROGRAM_IDS.has(mint.programId))
+      ? "Mint 使用了未核验的 Token Program"
+      : null;
 
   return {
     id,
@@ -143,6 +166,8 @@ function parsePool(value: unknown): RaydiumPoolInfo | null {
     mintAmountA: numberValue(value.mintAmountA),
     mintAmountB: numberValue(value.mintAmountB),
     feeRate: numberValue(value.feeRate),
+    isActive: explicitPoolActive(value),
+    identityConflict,
     openTime: stringValue(value.openTime),
     tvl: numberValue(value.tvl),
     day: {
@@ -232,6 +257,7 @@ export async function discoverRwaUsdcPools(): Promise<RwaDiscoveryResult> {
   }
 
   const pools = [...uniquePools.values()].sort((a, b) => (b.tvl ?? 0) - (a.tvl ?? 0));
+  const universe = evaluateResearchUniverse(pools, new Date(observedAt));
   const pairCount = new Set(
     pools.map((pool) => (pool.mintA.address === USDC_MINT ? pool.mintB.address : pool.mintA.address)),
   ).size;
@@ -242,6 +268,7 @@ export async function discoverRwaUsdcPools(): Promise<RwaDiscoveryResult> {
 
   const result: RwaDiscoveryResult = {
     pools,
+    universe,
     rwaAssetCount: getMintFilterCount(filterResponse.data),
     candidatePoolCount: candidatePools.length,
     pairCount,
@@ -263,6 +290,9 @@ export async function discoverRwaUsdcPools(): Promise<RwaDiscoveryResult> {
   if (lastGoodDiscovery) {
     return {
       ...lastGoodDiscovery,
+      // A stale API snapshot is not a fresh TVL observation. Do not age a pool
+      // out of the research Universe merely because the public source is down.
+      universe: lastGoodDiscovery.universe,
       apiStatus: "降级",
       apiLatencyMs,
       errors: [...new Set([...errors, "Raydium API 暂时不可用，继续展示最近一次公开市场快照"])].slice(0, 6),
@@ -273,10 +303,11 @@ export async function discoverRwaUsdcPools(): Promise<RwaDiscoveryResult> {
     lastGoodDiscovery = persisted;
     return {
       ...persisted,
+      universe: persisted.universe ?? evaluateResearchUniverse(persisted.pools, new Date(observedAt)),
       apiStatus: "降级",
       apiLatencyMs,
       errors: [...new Set([...errors, "Raydium API 暂时不可用，继续展示 SQLite 最近一次公开市场快照"])].slice(0, 6),
     };
   }
-  return result;
+  return { ...result, universe };
 }

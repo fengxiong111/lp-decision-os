@@ -121,7 +121,8 @@ export function readMarketProjection(): MarketProjection | null {
   return fallbackProjection();
 }
 
-export function getProjectedRanking(projection: MarketProjection, capital: 1_000 | 10_000, window: TerminalWindow): RankingResponse {
+export function getProjectedRanking(projection: MarketProjection, capital: 1_000 | 10_000, window: TerminalWindow, includeOfficialOnly = false): RankingResponse {
+  if (includeOfficialOnly) return buildRankingResponse(projection.snapshot, capital, window, { includeOfficialOnly: true });
   const stored = projection.rankings[String(capital)]?.[window];
   return stored ?? buildRankingResponse(projection.snapshot, capital, window);
 }

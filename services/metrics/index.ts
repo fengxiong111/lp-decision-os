@@ -1,9 +1,10 @@
-import { CAPITAL_OPTIONS, WINDOW_KEYS, type CapacityStatus, type EventWindowCoverage, type ExecutableEstimate, type FeeReconciliation, type MarketSession, type PoolRecommendation, type PoolSnapshot, type PoolVerification, type PublicMarketLevel, type RangeRecommendation, type RouteShareMetric, type SourceRef, type SwapEventRecord, type WindowKey, type WindowMetric } from "@/packages/models/src";
+import { CAPITAL_OPTIONS, WINDOW_KEYS, type CapacityStatus, type EventWindowCoverage, type ExecutableEstimate, type FeeReconciliation, type MarketSession, type PoolRecommendation, type PoolSnapshot, type PoolUniverseStatus, type PoolVerification, type PublicMarketLevel, type RangeRecommendation, type RouteShareMetric, type SourceRef, type SwapEventRecord, type WindowKey, type WindowMetric } from "@/packages/models/src";
 import type { RaydiumPoolInfo } from "@/services/raydium/api";
 import type { RaydiumPoolKeys, TickLine } from "@/services/raydium/keys";
 import { USDC_MINT } from "@/services/raydium/config";
 import { calculatePoolQuality } from "@/services/quality";
 import type { ServiceHealth } from "@/packages/models/src";
+import { coverageIsDeterministicallyComplete } from "@/services/indexer/progress";
 
 type PoolBuildInput = {
   pool: RaydiumPoolInfo;
@@ -21,6 +22,8 @@ type PoolBuildInput = {
   windowCoverage: Record<WindowKey, EventWindowCoverage>;
   publicApiAvailable: boolean;
   marketLevel: PublicMarketLevel;
+  universeStatus: PoolUniverseStatus;
+  universeReason: string;
 };
 
 const unavailable = (window: WindowKey, reason = "等待窗口回补：数据覆盖未完成"): WindowMetric => ({
@@ -68,7 +71,10 @@ function rangeOptions(pool: RaydiumPoolInfo): string[] {
 }
 
 function makeEventWindow(window: WindowKey, events: SwapEventRecord[], observedAt: string, effectiveActiveTvl: number | null, coverage: EventWindowCoverage): WindowMetric {
-  if ((coverage.backfillStatus !== "COMPLETE" && coverage.backfillStatus !== "LIVE") || coverage.coverageRatio !== 100 || coverage.gapSlots !== 0 || coverage.unknownInstructions !== 0) {
+  const complete = window === "1h" || window === "6h" || window === "12h"
+    ? coverageIsDeterministicallyComplete(coverage, window)
+    : (coverage.backfillStatus === "COMPLETE" || coverage.backfillStatus === "LIVE") && coverage.coverageRatio !== null;
+  if (!complete) {
     return unavailable(window, `等待 ${window} 回补：${coverage.backfillStatus}`);
   }
   if (events.length === 0) {
@@ -88,7 +94,7 @@ function makeEventWindow(window: WindowKey, events: SwapEventRecord[], observedA
       feeDensity: effectiveActiveTvl && effectiveActiveTvl > 0 ? 0 : null,
       liquidityVelocity: effectiveActiveTvl && effectiveActiveTvl > 0 ? 0 : null,
       routeShare: null,
-      coverageRatio: 100,
+      coverageRatio: coverage.coverageRatio ?? 100,
       status: coverage.backfillStatus === "LIVE" ? "LIVE" : "COMPLETE",
       firstEventAt: null,
       lastEventAt: null,
@@ -120,7 +126,7 @@ function makeEventWindow(window: WindowKey, events: SwapEventRecord[], observedA
     feeDensity: effectiveActiveTvl && effectiveActiveTvl > 0 ? (fee / effectiveActiveTvl) * 100 : null,
     liquidityVelocity: effectiveActiveTvl && effectiveActiveTvl > 0 ? volume / effectiveActiveTvl : null,
     routeShare: null,
-    coverageRatio: 100,
+    coverageRatio: coverage.coverageRatio ?? 100,
     status: coverage.backfillStatus === "LIVE" ? "LIVE" : "COMPLETE",
     firstEventAt: coverage.firstEventAt,
     lastEventAt: coverage.lastEventAt,
@@ -296,11 +302,19 @@ function executableEstimate(pool: PoolSnapshot, capitalUsd: number, window: Wind
     : null;
   // 官方 24h 估算必须能在 RPC/Tick/短窗口缺失时给出具体答案。质量分数只
   // 作为说明信息；公开 API 事实层不因高级指标未完成而退出。
-  const dataQualityFactor = window === "24h" ? 1 : measuredQualityFactor;
-  const expectedLpFeeUsd = lpFeeUsd !== null && userLiquidityShare !== null && inRangeProbability !== null && dataQualityFactor !== null
-    ? lpFeeUsd * userLiquidityShare * inRangeProbability * dataQualityFactor
+  const shortWindowComplete = window === "1h" || window === "6h" || window === "12h"
+    ? (metric.status === "COMPLETE" || metric.status === "LIVE") && (metric.coverageRatio === null || metric.coverageRatio >= 100)
+    : false;
+  const dataQualityFactor = window === "24h" || shortWindowComplete ? 1 : measuredQualityFactor;
+  const exactShortWindowEstimate = shortWindowComplete
+    && lpFeeUsd !== null
+    && userLiquidityShare !== null;
+  const expectedLpFeeUsd = exactShortWindowEstimate
+    ? (lpFeeUsd as number) * (userLiquidityShare as number)
+    : lpFeeUsd !== null && userLiquidityShare !== null && inRangeProbability !== null && dataQualityFactor !== null
+      ? lpFeeUsd * userLiquidityShare * inRangeProbability * dataQualityFactor
     : null;
-  const feeUnavailable = lpFeeUsd === null || (window !== "24h" && metric.status !== "COMPLETE" && metric.status !== "LIVE");
+  const feeUnavailable = lpFeeUsd === null || (window !== "24h" && !shortWindowComplete && !metric.available);
   const estimateMethod: ExecutableEstimate["estimateMethod"] = window === "24h"
     ? hasTickLiquidity ? "OFFICIAL_24H" : "TVL_CONSERVATIVE"
     : hasTickLiquidity ? "TICK_LEVEL" : "TVL_CONSERVATIVE";
@@ -313,6 +327,8 @@ function executableEstimate(pool: PoolSnapshot, capitalUsd: number, window: Wind
       ? `投入金额占现有有效 TVL ${(capitalToActiveTvlRatio * 100).toFixed(1)}%，超过30%容量上限`
       : feeUnavailable
         ? missingModelInputs[0]
+    : exactShortWindowEstimate
+      ? `${window} 实际 LP Fee × capital / (TVL + capital)；容量稀释已纳入`
     : window === "24h" && inRangeProbability === 1
       ? `24h LP Fee × 投入后份额；TVL 比例估算，未扣除区间外影响`
       : `LP Fee × 投入后份额 × 区间概率 × 数据质量 ${dataQualityFactor === null ? "等待数据质量" : `${(dataQualityFactor * 100).toFixed(0)}%`}`;
@@ -366,7 +382,7 @@ export function refreshExecutableModels(pool: PoolSnapshot): PoolSnapshot {
 }
 
 export function buildPoolSnapshots(inputs: PoolBuildInput[], observedAt: string): PoolSnapshot[] {
-  const preliminary = inputs.map(({ pool, keys, ticks, verification, sources, tickSource, swapEvents, websocket, session, apiAgeSeconds, rpcSlotLag, scannedForEvents, windowCoverage, publicApiAvailable, marketLevel }) => {
+  const preliminary = inputs.map(({ pool, keys, ticks, verification, sources, tickSource, swapEvents, websocket, session, apiAgeSeconds, rpcSlotLag, scannedForEvents, windowCoverage, publicApiAvailable, marketLevel, universeStatus, universeReason }) => {
     const assetIsA = pool.mintA.address !== USDC_MINT;
     const asset = assetIsA ? pool.mintA : pool.mintB;
     const quote = assetIsA ? pool.mintB : pool.mintA;
@@ -423,6 +439,8 @@ export function buildPoolSnapshots(inputs: PoolBuildInput[], observedAt: string)
       id: pool.id,
       pair: `${asset.symbol} / USDC`,
       pairKey: asset.address,
+      universeStatus,
+      universeReason,
       identity: { baseMint: asset.address, quoteMint: USDC_MINT, poolAddress: pool.id, positionNftMint: null },
       asset: { symbol: asset.symbol, name: asset.name, mint: asset.address, decimals: asset.decimals },
       issuer: asset.issuer,

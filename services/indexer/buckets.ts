@@ -1,4 +1,5 @@
 import { WINDOW_KEYS, type EventWindowCoverage, type MinuteBucket, type PersistedPoolMetricState, type RouteShareMetric, type SwapEventRecord, type WindowKey, type WindowMetric } from "@/packages/models/src";
+import { coverageIsDeterministicallyComplete } from "@/services/indexer/progress";
 
 export const WINDOW_SECONDS: Record<WindowKey, number> = {
   "1m": 60,
@@ -154,10 +155,25 @@ function coverageForWindow(window: WindowKey, buckets: MinuteBucket[], asOf: Dat
     firstEventTime: selected.at(-1)?.bucketStart ?? null,
     lastEventTime: selected[0]?.bucketStart ?? null,
     backfillStatus: contiguous ? "COMPLETE" as const : selected.length > 0 ? "PARTIAL" as const : "UNAVAILABLE" as const,
+    expectedBucketCount: expected,
+    metricsBucketCount: observed,
+    unresolvedRetryableTransactions: null,
+    gapCount: contiguous ? 0 : expected - observed,
+    oldestCoveredBlockTime: null,
   } satisfies EventWindowCoverage;
-  const complete = contiguous && (base.backfillStatus === "COMPLETE" || base.backfillStatus === "LIVE") && base.gapSlots === 0 && base.unknownInstructions === 0;
-  return {
+  const evidence: EventWindowCoverage = {
     ...base,
+    windowStart: start.toISOString(),
+    windowEnd: end.toISOString(),
+    expectedBucketCount: base.expectedBucketCount ?? expected,
+    metricsBucketCount: base.metricsBucketCount ?? observed,
+    gapCount: base.gapCount ?? base.gapSlots ?? (contiguous ? 0 : expected - observed),
+  };
+  const complete = window === "1h" || window === "6h" || window === "12h"
+    ? coverageIsDeterministicallyComplete(evidence, window)
+    : (evidence.backfillStatus === "COMPLETE" || evidence.backfillStatus === "LIVE") && evidence.coverageRatio !== null;
+  return {
+    ...evidence,
     windowStart: start.toISOString(),
     windowEnd: end.toISOString(),
     eventCount: selected.reduce((total, bucket) => total + bucket.swapCount, 0),
@@ -165,6 +181,9 @@ function coverageForWindow(window: WindowKey, buckets: MinuteBucket[], asOf: Dat
     coverageRatio: base.coverageRatio ?? (observed / expected) * 100,
     backfillStatus: complete ? base.backfillStatus : base.backfillStatus === "BACKFILLING" || base.backfillStatus === "RUNNING" ? base.backfillStatus : selected.length > 0 ? "PARTIAL" : "UNAVAILABLE",
     gapSlots: complete ? 0 : base.gapSlots,
+    expectedBucketCount: expected,
+    metricsBucketCount: observed,
+    gapCount: complete ? 0 : evidence.gapCount,
   };
 }
 
@@ -185,7 +204,9 @@ function metricForWindow(window: WindowKey, buckets: MinuteBucket[], asOf: Date,
   const tvlEnd = [...selected].reverse().find((bucket) => finite(bucket.tvlEnd))?.tvlEnd ?? fallbackTvl;
   const activeTvl = selected.find((bucket) => finite(bucket.activeTvl))?.activeTvl ?? fallbackTvl;
   const avgTvl = finite(tvlStart) && finite(tvlEnd) ? (tvlStart + tvlEnd) / 2 : activeTvl;
-  const complete = (coverage.backfillStatus === "COMPLETE" || coverage.backfillStatus === "LIVE") && coverage.coverageRatio === 100 && coverage.gapSlots === 0 && coverage.unknownInstructions === 0;
+  const complete = window === "1h" || window === "6h" || window === "12h"
+    ? coverageIsDeterministicallyComplete(coverage, window)
+    : (coverage.backfillStatus === "COMPLETE" || coverage.backfillStatus === "LIVE") && coverage.coverageRatio !== null;
   const metric: WindowMetric = {
     window,
     volume,
@@ -326,7 +347,12 @@ export function buildPersistedPoolMetrics(input: {
   for (const window of WINDOW_KEYS) {
     const rows = [...poolStates.values()].map((item) => item.state.windows[window]);
     const known = rows.filter((metric) => metric.status !== "UNAVAILABLE");
-    const complete = known.length === rows.length && rows.length > 0 && rows.every((metric) => (metric.status === "COMPLETE" || metric.status === "LIVE") && metric.coverageRatio === 100);
+    const complete = known.length === rows.length && rows.length > 0 && rows.every((metric) => {
+      if (window === "1h" || window === "6h" || window === "12h") {
+        return metric.available && (metric.status === "COMPLETE" || metric.status === "LIVE") && metric.coverageRatio !== null;
+      }
+      return (metric.status === "COMPLETE" || metric.status === "LIVE") && metric.coverageRatio !== null;
+    });
     globalWindows[window].backfillStatus = complete ? (rows.some((metric) => metric.status === "LIVE") ? "LIVE" : "COMPLETE") : known.some((metric) => metric.status === "BACKFILLING" || metric.status === "RUNNING") ? "BACKFILLING" : known.length > 0 ? "PARTIAL" : "UNAVAILABLE";
     globalWindows[window].coverageRatio = rows.length > 0 ? rows.reduce((total, metric) => total + (metric.coverageRatio ?? 0), 0) / rows.length : null;
     globalWindows[window].eventCount = rows.reduce((total, metric) => total + (metric.swapCount ?? 0), 0);

@@ -54,6 +54,11 @@ try {
   const ranking = await (await fetch(`${baseUrl}/api/rankings?capital=1000&window=24h`)).json();
   assert.equal(ranking.capital, 1000);
   assert.ok(ranking.pairs.length > 0);
+  assert.deepEqual(ranking.filters, { volume24hGt: 1000, lpFee24hGt: 30, tvlGt: 5000, operator: "AND", applied: true });
+  for (const pair of ranking.pairs) {
+    const pool = pair.recommendedPool;
+    assert.ok(pool && pool.volume24h > 1000 && pool.lpFee24h > 30 && pool.tvl > 5000, `推荐 Pool 未满足默认筛选：${pair.symbol}`);
+  }
 
   browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", headless: true, args: ["--disable-gpu", "--no-sandbox"] });
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
@@ -81,4 +86,3 @@ try {
   await browser?.close();
   child.kill("SIGTERM");
 }
-

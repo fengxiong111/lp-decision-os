@@ -9,13 +9,14 @@ action="${1:-start}"
 case "$action" in
   start)
     runtime_port="${LP_BACKEND_PORT:-${LP_PORT:-3838}}"
+    lan_enabled="${LP_ENABLE_LAN:-1}"
     if command -v lsof >/dev/null 2>&1 && lsof -nP -iTCP:"$runtime_port" -sTCP:LISTEN >/dev/null 2>&1; then
       echo "端口 $runtime_port 已被占用；请先运行 ./run stop 或设置 LP_PORT" >&2
       exit 1
     fi
     if [ ! -f apps/frontend/dist/index.html ]; then npm run build:frontend; fi
     echo "LP Alpha Terminal backend: http://localhost:$runtime_port"
-    if [ "${LP_ENABLE_LAN:-0}" = "1" ]; then echo "LAN 模式已启用：仅允许私有网段，具体地址见 supervisor 日志"; fi
+    if [ "$lan_enabled" = "1" ]; then echo "LAN 模式已启用：仅允许私有网段，访问地址见系统详情"; fi
     exec bash scripts/supervisor.sh start
     ;;
   stop)

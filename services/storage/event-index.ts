@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { WINDOW_KEYS, type BackfillFailure, type BackfillJobSnapshot, type BackfillPoolCursor, type EventWindowCoverage, type MinuteBucket, type PositionSnapshot, type SwapEventRecord, type WindowKey } from "@/packages/models/src";
+import { WINDOW_KEYS, type BackfillFailure, type BackfillJobSnapshot, type BackfillPoolCursor, type EventWindowCoverage, type MinuteBucket, type PositionSnapshot, type RawTransactionRecord, type RpcFailureCategory, type SwapErrorCategory, type SwapEventRecord, type TransactionClassification, type WindowKey } from "@/packages/models/src";
 
 type SqliteModule = typeof import("node:sqlite");
 type DatabaseHandle = InstanceType<SqliteModule["DatabaseSync"]>;
@@ -40,6 +40,8 @@ export type CachedRpcTransaction = {
   fetchedAt: string;
   providerUrl: string | null;
 };
+
+export type RawTransactionCacheEntry = RawTransactionRecord;
 
 export type BackfillCheckpoint = {
   checkpointKey: string;
@@ -227,6 +229,11 @@ function getDatabase(): DatabaseHandle | null {
         first_event_time TEXT,
         last_event_time TEXT,
         backfill_status TEXT NOT NULL,
+        expected_bucket_count INTEGER,
+        metrics_bucket_count INTEGER,
+        unresolved_retryable_transactions INTEGER,
+        gap_count INTEGER,
+        oldest_covered_block_time TEXT,
         observed_at TEXT NOT NULL,
         PRIMARY KEY (pool_id, window_key)
       );
@@ -438,6 +445,48 @@ function getDatabase(): DatabaseHandle | null {
         fetched_at TEXT NOT NULL,
         provider_url TEXT
       );
+      CREATE TABLE IF NOT EXISTS raw_transactions (
+        signature TEXT PRIMARY KEY,
+        slot INTEGER,
+        block_time INTEGER,
+        transaction_json TEXT,
+        fetch_status TEXT NOT NULL,
+        fetched_at TEXT NOT NULL,
+        rpc_endpoint TEXT,
+        sha256 TEXT,
+        error_category TEXT,
+        error_code TEXT,
+        error_message TEXT,
+        retryable INTEGER NOT NULL,
+        attempt_count INTEGER NOT NULL,
+        first_seen_at TEXT NOT NULL,
+        last_attempt_at TEXT NOT NULL,
+        parser_version TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS raw_transactions_status ON raw_transactions (fetch_status, last_attempt_at);
+      CREATE TABLE IF NOT EXISTS transaction_classifications (
+        classification_key TEXT PRIMARY KEY,
+        signature TEXT NOT NULL,
+        slot INTEGER,
+        block_time INTEGER,
+        pool_address TEXT,
+        program_id TEXT,
+        transaction_version TEXT,
+        error_category TEXT NOT NULL,
+        error_code TEXT NOT NULL,
+        error_message TEXT NOT NULL,
+        retryable INTEGER NOT NULL,
+        attempt_count INTEGER NOT NULL,
+        first_seen_at TEXT NOT NULL,
+        last_attempt_at TEXT NOT NULL,
+        raw_transaction_path TEXT,
+        parser_version TEXT NOT NULL,
+        instruction_index INTEGER,
+        discriminator TEXT,
+        account_count INTEGER
+      );
+      CREATE INDEX IF NOT EXISTS transaction_classifications_signature ON transaction_classifications (signature, pool_address);
+      CREATE INDEX IF NOT EXISTS transaction_classifications_category ON transaction_classifications (error_category, last_attempt_at);
       CREATE TABLE IF NOT EXISTS backfill_checkpoints (
         checkpoint_key TEXT PRIMARY KEY,
         window_key TEXT NOT NULL,
@@ -483,6 +532,19 @@ function getDatabase(): DatabaseHandle | null {
         database.exec(`ALTER TABLE swap_events ADD COLUMN ${column}`);
       } catch {
         // 已存在的列无需迁移。
+      }
+    }
+    for (const column of [
+      "expected_bucket_count INTEGER",
+      "metrics_bucket_count INTEGER",
+      "unresolved_retryable_transactions INTEGER",
+      "gap_count INTEGER",
+      "oldest_covered_block_time TEXT",
+    ]) {
+      try {
+        database.exec(`ALTER TABLE window_coverage ADD COLUMN ${column}`);
+      } catch {
+        // 已存在的窗口证据列无需迁移。
       }
     }
     try {
@@ -739,8 +801,8 @@ export function persistWindowCoverage(coverageByPool: Record<string, Partial<Rec
   try {
     const insert = db.prepare(`
       INSERT OR REPLACE INTO window_coverage
-      (pool_id, window_key, window_start, window_end, start_slot, end_slot, expected_slot_start, expected_slot_end, event_count, pool_count, first_slot, last_slot, first_event_at, last_event_at, completeness, persisted, source, signatures_discovered, transactions_fetched, transactions_successful, transactions_failed, swaps_parsed, swaps_rejected, duplicates_removed, unknown_instructions, gap_slots, coverage_ratio, first_event_time, last_event_time, backfill_status, observed_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (pool_id, window_key, window_start, window_end, start_slot, end_slot, expected_slot_start, expected_slot_end, event_count, pool_count, first_slot, last_slot, first_event_at, last_event_at, completeness, persisted, source, signatures_discovered, transactions_fetched, transactions_successful, transactions_failed, swaps_parsed, swaps_rejected, duplicates_removed, unknown_instructions, gap_slots, coverage_ratio, first_event_time, last_event_time, backfill_status, expected_bucket_count, metrics_bucket_count, unresolved_retryable_transactions, gap_count, oldest_covered_block_time, observed_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     for (const [poolId, windows] of Object.entries(coverageByPool)) {
       for (const window of WINDOW_KEYS) {
@@ -776,6 +838,11 @@ export function persistWindowCoverage(coverageByPool: Record<string, Partial<Rec
           item.firstEventTime,
           item.lastEventTime,
           item.backfillStatus,
+          item.expectedBucketCount ?? null,
+          item.metricsBucketCount ?? null,
+          item.unresolvedRetryableTransactions ?? null,
+          item.gapCount ?? null,
+          item.oldestCoveredBlockTime ?? item.oldestCoveredAt ?? null,
           observedAt,
         );
         if (Number(result.changes ?? 0) > 0) rows += 1;
@@ -795,7 +862,7 @@ export function readWindowCoverage(poolIds: string[]): Record<string, Record<Win
   if (!db || poolIds.length === 0) return result;
   try {
     const placeholders = poolIds.map(() => "?").join(",");
-    const rows = db.prepare(`SELECT pool_id, window_key, window_start, window_end, start_slot, end_slot, expected_slot_start, expected_slot_end, event_count, pool_count, first_slot, last_slot, first_event_at, last_event_at, completeness, persisted, source, signatures_discovered, transactions_fetched, transactions_successful, transactions_failed, swaps_parsed, swaps_rejected, duplicates_removed, unknown_instructions, gap_slots, coverage_ratio, first_event_time, last_event_time, backfill_status FROM window_coverage WHERE pool_id IN (${placeholders})`).all(...poolIds) as Array<Record<string, unknown>>;
+    const rows = db.prepare(`SELECT pool_id, window_key, window_start, window_end, start_slot, end_slot, expected_slot_start, expected_slot_end, event_count, pool_count, first_slot, last_slot, first_event_at, last_event_at, completeness, persisted, source, signatures_discovered, transactions_fetched, transactions_successful, transactions_failed, swaps_parsed, swaps_rejected, duplicates_removed, unknown_instructions, gap_slots, coverage_ratio, first_event_time, last_event_time, backfill_status, expected_bucket_count, metrics_bucket_count, unresolved_retryable_transactions, gap_count, oldest_covered_block_time FROM window_coverage WHERE pool_id IN (${placeholders})`).all(...poolIds) as Array<Record<string, unknown>>;
     for (const row of rows) {
       if (typeof row.pool_id !== "string" || typeof row.window_key !== "string" || !WINDOW_KEYS.includes(row.window_key as WindowKey)) continue;
       const asNumber = (value: unknown) => typeof value === "number" ? value : null;
@@ -828,6 +895,11 @@ export function readWindowCoverage(poolIds: string[]): Record<string, Record<Win
         firstEventTime: asString(row.first_event_time),
         lastEventTime: asString(row.last_event_time),
         backfillStatus: row.backfill_status === "COMPLETE" || row.backfill_status === "RUNNING" || row.backfill_status === "BACKFILLING" || row.backfill_status === "PARTIAL" || row.backfill_status === "STALLED" || row.backfill_status === "BLOCKED" || row.backfill_status === "LIVE" || row.backfill_status === "INVALID" ? row.backfill_status : "UNAVAILABLE",
+        expectedBucketCount: asNumber(row.expected_bucket_count) ?? undefined,
+        metricsBucketCount: asNumber(row.metrics_bucket_count) ?? undefined,
+        unresolvedRetryableTransactions: asNumber(row.unresolved_retryable_transactions) ?? undefined,
+        gapCount: asNumber(row.gap_count),
+        oldestCoveredBlockTime: asString(row.oldest_covered_block_time),
       };
       result[row.pool_id][row.window_key as WindowKey] = coverage;
     }
@@ -1446,6 +1518,389 @@ export function readRpcTransactionCache(signatures: string[]): Map<string, Cache
     }
   } catch {
     // 缓存读取失败时允许上层继续请求。
+  }
+  return result;
+}
+
+const SWAP_ERROR_CATEGORIES = new Set<SwapErrorCategory>([
+  "RPC_429",
+  "RPC_TIMEOUT",
+  "RPC_NETWORK_ERROR",
+  "TRANSACTION_NOT_AVAILABLE",
+  "TRANSACTION_VERSION_UNSUPPORTED",
+  "ADDRESS_LOOKUP_TABLE_FAILED",
+  "ONCHAIN_TRANSACTION_FAILED",
+  "NOT_TARGET_POOL",
+  "NOT_RAYDIUM_SWAP",
+  "PROGRAM_UNSUPPORTED",
+  "INSTRUCTION_DISCRIMINATOR_UNKNOWN",
+  "INNER_INSTRUCTIONS_MISSING",
+  "ACCOUNT_INDEX_INVALID",
+  "TOKEN_BALANCE_MISSING",
+  "TOKEN_DECIMALS_MISSING",
+  "AMOUNT_RECONCILIATION_FAILED",
+  "FEE_CONFIG_MISSING",
+  "FEE_VERSION_UNSUPPORTED",
+  "PARSE_EXCEPTION",
+  "PARSED_SWAP",
+]);
+
+function asSwapErrorCategory(value: unknown): SwapErrorCategory | null {
+  return typeof value === "string" && SWAP_ERROR_CATEGORIES.has(value as SwapErrorCategory) ? value as SwapErrorCategory : null;
+}
+
+export function persistRawTransactions(entries: RawTransactionCacheEntry[]): { rows: number; error: string | null } {
+  const db = getDatabase();
+  if (!db || entries.length === 0) return { rows: 0, error: db ? null : databaseError ?? "SQLite 不可用" };
+  try {
+    const insert = db.prepare(`
+      INSERT OR REPLACE INTO raw_transactions
+      (signature, slot, block_time, transaction_json, fetch_status, fetched_at, rpc_endpoint, sha256, error_category, error_code, error_message, retryable, attempt_count, first_seen_at, last_attempt_at, parser_version)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const entry of entries) {
+      insert.run(
+        entry.signature,
+        entry.slot,
+        entry.blockTime,
+        entry.transactionJson,
+        entry.fetchStatus,
+        entry.fetchedAt,
+        entry.rpcEndpoint,
+        entry.sha256,
+        entry.errorCategory,
+        entry.errorCode,
+        entry.errorMessage,
+        entry.retryable ? 1 : 0,
+        entry.attemptCount,
+        entry.firstSeenAt,
+        entry.lastAttemptAt,
+        entry.parserVersion,
+      );
+    }
+    noteStorageWrites("raw_transactions", entries.length);
+    return { rows: entries.length, error: null };
+  } catch (error) {
+    return { rows: 0, error: error instanceof Error ? error.message : "raw transaction 缓存落库失败" };
+  }
+}
+
+export function readRawTransactions(signatures: string[]): Map<string, RawTransactionCacheEntry> {
+  const db = getDatabase();
+  const result = new Map<string, RawTransactionCacheEntry>();
+  if (!db || signatures.length === 0) return result;
+  try {
+    const placeholders = signatures.map(() => "?").join(",");
+    const rows = db.prepare(`SELECT signature, slot, block_time, transaction_json, fetch_status, fetched_at, rpc_endpoint, sha256, error_category, error_code, error_message, retryable, attempt_count, first_seen_at, last_attempt_at, parser_version FROM raw_transactions WHERE signature IN (${placeholders})`).all(...signatures) as Array<Record<string, unknown>>;
+    for (const row of rows) {
+      if (typeof row.signature !== "string" || typeof row.fetch_status !== "string" || typeof row.fetched_at !== "string" || typeof row.first_seen_at !== "string" || typeof row.last_attempt_at !== "string" || typeof row.parser_version !== "string") continue;
+      result.set(row.signature, {
+        signature: row.signature,
+        slot: typeof row.slot === "number" ? row.slot : null,
+        blockTime: typeof row.block_time === "number" ? row.block_time : null,
+        transactionJson: typeof row.transaction_json === "string" ? row.transaction_json : null,
+        fetchStatus: row.fetch_status === "SUCCESS" ? "SUCCESS" : "FAILED",
+        fetchedAt: row.fetched_at,
+        rpcEndpoint: typeof row.rpc_endpoint === "string" ? row.rpc_endpoint : null,
+        sha256: typeof row.sha256 === "string" ? row.sha256 : null,
+        errorCategory: asSwapErrorCategory(row.error_category),
+        errorCode: typeof row.error_code === "string" ? row.error_code : null,
+        errorMessage: typeof row.error_message === "string" ? row.error_message : null,
+        retryable: row.retryable === 1,
+        attemptCount: typeof row.attempt_count === "number" ? row.attempt_count : 1,
+        firstSeenAt: row.first_seen_at,
+        lastAttemptAt: row.last_attempt_at,
+        parserVersion: row.parser_version,
+      });
+    }
+  } catch {
+    // 缓存读取失败时由上层回退到 legacy cache/RPC，不阻塞公开数据。
+  }
+  return result;
+}
+
+/**
+ * 返回指定 Pool 在窗口内仍需重试的 raw transaction。
+ * 游标可能已经越过失败签名，因此重试不能依赖下一页 signatures；必须从
+ * 持久化的失败缓存恢复，否则窗口会永远停在 BACKFILLING。
+ */
+export function readRetryableRawTransactions(poolAddress: string, windowStart: Date): RawTransactionCacheEntry[] {
+  const db = getDatabase();
+  if (!db) return [];
+  try {
+    const rows = db.prepare(`
+      SELECT DISTINCT rt.signature
+      FROM raw_transactions rt
+      INNER JOIN transaction_classifications tc ON tc.signature = rt.signature
+      WHERE tc.pool_address = ?
+        AND rt.fetch_status = 'FAILED'
+        AND rt.retryable = 1
+        AND (rt.block_time IS NULL OR rt.block_time >= ?)
+      ORDER BY COALESCE(rt.block_time, 0) DESC, rt.signature
+    `).all(poolAddress, Math.floor(windowStart.getTime() / 1_000)) as Array<Record<string, unknown>>;
+    const signatures = rows.flatMap((row) => typeof row.signature === "string" ? [row.signature] : []);
+    return [...readRawTransactions(signatures).values()];
+  } catch {
+    return [];
+  }
+}
+
+export function persistTransactionClassifications(entries: TransactionClassification[]): { rows: number; error: string | null } {
+  const db = getDatabase();
+  if (!db || entries.length === 0) return { rows: 0, error: db ? null : databaseError ?? "SQLite 不可用" };
+  try {
+    // 一次重新解析代表该 transaction 的完整分类结果。先按 signature+pool
+    // 清掉旧的 NULL instruction RPC 失败记录，再写入本次全部 instruction
+    // 分类；否则成功重试后旧失败仍会被窗口计为 unresolved。
+    const removePrevious = db.prepare("DELETE FROM transaction_classifications WHERE signature = ? AND COALESCE(pool_address, '') = COALESCE(?, '')");
+    const insert = db.prepare(`
+      INSERT OR REPLACE INTO transaction_classifications
+      (classification_key, signature, slot, block_time, pool_address, program_id, transaction_version, error_category, error_code, error_message, retryable, attempt_count, first_seen_at, last_attempt_at, raw_transaction_path, parser_version, instruction_index, discriminator, account_count)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    const cleared = new Set<string>();
+    for (const entry of entries) {
+      const groupKey = `${entry.signature}:${entry.poolAddress ?? "-"}`;
+      if (!cleared.has(groupKey)) {
+        removePrevious.run(entry.signature, entry.poolAddress);
+        cleared.add(groupKey);
+      }
+      const key = `${entry.signature}:${entry.poolAddress ?? "-"}:${entry.instructionIndex ?? -1}`;
+      insert.run(
+        key,
+        entry.signature,
+        entry.slot,
+        entry.blockTime,
+        entry.poolAddress,
+        entry.programId,
+        entry.transactionVersion === null ? null : String(entry.transactionVersion),
+        entry.errorCategory,
+        entry.errorCode,
+        entry.errorMessage,
+        entry.retryable ? 1 : 0,
+        entry.attemptCount,
+        entry.firstSeenAt,
+        entry.lastAttemptAt,
+        entry.rawTransactionPath,
+        entry.parserVersion,
+        entry.instructionIndex,
+        entry.discriminator,
+        entry.accountCount,
+      );
+    }
+    noteStorageWrites("transaction_classifications", entries.length);
+    return { rows: entries.length, error: null };
+  } catch (error) {
+    return { rows: 0, error: error instanceof Error ? error.message : "交易分类落库失败" };
+  }
+}
+
+export function clearTransactionClassifications(parserVersion = "raydium-swap-parser-v2"): { rows: number; error: string | null } {
+  const db = getDatabase();
+  if (!db) return { rows: 0, error: databaseError ?? "SQLite 不可用" };
+  try {
+    const result = db.prepare("DELETE FROM transaction_classifications WHERE parser_version = ?").run(parserVersion);
+    return { rows: Number(result.changes ?? 0), error: null };
+  } catch (error) {
+    return { rows: 0, error: error instanceof Error ? error.message : "交易分类旧版本清理失败" };
+  }
+}
+
+export function clearNormalizedSwaps(parseVersion: string, poolIds: string[]): { rows: number; error: string | null } {
+  const db = getDatabase();
+  if (!db || poolIds.length === 0) return { rows: 0, error: db ? null : databaseError ?? "SQLite 不可用" };
+  try {
+    const placeholders = poolIds.map(() => "?").join(",");
+    const result = db.prepare(`DELETE FROM normalized_swaps WHERE parse_version = ? AND pool_address IN (${placeholders})`).run(parseVersion, ...poolIds);
+    return { rows: Number(result.changes ?? 0), error: null };
+  } catch (error) {
+    return { rows: 0, error: error instanceof Error ? error.message : "标准化 Swap 旧版本清理失败" };
+  }
+}
+
+export function readTransactionClassificationCounts(poolAddress: string | null = null): Record<string, number> {
+  const db = getDatabase();
+  if (!db) return {};
+  try {
+    const rows = poolAddress === null
+      ? db.prepare("SELECT error_category, COUNT(*) AS count FROM transaction_classifications GROUP BY error_category").all() as Array<Record<string, unknown>>
+      : db.prepare("SELECT error_category, COUNT(*) AS count FROM transaction_classifications WHERE pool_address = ? GROUP BY error_category").all(poolAddress) as Array<Record<string, unknown>>;
+    return Object.fromEntries(rows.flatMap((row) => typeof row.error_category === "string" && typeof row.count === "number" ? [[row.error_category, row.count] as const] : []));
+  } catch {
+    return {};
+  }
+}
+
+export type ParserFunnelSnapshot = {
+  transactionsLoaded: number;
+  onchainSuccess: number;
+  containsTargetPool: number;
+  raydiumSwapCandidate: number;
+  parsedSwap: number;
+  unsupportedSwap: number;
+  amountReconciliationFailed: number;
+  candidateTransactions: number;
+  parsedSwapTransactions: number;
+  classificationRows: number;
+  normalizedSwapRows: number;
+  normalizedSwapRowsByVersion: Record<string, number>;
+  distinctParsedSignatures: number;
+  multipleSwapTransactions: number;
+  realParseSuccessRate: number | null;
+};
+
+const RPC_CLASSIFICATION_CATEGORIES = ["RPC_429", "RPC_TIMEOUT", "RPC_NETWORK_ERROR", "TRANSACTION_NOT_AVAILABLE"];
+const RAYDIUM_SWAP_CANDIDATE_CATEGORIES = [
+  "PARSED_SWAP",
+  "AMOUNT_RECONCILIATION_FAILED",
+  "TOKEN_BALANCE_MISSING",
+  "TOKEN_DECIMALS_MISSING",
+  "FEE_CONFIG_MISSING",
+  "FEE_VERSION_UNSUPPORTED",
+  "PROGRAM_UNSUPPORTED",
+  "INSTRUCTION_DISCRIMINATOR_UNKNOWN",
+  "INNER_INSTRUCTIONS_MISSING",
+  "ACCOUNT_INDEX_INVALID",
+  "PARSE_EXCEPTION",
+];
+const UNSUPPORTED_SWAP_CATEGORIES = ["PROGRAM_UNSUPPORTED", "INSTRUCTION_DISCRIMINATOR_UNKNOWN", "FEE_VERSION_UNSUPPORTED"];
+
+function countDistinctSignatures(db: DatabaseHandle, where: string, args: Array<string | number | null>): number {
+  const row = db.prepare(`SELECT COUNT(DISTINCT signature) AS count FROM transaction_classifications WHERE ${where}`).get(...args) as { count?: unknown } | undefined;
+  return typeof row?.count === "number" ? row.count : 0;
+}
+
+function countClassificationRows(db: DatabaseHandle, where: string, args: Array<string | number | null>): number {
+  const row = db.prepare(`SELECT COUNT(*) AS count FROM transaction_classifications WHERE ${where}`).get(...args) as { count?: unknown } | undefined;
+  return typeof row?.count === "number" ? row.count : 0;
+}
+
+export function readUnresolvedRetryableTransactions(poolAddress: string, windowStart: Date, parserVersion = "raydium-swap-parser-v2"): number {
+  const db = getDatabase();
+  if (!db) return 0;
+  try {
+    const row = db.prepare(`
+      SELECT COUNT(DISTINCT tc.signature) AS count
+      FROM transaction_classifications tc
+      INNER JOIN raw_transactions rt ON rt.signature = tc.signature
+      WHERE tc.pool_address = ?
+        AND tc.parser_version = ?
+        AND tc.retryable = 1
+        AND rt.fetch_status = 'FAILED'
+        AND rt.retryable = 1
+        AND (rt.block_time IS NULL OR rt.block_time >= ?)
+    `).get(poolAddress, parserVersion, Math.floor(windowStart.getTime() / 1_000)) as { count?: unknown } | undefined;
+    return typeof row?.count === "number" ? row.count : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function readParserFunnel(poolAddress: string, since: Date | null = null, parserVersion = "raydium-swap-parser-v2"): ParserFunnelSnapshot {
+  const empty: ParserFunnelSnapshot = {
+    transactionsLoaded: 0,
+    onchainSuccess: 0,
+    containsTargetPool: 0,
+    raydiumSwapCandidate: 0,
+    parsedSwap: 0,
+    unsupportedSwap: 0,
+    amountReconciliationFailed: 0,
+    candidateTransactions: 0,
+    parsedSwapTransactions: 0,
+    classificationRows: 0,
+    normalizedSwapRows: 0,
+    normalizedSwapRowsByVersion: {},
+    distinctParsedSignatures: 0,
+    multipleSwapTransactions: 0,
+    realParseSuccessRate: null,
+  };
+  const db = getDatabase();
+  if (!db) return empty;
+  try {
+    const timeClause = since ? " AND (block_time IS NULL OR block_time >= ?)" : "";
+    const timeArgs = since ? [Math.floor(since.getTime() / 1_000)] : [];
+    const baseArgs = [poolAddress, parserVersion, ...timeArgs];
+    const loaded = countDistinctSignatures(db, `pool_address = ? AND parser_version = ?${timeClause} AND error_category NOT IN (${RPC_CLASSIFICATION_CATEGORIES.map(() => "?").join(",")})`, [poolAddress, parserVersion, ...timeArgs, ...RPC_CLASSIFICATION_CATEGORIES]);
+    const onchainSuccess = countDistinctSignatures(db, `pool_address = ? AND parser_version = ?${timeClause} AND error_category NOT IN (${[...RPC_CLASSIFICATION_CATEGORIES, "ONCHAIN_TRANSACTION_FAILED"].map(() => "?").join(",")})`, [poolAddress, parserVersion, ...timeArgs, ...RPC_CLASSIFICATION_CATEGORIES, "ONCHAIN_TRANSACTION_FAILED"]);
+    const containsTargetPool = countDistinctSignatures(db, `pool_address = ? AND parser_version = ?${timeClause} AND error_category NOT IN (${[...RPC_CLASSIFICATION_CATEGORIES, "ONCHAIN_TRANSACTION_FAILED", "NOT_TARGET_POOL"].map(() => "?").join(",")})`, [poolAddress, parserVersion, ...timeArgs, ...RPC_CLASSIFICATION_CATEGORIES, "ONCHAIN_TRANSACTION_FAILED", "NOT_TARGET_POOL"]);
+    const candidatePlaceholders = RAYDIUM_SWAP_CANDIDATE_CATEGORIES.map(() => "?").join(",");
+    const candidateWhere = `pool_address = ? AND parser_version = ?${timeClause} AND error_category IN (${candidatePlaceholders})`;
+    const candidateArgs = [poolAddress, parserVersion, ...timeArgs, ...RAYDIUM_SWAP_CANDIDATE_CATEGORIES];
+    const parsedWhere = `pool_address = ? AND parser_version = ?${timeClause} AND error_category = ?`;
+    const parsedArgs = [poolAddress, parserVersion, ...timeArgs, "PARSED_SWAP"];
+    const unsupportedPlaceholders = UNSUPPORTED_SWAP_CATEGORIES.map(() => "?").join(",");
+    const unsupported = countClassificationRows(db, `pool_address = ? AND parser_version = ?${timeClause} AND error_category IN (${unsupportedPlaceholders})`, [poolAddress, parserVersion, ...timeArgs, ...UNSUPPORTED_SWAP_CATEGORIES]);
+    const amountReconciliationFailed = countClassificationRows(db, `pool_address = ? AND parser_version = ?${timeClause} AND error_category = ?`, [poolAddress, parserVersion, ...timeArgs, "AMOUNT_RECONCILIATION_FAILED"]);
+    const raydiumSwapCandidate = countClassificationRows(db, candidateWhere, candidateArgs);
+    const parsedSwap = countClassificationRows(db, parsedWhere, parsedArgs);
+    const candidateTransactions = countDistinctSignatures(db, candidateWhere, candidateArgs);
+    const parsedSwapTransactions = countDistinctSignatures(db, parsedWhere, parsedArgs);
+    const classificationRows = countClassificationRows(db, `pool_address = ? AND parser_version = ?${timeClause}`, baseArgs);
+    const distinctParsedSignatures = parsedSwapTransactions;
+    const multipleRow = db.prepare(`SELECT COUNT(*) AS count FROM (SELECT signature FROM transaction_classifications WHERE ${parsedWhere} GROUP BY signature HAVING COUNT(*) > 1)`).get(...parsedArgs) as { count?: unknown } | undefined;
+    const multipleSwapTransactions = typeof multipleRow?.count === "number" ? multipleRow.count : 0;
+    const normalizedRows = db.prepare(`SELECT COUNT(*) AS count FROM normalized_swaps WHERE pool_address = ?${since ? " AND block_time >= ?" : ""}`).get(...(since ? [poolAddress, since.toISOString()] : [poolAddress])) as { count?: unknown } | undefined;
+    const normalizedSwapRows = typeof normalizedRows?.count === "number" ? normalizedRows.count : 0;
+    const versionRows = db.prepare(`SELECT parse_version, COUNT(*) AS count FROM normalized_swaps WHERE pool_address = ?${since ? " AND block_time >= ?" : ""} GROUP BY parse_version`).all(...(since ? [poolAddress, since.toISOString()] : [poolAddress])) as Array<Record<string, unknown>>;
+    const normalizedSwapRowsByVersion = Object.fromEntries(versionRows.flatMap((row) => typeof row.parse_version === "string" && typeof row.count === "number" ? [[row.parse_version, row.count] as const] : []));
+    return {
+      ...empty,
+      transactionsLoaded: loaded,
+      onchainSuccess,
+      containsTargetPool,
+      raydiumSwapCandidate,
+      parsedSwap,
+      unsupportedSwap: unsupported,
+      amountReconciliationFailed,
+      candidateTransactions,
+      parsedSwapTransactions,
+      classificationRows,
+      normalizedSwapRows,
+      normalizedSwapRowsByVersion,
+      distinctParsedSignatures,
+      multipleSwapTransactions,
+      realParseSuccessRate: raydiumSwapCandidate > 0 ? (parsedSwap / raydiumSwapCandidate) * 100 : null,
+    };
+  } catch {
+    return empty;
+  }
+}
+
+function classifyRpcFailureMessage(category: string | null, message: string | null): RpcFailureCategory | "RPC_429" {
+  if (category === "RPC_429" || /\b429\b|rate.?limit/i.test(message ?? "")) return "RPC_429";
+  const text = `${category ?? ""} ${message ?? ""}`.toLowerCase();
+  if (/enotfound|eai_again|dns|name resolution|域名解析/.test(text)) return "DNS_ERROR";
+  if (/econnreset|connection reset|socket hang up|连接重置/.test(text)) return "CONNECTION_RESET";
+  if (/json|unexpected token|解析响应/.test(text)) return "JSON_PARSE_ERROR";
+  if (/transaction.*null|返回空|gettransaction 返回空|not available/.test(text)) return "TRANSACTION_NULL";
+  if (/closed|endpoint.*(close|down)|连接关闭/.test(text)) return "ENDPOINT_CLOSED";
+  if (/^http\s+\d+|http_non_200|status\s*[4-5]\d\d/.test(text)) return "HTTP_NON_200";
+  return "OTHER_NETWORK_ERROR";
+}
+
+export function reclassifyRpcFailureRecords(): { raw: Record<string, number>; classifications: Record<string, number> } {
+  const db = getDatabase();
+  const result = { raw: {} as Record<string, number>, classifications: {} as Record<string, number> };
+  if (!db) return result;
+  try {
+    const rawRows = db.prepare("SELECT signature, error_category, error_message FROM raw_transactions WHERE error_category IN ('RPC_NETWORK_ERROR', 'RPC_429')").all() as Array<Record<string, unknown>>;
+    const rawUpdate = db.prepare("UPDATE raw_transactions SET error_code = ? WHERE signature = ?");
+    for (const row of rawRows) {
+      if (typeof row.signature !== "string") continue;
+      const classification = classifyRpcFailureMessage(typeof row.error_category === "string" ? row.error_category : null, typeof row.error_message === "string" ? row.error_message : null);
+      rawUpdate.run(classification, row.signature);
+      result.raw[classification] = (result.raw[classification] ?? 0) + 1;
+    }
+    const classificationRows = db.prepare("SELECT classification_key, error_category, error_message FROM transaction_classifications WHERE error_category IN ('RPC_NETWORK_ERROR', 'RPC_429')").all() as Array<Record<string, unknown>>;
+    const classificationUpdate = db.prepare("UPDATE transaction_classifications SET error_code = ? WHERE classification_key = ?");
+    for (const row of classificationRows) {
+      if (typeof row.classification_key !== "string") continue;
+      const classification = classifyRpcFailureMessage(typeof row.error_category === "string" ? row.error_category : null, typeof row.error_message === "string" ? row.error_message : null);
+      classificationUpdate.run(classification, row.classification_key);
+      result.classifications[classification] = (result.classifications[classification] ?? 0) + 1;
+    }
+  } catch {
+    // 重新分类是诊断增强，不得阻塞事实层写入。
   }
   return result;
 }

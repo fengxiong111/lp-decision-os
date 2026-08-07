@@ -7,6 +7,8 @@ import { getHttpMetricsSnapshot } from "@/services/shared/http";
 import { getActiveRpcProvider, getRpcPoolSnapshot, collectProgramWideRwaSwapEvents, parseProgramTransaction, rpcRequest, type HistoricalTransaction, type ProgramBackfillPool, type ProgramBackfillResult, type RpcProvider } from "@/services/rpc/pool";
 import { getStorageMetricsSnapshot, persistIndexerState, persistMinuteBuckets, persistOfficialReconciliation, persistSwapEvents, persistWindowCoverage, readIndexerState, readMinuteBuckets, readRecentSwapEvents, readWindowCoverage, type OfficialReconciliationRow } from "@/services/storage/event-index";
 import { getConfiguredReadOnlyAddress } from "@/services/wallet/config";
+import { evaluateUniverseExpansion, selectShortWindowPools } from "@/services/indexer/expansion";
+import { coverageIsDeterministicallyComplete } from "@/services/indexer/progress";
 
 type RuntimeLog = (message: string) => void;
 
@@ -73,7 +75,14 @@ function progressDefault(targetPoolCount: number): BackfillProgress {
 }
 
 function targetIsComplete(poolIds: string[], window: WindowKey, coverage: Record<string, Record<WindowKey, EventWindowCoverage>>): boolean {
-  return poolIds.length > 0 && poolIds.every((poolId) => coverage[poolId]?.[window]?.backfillStatus === "COMPLETE" && coverage[poolId]?.[window]?.coverageRatio === 100 && coverage[poolId]?.[window]?.gapSlots === 0 && coverage[poolId]?.[window]?.unknownInstructions === 0);
+  if (poolIds.length === 0) return false;
+  return poolIds.every((poolId) => {
+    const item = coverage[poolId]?.[window];
+    if (!item) return false;
+    return window === "1h" || window === "6h" || window === "12h"
+      ? coverageIsDeterministicallyComplete(item, window)
+      : (item.backfillStatus === "COMPLETE" || item.backfillStatus === "LIVE") && item.coverageRatio !== null;
+  });
 }
 
 function advanceProgress(progress: BackfillProgress, plan: string[][], coverage: Record<string, Record<WindowKey, EventWindowCoverage>>): BackfillProgress {
@@ -180,27 +189,32 @@ async function reconcileOfficial(discovery: Awaited<ReturnType<typeof discoverRw
 
 async function discoverAndBackfill(now: Date): Promise<{ discovery: Awaited<ReturnType<typeof discoverRwaUsdcPools>>; rpc: Awaited<ReturnType<typeof getRpcPoolSnapshot>>; backfill: ProgramBackfillResult | null; coverage: Record<string, Record<WindowKey, EventWindowCoverage>>; events: import("@/packages/models/src").SwapEventRecord[]; progress: BackfillProgress }> {
   const discovery = await discoverRwaUsdcPools();
+  const expansion = evaluateUniverseExpansion(discovery.pools, discovery.universe, now);
+  const researchPools = selectShortWindowPools(discovery.pools, expansion);
   const rpc = await getRpcPoolSnapshot();
   const provider = getActiveRpcProvider(rpc);
-  const keys = await fetchPoolKeys(discovery.pools.map((pool) => pool.id));
-  const knownPools = discovery.pools.map((pool) => {
+  const keys = await fetchPoolKeys(researchPools.map((pool) => pool.id));
+  const knownPools = researchPools.map((pool) => {
     const assetIsA = pool.mintA.address !== "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
     const asset = assetIsA ? pool.mintA : pool.mintB;
     const quote = assetIsA ? pool.mintB : pool.mintA;
     return {
       id: pool.id,
       programId: pool.programId,
+      poolKind: pool.kind,
       vaultA: keys.keys.get(pool.id)?.vaultA ?? null,
       vaultB: keys.keys.get(pool.id)?.vaultB ?? null,
       assetMint: asset.address,
       quoteMint: quote.address,
       currentPrice: pool.price === null ? null : assetIsA ? pool.price : pool.price > 0 ? 1 / pool.price : null,
+      feeRate: pool.feeRate,
+      hasDynamicFee: pool.hasDynamicFee === true,
     };
   });
   activeProvider = provider;
   activePools = knownPools;
   const poolIds = knownPools.map((pool) => pool.id);
-  const plan = priorityPlan(discovery.pools);
+  const plan = priorityPlan(researchPools);
   let progress = readIndexerState<BackfillProgress>("backfill.progress") ?? progressDefault(plan[0]?.length ?? 0);
   const existingCoverage = readWindowCoverage(poolIds);
   progress = advanceProgress(progress, plan, existingCoverage);

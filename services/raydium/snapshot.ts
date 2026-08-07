@@ -1,4 +1,4 @@
-import { CAPITAL_OPTIONS, WINDOW_KEYS, type DashboardSnapshot, type EventIndexSnapshot, type EventWindowCoverage, type GroundTruthCalibration, type IndexerStatusReport, type LastSwap, type OfficialReconciliationSnapshot, type PoolVerification, type PositionSnapshot, type ProductStatusReport, type PublicMarketHealth, type PublicMarketLevel, type PublicMetricsState, type QualitySnapshot, type RankingSummary, type RpcPoolSnapshot, type ServiceHealth, type SwapEventRecord, type WindowKey } from "@/packages/models/src";
+import { CAPITAL_OPTIONS, WINDOW_KEYS, type DashboardSnapshot, type EventIndexSnapshot, type EventWindowCoverage, type GroundTruthCalibration, type IndexerStatusReport, type LastSwap, type OfficialReconciliationSnapshot, type PoolVerification, type PositionSnapshot, type ProductStatusReport, type PublicMarketHealth, type PublicMarketLevel, type PublicMetricsState, type QualitySnapshot, type RankingSummary, type ResearchUniverse, type RpcPoolSnapshot, type ServiceHealth, type SwapEventRecord, type WindowKey } from "@/packages/models/src";
 import { aggregateQuality } from "@/services/quality";
 import { getMarketSession } from "@/services/session";
 import { buildPoolSnapshots, refreshExecutableModels } from "@/services/metrics";
@@ -17,7 +17,8 @@ import { buildPositionSnapshots, discoverReadOnlyClmmPositions } from "@/service
 import { getConfiguredReadOnlyAddress } from "@/services/wallet/config";
 import { getLocalAccessInfo } from "@/services/network/access";
 import { countPositionSnapshots, getEventStoreError, getScannedPoolIds, persistIndexerState, persistPositionSnapshots, readIndexerState, readLatestPositionSnapshot, readLatestPositionSnapshotsForOwner, readPositionBaseline, readRecentSwapEvents, readWindowCoverage, readOfficialReconciliation } from "@/services/storage/event-index";
-import { selectTop20Pools, SHORT_WINDOW_POOL_LIMIT } from "@/services/indexer/universe";
+import { selectShortWindowPools } from "@/services/indexer/expansion";
+import { coverageIsDeterministicallyComplete } from "@/services/indexer/progress";
 
 let cachedSnapshot: { expiresAt: number; value: DashboardSnapshot } | null = null;
 let latestSnapshot: DashboardSnapshot | null = null;
@@ -34,6 +35,10 @@ function emptyRpcPoolSnapshot(): RpcPoolSnapshot {
     slotLag: null,
     providers: [],
   };
+}
+
+function workerRpcPoolSnapshot(): RpcPoolSnapshot {
+  return readIndexerState<RpcPoolSnapshot>("rpc.pool") ?? emptyRpcPoolSnapshot();
 }
 
 const statusFromApi = (status: DashboardSnapshot["raydiumApi"]["status"]): ServiceHealth["status"] => status;
@@ -294,6 +299,7 @@ function statusReport(input: {
   walletConfigured: boolean;
   netYieldAvailable: boolean;
   shortWindowReady: boolean;
+  eligiblePoolCount: number;
 }): ProductStatusReport {
   const rpcAvailable = input.rpc.activeProvider !== null;
   const rpcVerificationStatus = !rpcAvailable
@@ -305,7 +311,12 @@ function statusReport(input: {
         : "RPC_VERIFICATION_AVAILABLE";
   return {
     PUBLIC_MARKET_STATUS: input.publicMarket.status === "PUBLIC_RWA_MARKET_READY" ? "PUBLIC_API_MARKET_READY" : input.publicMarket.status,
-    SHORT_WINDOW_ANALYTICS_STATUS: input.shortWindowReady ? "SHORT_WINDOW_ANALYTICS_READY" : "SHORT_WINDOW_ANALYTICS_UNAVAILABLE",
+    SHORT_WINDOW_ANALYTICS_STATUS: input.shortWindowReady
+      ? "SHORT_WINDOW_ANALYTICS_READY"
+      : ["1h", "6h", "12h"].map((window) => {
+          const coverage = input.swapIndexer.windows[window as WindowKey];
+          return `${window}完成${coverage.completedPoolCount ?? 0}/${input.eligiblePoolCount}`;
+        }).join(" · "),
     RPC_VERIFICATION_STATUS: rpcVerificationStatus,
     REALTIME_INDEXING_STATUS: input.swapIndexer.status === "在线" && input.websocket.status === "在线" ? "REALTIME_INDEXING_AVAILABLE" : "REALTIME_INDEXING_DEGRADED",
     WALLET_POSITION_STATUS: input.walletConfigured ? "WALLET_POSITION_OPTIONAL_CONFIGURED" : "WALLET_POSITION_OPTIONAL_NOT_CONFIGURED",
@@ -438,7 +449,10 @@ function buildEventIndex(
   })) as Record<WindowKey, EventWindowCoverage>;
   for (const window of WINDOW_KEYS) {
     const rows = Object.values(poolCoverage).map((item) => item[window]).filter((item): item is EventWindowCoverage => Boolean(item));
-    const allComplete = rows.length === totalPoolCount && totalPoolCount > 0 && rows.every((item) => (item.backfillStatus === "COMPLETE" || item.backfillStatus === "LIVE") && item.coverageRatio === 100 && item.gapSlots === 0 && item.unknownInstructions === 0);
+    const completeForWindow = (item: EventWindowCoverage) => window === "1h" || window === "6h" || window === "12h"
+      ? coverageIsDeterministicallyComplete(item, window)
+      : (item.backfillStatus === "COMPLETE" || item.backfillStatus === "LIVE") && item.coverageRatio !== null;
+    const allComplete = rows.length === totalPoolCount && totalPoolCount > 0 && rows.every(completeForWindow);
     const allKnown = rows.length === totalPoolCount && rows.every((item) => item.unknownInstructions !== null && item.gapSlots !== null);
     const sum = (field: keyof EventWindowCoverage) => rows.reduce((total, item) => total + (typeof item[field] === "number" ? item[field] as number : 0), 0);
     const firstSlots = rows.flatMap((item) => item.firstSlot === null ? [] : [item.firstSlot]);
@@ -460,7 +474,7 @@ function buildEventIndex(
       endSlot: lastSlots.length > 0 ? Math.max(...lastSlots) : null,
       expectedSlotRange: firstSlots.length > 0 && lastSlots.length > 0 ? { start: Math.min(...firstSlots), end: Math.max(...lastSlots) } : null,
       targetPoolCount: totalPoolCount,
-      completedPoolCount: rows.filter((item) => (item.backfillStatus === "COMPLETE" || item.backfillStatus === "LIVE") && item.coverageRatio === 100 && item.gapSlots === 0 && item.unknownInstructions === 0).length,
+      completedPoolCount: rows.filter(completeForWindow).length,
     };
   }
   const backfillProgress = totalPoolCount > 0 ? Math.min(100, (scannedPoolCount / totalPoolCount) * 100) : null;
@@ -522,12 +536,11 @@ function overlayPersistedWindowProgress(indexer: EventIndexSnapshot, persisted: 
 }
 
 function hasLegacyFullUniverseProgress(snapshot: DashboardSnapshot | null): boolean {
-  if (!snapshot?.swapIndexer) return false;
+  if (!snapshot?.swapIndexer || !snapshot.universe) return true;
   const targetPoolCounts = Object.values(snapshot.swapIndexer.windows)
     .map((window) => window.targetPoolCount ?? null)
     .filter((value): value is number => value !== null);
-  return (snapshot.swapIndexer.totalPoolCount ?? 0) > SHORT_WINDOW_POOL_LIMIT
-    || targetPoolCounts.some((value) => value > SHORT_WINDOW_POOL_LIMIT);
+  return targetPoolCounts.some((value) => value > snapshot.universe.activePoolCount);
 }
 
 function buildEmptySnapshot(input: {
@@ -538,6 +551,7 @@ function buildEmptySnapshot(input: {
   rwaAssetCount: number | null;
   candidatePoolCount: number;
   pairCount: number;
+  universe: ResearchUniverse;
   rpc: DashboardSnapshot["rpc"];
   websocket: ServiceHealth;
   apiUrl: string;
@@ -572,6 +586,7 @@ function buildEmptySnapshot(input: {
     network: "Solana Mainnet",
     pools: [],
     pairs: [],
+    universe: input.universe,
     discovery: {
       rwaAssetCount: input.rwaAssetCount,
       candidatePoolCount: input.candidatePoolCount,
@@ -596,7 +611,7 @@ function buildEmptySnapshot(input: {
     calibration: emptyCalibration(input.generatedAt),
     ranking: defaultRanking(),
     publicMarket,
-    statusReport: statusReport({ publicMarket, rpc: input.rpc, websocket: input.websocket, swapIndexer, verifiedPoolCount: 0, walletConfigured: Boolean(getConfiguredReadOnlyAddress()), netYieldAvailable: false, shortWindowReady: false }),
+    statusReport: statusReport({ publicMarket, rpc: input.rpc, websocket: input.websocket, swapIndexer, verifiedPoolCount: 0, walletConfigured: Boolean(getConfiguredReadOnlyAddress()), netYieldAvailable: false, shortWindowReady: false, eligiblePoolCount: input.universe.activePoolCount }),
     indexerStatus,
     officialReconciliation: emptyOfficialReconciliation(input.apiErrors[0] ?? "公开 API 数据不可用"),
     wallet: { configured: Boolean(getConfiguredReadOnlyAddress()), address: getConfiguredReadOnlyAddress(), readOnly: true },
@@ -614,7 +629,7 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
   const workerWebsocket = websocketHealthFromWorker(generatedAt);
   const [discovery, rpc, websocket] = await Promise.all([
     discoverRwaUsdcPools(),
-    apiOnly ? Promise.resolve(emptyRpcPoolSnapshot()) : getRpcPoolSnapshot(),
+    apiOnly ? Promise.resolve(workerRpcPoolSnapshot()) : getRpcPoolSnapshot(),
     apiOnly
       ? Promise.resolve(workerWebsocket ?? {
           name: "solana-ws",
@@ -638,6 +653,7 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
       rwaAssetCount: discovery.rwaAssetCount,
       candidatePoolCount: discovery.candidatePoolCount,
       pairCount: discovery.pairCount,
+      universe: discovery.universe,
       rpc,
       websocket,
       apiUrl,
@@ -648,18 +664,22 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     return empty;
   }
 
+  // Public snapshots still expose every API pool. Only the two parser
+  // recovery pools are allowed to affect RPC verification and short-window
+  // evidence until the parser acceptance gate is met.
+  const shortWindowPools = selectShortWindowPools(discovery.pools);
   const provider = apiOnly ? null : getActiveRpcProvider(rpc);
   const keyResult = provider
-    ? await fetchPoolKeys(discovery.pools.map((pool) => pool.id))
+    ? await fetchPoolKeys(shortWindowPools.map((pool) => pool.id))
     : {
         keys: new Map(),
         source: { label: "Raydium Pool Keys", url: "https://api-v3.raydium.io/pools/key/ids", observedAt: generatedAt, status: "unavailable" as const },
         error: "RPC 不可用，Pool Keys 暂不核验",
       };
   const reconciliation = provider
-    ? await reconcilePools({ provider, pools: discovery.pools, keys: keyResult.keys, slot: rpc.currentSlot })
+    ? await reconcilePools({ provider, pools: shortWindowPools, keys: keyResult.keys, slot: rpc.currentSlot })
     : { verification: new Map<string, PoolVerification>(), error: "RPC 不可用，公开 API 数据仍可用" };
-  const verifiedPools = discovery.pools.filter((pool) => {
+  const verifiedPools = shortWindowPools.filter((pool) => {
     const verification = reconciliation.verification.get(pool.id);
     return Boolean(verification?.active && verification.programVerified && verification.mintsVerified && verification.vaultsVerified);
   });
@@ -680,16 +700,14 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
   const latestIndexedEvent = [...swapEvents].sort((a, b) => b.slot - a.slot)[0] ?? null;
   const lastSwap = latestIndexedEvent ? lastSwapFromEvent(latestIndexedEvent, generatedAt, provider?.url ?? "https://api.mainnet-beta.solana.com") : null;
   const scannedPoolIds = getScannedPoolIds(scanSince);
-  const shortWindowPools = selectTop20Pools(discovery.pools);
   const shortWindowPoolIds = new Set(shortWindowPools.map((pool) => pool.id));
   const scannedPoolCount = [...scannedPoolIds].filter((poolId) => shortWindowPoolIds.has(poolId)).length;
   const storeError = getEventStoreError();
   const apiObservedAt = discovery.sources.find((source) => source.label === "Raydium RWA 池发现")?.observedAt ?? generatedAt;
   const apiAgeSeconds = Math.max(0, Math.round((new Date(generatedAt).getTime() - new Date(apiObservedAt).getTime()) / 1000));
   const storedPoolCoverage = readWindowCoverage(discovery.pools.map((pool) => pool.id));
-  // Public discovery remains all-pool. Short-window evidence is deliberately
-  // bounded to Top20 so an old 176-pool cursor cannot keep the product in a
-  // false "waiting for every pool" state.
+  // Public discovery remains all-pool. Short-window evidence only targets the
+  // hysteresis-qualified research Universe; low-TVL pools remain official-only.
   const poolCoverage = Object.fromEntries(shortWindowPools.map((pool) => [pool.id, storedPoolCoverage[pool.id] ?? apiOnlyWindowCoverage(generatedAt)]));
   const persistedShortWindowTarget = Object.values(persistedMetrics?.windows ?? {})
     .map((window) => window.targetPoolCount ?? null)
@@ -697,7 +715,7 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     .sort((left, right) => right - left)[0] ?? null;
   const legacyFullUniverseProgress = persistedShortWindowTarget !== null && persistedShortWindowTarget > shortWindowPools.length;
   const swapIndexer = overlayPersistedWindowProgress(
-    buildEventIndex(swapEvents, liveSwapEvents, generatedAt, websocket, scannedPoolCount, shortWindowPools.length, null, storeError, persistedMetrics && !legacyFullUniverseProgress ? null : "等待 Top20 短窗口回补", apiObservedAt, apiAgeSeconds, poolCoverage),
+    buildEventIndex(swapEvents, liveSwapEvents, generatedAt, websocket, scannedPoolCount, shortWindowPools.length, null, storeError, persistedMetrics && !legacyFullUniverseProgress ? null : "等待合格 Universe 短窗口回补", apiObservedAt, apiAgeSeconds, poolCoverage),
     legacyFullUniverseProgress ? null : persistedMetrics,
   );
   const official24h = swapIndexer.windows["24h"];
@@ -727,11 +745,12 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     eventsByPool.set(event.poolId, events);
   }
   const sourceList = [...discovery.sources, keyResult.source];
+  const completeOneHourHistoricalWindow = coverageIsDeterministicallyComplete(swapIndexer.windows["1h"], "1h");
   const completeShortHistoricalWindows = ["1h", "6h", "12h"].every((window) => {
     const coverage = swapIndexer.windows[window as WindowKey];
-    return (coverage.backfillStatus === "COMPLETE" || coverage.backfillStatus === "LIVE") && coverage.coverageRatio === 100 && coverage.gapSlots === 0 && coverage.unknownInstructions === 0;
+    return coverageIsDeterministicallyComplete(coverage, window as "1h" | "6h" | "12h");
   });
-  const completeHistoricalWindows = completeShortHistoricalWindows && discovery.pools.length > 0 && discovery.pools.every((pool) => pool.day.volume !== null || pool.day.volumeFee !== null || pool.day.apr !== null);
+  const completeHistoricalWindows = completeShortHistoricalWindows && shortWindowPools.length > 0 && shortWindowPools.every((pool) => pool.day.volume !== null || pool.day.volumeFee !== null || pool.day.apr !== null);
   const marketLevel: PublicMarketLevel = verifiedPools.length === 0
     ? "LEVEL_1_API"
     : websocket.status === "在线" && swapIndexer.status === "在线" && completeHistoricalWindows
@@ -754,12 +773,17 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
       windowCoverage: poolCoverage[pool.id] ?? apiOnlyWindowCoverage(generatedAt),
       publicApiAvailable: true,
       marketLevel: verifiedPools.some((item) => item.id === pool.id) ? marketLevel : "LEVEL_1_API",
+      universeStatus: discovery.universe.entries[pool.id]?.status ?? "QUARANTINED",
+      universeReason: discovery.universe.entries[pool.id]?.reason ?? "Pool 未进入研究 Universe",
     })),
     generatedAt,
   );
   const workerMetrics = persistedMetrics && Date.parse(persistedMetrics.generatedAt) >= Date.now() - 15 * 60_000 ? persistedMetrics : null;
+  // Tier2 remains public/API-only until its own admission reaches READY; do
+  // not let the broad research Universe masquerade as a short-window index.
+  const activeUniverseIds = new Set(shortWindowPools.map((pool) => pool.id));
   let snapshots = refreshDecisionModels(baseSnapshots.map((pool) => {
-    const state = workerMetrics?.pools[pool.id];
+    const state = activeUniverseIds.has(pool.id) ? workerMetrics?.pools[pool.id] : null;
     if (!state) return refreshExecutableModels({ ...pool, recentSwaps: eventsByPool.get(pool.id)?.slice(0, 20) ?? [] });
     return refreshExecutableModels({
       ...pool,
@@ -835,10 +859,10 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     updatedAt: apiObservedAt,
     level: marketLevel,
     detail: verifiedPools.length > 0
-      ? `官方 API ${snapshots.length} 个池；RPC 已核验 ${verifiedPools.length} 个；钱包配置不影响公开市场`
+      ? `官方 API ${snapshots.length} 个池；合格 Universe ${discovery.universe.activePoolCount} 个；RPC 已核验 ${verifiedPools.length} 个`
       : rpc.activeProvider
-        ? `官方 API ${snapshots.length} 个池；RPC 账户核验尚未完成，分钟级链上指标降级`
-        : `官方 API ${snapshots.length} 个池；RPC 当前不可用，分钟级链上指标降级`,
+        ? `官方 API ${snapshots.length} 个池；合格 Universe ${discovery.universe.activePoolCount} 个；RPC 账户核验尚未完成`
+        : `官方 API ${snapshots.length} 个池；合格 Universe ${discovery.universe.activePoolCount} 个；RPC 当前不可用，分钟级链上指标降级`,
   });
   const ranking: RankingSummary = {
     defaultMode: snapshots.some((pool) => pool.executableEstimates["1000"]?.["1h"]?.netProfitUsd !== null) ? "executableNet" : "executableFee",
@@ -874,7 +898,8 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     modelVersion: "executable-capacity-v1",
     capitalOptions: [...CAPITAL_OPTIONS],
   };
-  const report = statusReport({ publicMarket, rpc, websocket, swapIndexer, verifiedPoolCount: verifiedPools.length, walletConfigured: Boolean(walletAddress), netYieldAvailable: ranking.available.executableNet, shortWindowReady: completeShortHistoricalWindows && ranking.available.lpFee });
+  // 1h 是本轮可验收的独立产品能力；6h/12h 继续后台回补，不能阻塞 1h 状态。
+  const report = statusReport({ publicMarket, rpc, websocket, swapIndexer, verifiedPoolCount: verifiedPools.length, walletConfigured: Boolean(walletAddress), netYieldAvailable: ranking.available.executableNet, shortWindowReady: completeOneHourHistoricalWindow && ranking.available.lpFee, eligiblePoolCount: shortWindowPools.length });
   const persistedIndexerStatus = readIndexerState<IndexerStatusReport>("indexer.status");
   const indexerStatus = persistedIndexerStatus ?? {
     ...defaultIndexerStatus({ apiAvailable: true, websocket, hasRpc: rpc.activeProvider !== null }),
@@ -896,6 +921,7 @@ export async function collectDashboardSnapshot(force = false, options: SnapshotO
     network: "Solana Mainnet",
     pools: snapshots,
     pairs: [...new Set(snapshots.map((pool) => pool.pairKey))],
+    universe: discovery.universe,
     discovery: {
       rwaAssetCount: discovery.rwaAssetCount,
       candidatePoolCount: discovery.candidatePoolCount,

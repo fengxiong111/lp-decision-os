@@ -17,7 +17,16 @@ export function currentOwed(liquidity, inside, last, owed) {
 }
 
 export function coverageIsComplete(coverage) {
-  return (coverage?.backfillStatus === "COMPLETE" || coverage?.backfillStatus === "LIVE") && coverage.coverageRatio === 100 && coverage.gapSlots === 0 && coverage.unknownInstructions === 0;
+  if (!coverage || (coverage.backfillStatus !== "COMPLETE" && coverage.backfillStatus !== "LIVE")) return false;
+  const start = Date.parse(coverage.windowStart ?? "");
+  const oldest = Date.parse(coverage.oldestCoveredBlockTime ?? coverage.oldestCoveredAt ?? "");
+  return Number.isFinite(start)
+    && Number.isFinite(oldest)
+    && oldest <= start
+    && coverage.unresolvedRetryableTransactions === 0
+    && (coverage.gapCount ?? coverage.gapSlots) === 0
+    && Number.isFinite(coverage.metricsBucketCount)
+    && coverage.metricsBucketCount >= (coverage.expectedBucketCount ?? 0);
 }
 
 export function identityKey({ baseMint, quoteMint, poolAddress, positionNftMint = "" }) {

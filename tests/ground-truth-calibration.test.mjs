@@ -30,11 +30,21 @@ for (let index = 0; index < 32; index += 1) {
 
 for (let index = 0; index < 20; index += 1) {
   test(`window completeness fail-closed case ${index + 1}`, () => {
-    const complete = { backfillStatus: "COMPLETE", coverageRatio: 100, gapSlots: 0, unknownInstructions: 0 };
+    const complete = {
+      backfillStatus: "COMPLETE",
+      coverageRatio: 100,
+      windowStart: "2026-08-05T11:00:00.000Z",
+      oldestCoveredBlockTime: "2026-08-05T10:59:59.000Z",
+      unresolvedRetryableTransactions: 0,
+      gapCount: 0,
+      metricsBucketCount: 60,
+      expectedBucketCount: 60,
+    };
     assert.equal(coverageIsComplete(complete), true);
-    assert.equal(coverageIsComplete({ ...complete, coverageRatio: 99 }), false);
-    assert.equal(coverageIsComplete({ ...complete, gapSlots: index % 2 }), index % 2 === 0);
-    assert.equal(coverageIsComplete({ ...complete, unknownInstructions: index % 2 }), index % 2 === 0);
+    // 覆盖率只是展示字段，不再是完成判定条件。
+    assert.equal(coverageIsComplete({ ...complete, coverageRatio: 99 }), true);
+    assert.equal(coverageIsComplete({ ...complete, gapCount: index % 2 }), index % 2 === 0);
+    assert.equal(coverageIsComplete({ ...complete, unknownInstructions: index % 2 }), true);
   });
 }
 

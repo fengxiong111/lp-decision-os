@@ -9,6 +9,8 @@ import { getProjectedRanking, readMarketProjection, type MarketProjection } from
 import { checkEventDatabaseIntegrity, getStorageMetricsSnapshot, readBackfillFailures, readBackfillJob, readBackfillPoolCursors, readIndexerState, readSwitchSignals } from "@/services/storage/event-index";
 import { RAW_BACKFILL_JOB_ID } from "@/services/indexer/progress";
 import { getConfiguredReadOnlyAddress, removeReadOnlyAddress, saveReadOnlyAddress } from "@/services/wallet/config";
+import type { HttpMetricsSnapshot, RpcFailureStats, RpcFailureStatsWindow } from "@/services/shared/http";
+import { expansionDiagnostics, readUniverseExpansionState } from "@/services/indexer/expansion";
 
 const port = Math.max(1, Number(process.env.LP_BACKEND_PORT ?? process.env.LP_PORT ?? 3838));
 const host = process.env.LP_ENABLE_LAN === "1" ? "0.0.0.0" : (process.env.LP_HOST ?? "127.0.0.1");
@@ -34,6 +36,59 @@ function requestOriginAllowed(origin: string | undefined): boolean {
   if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) return true;
   if (process.env.LP_ENABLE_LAN === "1" && /^http:\/\/192\.168\.|^http:\/\/10\.|^http:\/\/172\.(1[6-9]|2\d|3[0-1])\./.test(origin)) return true;
   return false;
+}
+
+function aggregateRpcMetrics(rows: Array<Partial<HttpMetricsSnapshot>>): Partial<HttpMetricsSnapshot> | null {
+  if (rows.length === 0) return null;
+  const sum = (key: keyof HttpMetricsSnapshot) => rows.reduce((total, row) => total + (typeof row[key] === "number" ? row[key] as number : 0), 0);
+  const requestsByMethod: Record<string, number> = {};
+  const statusCounts: Record<string, number> = {};
+  for (const row of rows) {
+    for (const [method, count] of Object.entries(row.requestsByMethod ?? {})) requestsByMethod[method] = (requestsByMethod[method] ?? 0) + count;
+    for (const [status, count] of Object.entries(row.statusCounts ?? {})) statusCounts[status] = (statusCounts[status] ?? 0) + count;
+  }
+  const total = sum("totalHttpRequests");
+  const mergeWindow = (key: keyof RpcFailureStats): RpcFailureStatsWindow => {
+    const merged: RpcFailureStatsWindow = { requests: 0, failures: 0, networkErrors: 0, rateLimit429: 0, byCategory: {} };
+    for (const row of rows) {
+      const item = row.rpcFailureStats?.[key];
+      if (!item) continue;
+      merged.requests += item.requests;
+      merged.failures += item.failures;
+      merged.networkErrors += item.networkErrors;
+      merged.rateLimit429 += item.rateLimit429;
+      for (const [category, count] of Object.entries(item.byCategory)) merged.byCategory[category] = (merged.byCategory[category] ?? 0) + count;
+    }
+    return merged;
+  };
+  const rpcFailureStats: RpcFailureStats = {
+    lifetime: mergeWindow("lifetime"),
+    last15m: mergeWindow("last15m"),
+    last30m: mergeWindow("last30m"),
+    last1h: mergeWindow("last1h"),
+    currentRun: mergeWindow("currentRun"),
+  };
+  return {
+    startedAt: rows.map((row) => row.startedAt).filter((value): value is string => Boolean(value)).sort()[0],
+    totalHttpRequests: total,
+    totalLogicalRequests: sum("totalLogicalRequests"),
+    requestsByMethod,
+    statusCounts,
+    rateLimit429Count: sum("rateLimit429Count"),
+    maxConcurrent: Math.max(...rows.map((row) => row.maxConcurrent ?? 0)),
+    averageLatencyMs: total > 0 ? Math.round(rows.reduce((value, row) => value + (row.averageLatencyMs ?? 0) * (row.totalHttpRequests ?? 0), 0) / total) : null,
+    p95LatencyMs: Math.max(...rows.map((row) => row.p95LatencyMs ?? 0)) || null,
+    lastRetryAfterMs: Math.max(...rows.map((row) => row.lastRetryAfterMs ?? 0)) || null,
+    requestsLast5m: sum("requestsLast5m"),
+    rateLimit429Last5m: sum("rateLimit429Last5m"),
+    requestsLast15m: sum("requestsLast15m"),
+    rateLimit429Last15m: sum("rateLimit429Last15m"),
+    requestsLast30m: sum("requestsLast30m"),
+    rateLimit429Last30m: sum("rateLimit429Last30m"),
+    requestsLast1h: sum("requestsLast1h"),
+    rateLimit429Last1h: sum("rateLimit429Last1h"),
+    rpcFailureStats,
+  };
 }
 
 const app = Fastify({
@@ -67,12 +122,13 @@ app.get("/api/rankings", async (request, reply) => {
   const parsed = RankingQuerySchema.safeParse({
     capital: (request.query as Record<string, unknown>).capital ?? "1000",
     window: (request.query as Record<string, unknown>).window ?? "24h",
+    includeOfficialOnly: (request.query as Record<string, unknown>).includeOfficialOnly ?? "0",
   });
   if (!parsed.success) return reply.code(400).send({ error: "capital 或 window 参数无效", details: parsed.error.flatten() });
   const projection = currentProjection();
   if (!projection) return unavailable(reply, "等待 metrics worker 写入排名投影");
   const capital = Number(parsed.data.capital) as 1_000 | 10_000;
-  const ranking = getProjectedRanking(projection, capital, parsed.data.window);
+  const ranking = getProjectedRanking(projection, capital, parsed.data.window, parsed.data.includeOfficialOnly);
   return reply.header("cache-control", "no-store").header("x-data-version", String(projection.projectionVersion)).send(normalizeNullSemantics(ranking));
 });
 
@@ -80,6 +136,10 @@ app.get("/api/health", async (_request, reply) => {
   const projection = currentProjection();
   const integrity = checkEventDatabaseIntegrity();
   const snapshot = projection?.snapshot ?? null;
+  const rpcByWorker = {
+    backfill: readIndexerState<Partial<HttpMetricsSnapshot>>("rpc.metrics.backfill"),
+    indexer: readIndexerState<Partial<HttpMetricsSnapshot>>("rpc.metrics.indexer"),
+  };
   const health = normalizeNullSemantics({
     status: snapshot?.status ?? "LIVE_RWA_DATA_PARTIAL",
     network: "Solana Mainnet",
@@ -106,7 +166,11 @@ app.get("/api/health", async (_request, reply) => {
     swapIndexer: snapshot?.swapIndexer ?? null,
     diagnostics: {
       stream: readIndexerState("stream.status"),
+      rpc: aggregateRpcMetrics(Object.values(rpcByWorker).filter((item): item is Partial<HttpMetricsSnapshot> => Boolean(item))),
+      rpcByWorker,
       metrics: readIndexerState("metrics.public"),
+      expansion: expansionDiagnostics(readUniverseExpansionState()),
+      backfillThrottle: readIndexerState("backfill.throttle"),
       workerLifecycle: {
         indexer: readIndexerState("worker.lifecycle.indexer"),
         backfill: readIndexerState("worker.lifecycle.backfill"),
@@ -123,12 +187,15 @@ app.get("/api/health", async (_request, reply) => {
 app.get("/api/signals", async (_request, reply) => reply.header("cache-control", "no-store").send(normalizeNullSemantics({ signals: readSwitchSignals(200) })));
 
 app.get("/api/backfill", async (_request, reply) => {
+  const backfillUniverse = readIndexerState<{ targetPoolIds?: string[] }>("backfill.universe");
+  const targetPoolIds = backfillUniverse?.targetPoolIds ?? [];
   return reply.header("cache-control", "no-store").send(normalizeNullSemantics({
     job: readBackfillJob(RAW_BACKFILL_JOB_ID),
-    cursors: readBackfillPoolCursors(RAW_BACKFILL_JOB_ID),
+    cursors: readBackfillPoolCursors(RAW_BACKFILL_JOB_ID, targetPoolIds.length > 0 ? targetPoolIds : undefined),
     failures: readBackfillFailures(RAW_BACKFILL_JOB_ID, 100),
     progress: readIndexerState("backfill.progress"),
-    universe: readIndexerState("backfill.universe"),
+    universe: backfillUniverse,
+    expansion: expansionDiagnostics(readUniverseExpansionState()),
   }));
 });
 

@@ -14,7 +14,9 @@ export LP_EVENT_DB_PATH="${LP_EVENT_DB_PATH:-$project_root/.local-data/lp-events
 export LP_RPC_RATE_DB_PATH="${LP_RPC_RATE_DB_PATH:-$project_root/.local-data/rpc-governor.sqlite}"
 export LP_WALLET_CONFIG_PATH="${LP_WALLET_CONFIG_PATH:-$project_root/.local-data/read-only-wallet.json}"
 export LP_BACKEND_PORT="$backend_port"
-export LP_HOST="${LP_HOST:-127.0.0.1}"
+# iPad/局域网访问是本地终端的默认用法；设置 LP_ENABLE_LAN=0 可恢复仅本机监听。
+export LP_ENABLE_LAN="${LP_ENABLE_LAN:-1}"
+export LP_HOST="${LP_HOST:-0.0.0.0}"
 
 action="${1:-start}"
 

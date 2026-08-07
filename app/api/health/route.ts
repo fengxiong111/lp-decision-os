@@ -2,6 +2,7 @@ import { getDashboardSnapshot } from "@/services/raydium/snapshot";
 import { RAW_BACKFILL_JOB_ID } from "@/services/indexer/progress";
 import { getStorageMetricsSnapshot, readBackfillFailures, readBackfillJob, readBackfillPoolCursors, readIndexerState } from "@/services/storage/event-index";
 import { jsonWithNullSemantics } from "@/services/shared/null-semantics";
+import type { RpcFailureStats, RpcFailureStatsWindow } from "@/services/shared/http";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,13 @@ type RpcMetrics = {
   lastRetryAfterMs?: number | null;
   requestsLast5m?: number;
   rateLimit429Last5m?: number;
+  requestsLast15m?: number;
+  rateLimit429Last15m?: number;
+  requestsLast30m?: number;
+  rateLimit429Last30m?: number;
+  requestsLast1h?: number;
+  rateLimit429Last1h?: number;
+  rpcFailureStats?: RpcFailureStats;
 };
 
 function aggregateRpcMetrics(metricsByWorker: Record<string, RpcMetrics | null>): RpcMetrics | null {
@@ -34,6 +42,26 @@ function aggregateRpcMetrics(metricsByWorker: Record<string, RpcMetrics | null>)
   const weightedAverage = total > 0
     ? rows.reduce((value, row) => value + (row.averageLatencyMs ?? 0) * (row.totalHttpRequests ?? 0), 0) / total
     : null;
+  const mergeFailureWindow = (key: keyof RpcFailureStats): RpcFailureStatsWindow => {
+    const merged: RpcFailureStatsWindow = { requests: 0, failures: 0, networkErrors: 0, rateLimit429: 0, byCategory: {} };
+    for (const row of rows) {
+      const item = row.rpcFailureStats?.[key];
+      if (!item) continue;
+      merged.requests += item.requests;
+      merged.failures += item.failures;
+      merged.networkErrors += item.networkErrors;
+      merged.rateLimit429 += item.rateLimit429;
+      for (const [category, count] of Object.entries(item.byCategory)) merged.byCategory[category] = (merged.byCategory[category] ?? 0) + count;
+    }
+    return merged;
+  };
+  const rpcFailureStats: RpcFailureStats = {
+    lifetime: mergeFailureWindow("lifetime"),
+    last15m: mergeFailureWindow("last15m"),
+    last30m: mergeFailureWindow("last30m"),
+    last1h: mergeFailureWindow("last1h"),
+    currentRun: mergeFailureWindow("currentRun"),
+  };
   return {
     startedAt: rows.map((row) => row.startedAt).filter((value): value is string => Boolean(value)).sort()[0],
     totalHttpRequests: total,
@@ -49,6 +77,13 @@ function aggregateRpcMetrics(metricsByWorker: Record<string, RpcMetrics | null>)
     lastRetryAfterMs: Math.max(...rows.map((row) => row.lastRetryAfterMs ?? 0)) || null,
     requestsLast5m: sum("requestsLast5m"),
     rateLimit429Last5m: sum("rateLimit429Last5m"),
+    requestsLast15m: sum("requestsLast15m"),
+    rateLimit429Last15m: sum("rateLimit429Last15m"),
+    requestsLast30m: sum("requestsLast30m"),
+    rateLimit429Last30m: sum("rateLimit429Last30m"),
+    requestsLast1h: sum("requestsLast1h"),
+    rateLimit429Last1h: sum("rateLimit429Last1h"),
+    rpcFailureStats,
   };
 }
 
@@ -74,6 +109,7 @@ export async function GET() {
       },
       stream: readIndexerState("stream.status"),
       metrics: readIndexerState("metrics.public"),
+      backfillThrottle: readIndexerState("backfill.throttle"),
       workerLifecycle: {
         indexer: readIndexerState("worker.lifecycle.indexer"),
         backfill: readIndexerState("worker.lifecycle.backfill"),

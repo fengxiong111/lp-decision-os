@@ -2,6 +2,14 @@
 
 这是一个围绕 Raydium Protocol 的 LP Operating System。前端不直接拼接 REST 请求，而是消费 Connector、发现、链上校验、指标、市场时段、数据质量和决策服务输出的统一快照。后续接入 Orca、Meteora、Jupiter、Phoenix 或 OpenBook 时，只增加 Connector、指标适配器和执行适配器。
 
+## 界面预览
+
+![公开市场决策终端](lp-decision-os-public.png)
+
+![短窗口分析界面](lp-decision-os-short-window.png)
+
+> GitHub 仓库用于在手机上查看代码、文档和界面快照。系统依赖常驻后端、Solana/Raydium 数据源与 SQLite，因此不是可直接托管在 GitHub Pages 的纯静态页面。
+
 ## 当前真实数据链路
 
 产品分成两个互不阻塞的模式：

@@ -35,6 +35,11 @@ test("invalid historical progress is blocked", () => {
 });
 
 test("a cursor with failed transactions cannot be complete", () => {
-  assert.equal(windowIsComplete("COMPLETE", 100, 0, 1), false);
-  assert.equal(windowIsComplete("LIVE", 100, 0, 0), true);
+  const evidence = {
+    windowStart: "2026-08-05T11:00:00.000Z",
+    oldestCoveredBlockTime: "2026-08-05T10:59:59.000Z",
+    metricsBucketCount: 60,
+  };
+  assert.equal(windowIsComplete("COMPLETE", 100, 0, 1, evidence), false);
+  assert.equal(windowIsComplete("LIVE", 99.99, 0, 0, evidence), true);
 });

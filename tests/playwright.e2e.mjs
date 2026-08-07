@@ -80,7 +80,9 @@ try {
   assert.doesNotMatch(await page.locator(".terminal-table thead").innerText(), /预计净利润/, "净收益模型未完成时主表不得显示预计净利润列");
   assert.deepEqual(await page.locator(".terminal-table thead th").allTextContents(), ["排名", "交易对", "推荐 Pool / Fee Tier", "股票价格", "24小时上下限", "TVL", "24小时成交量", "24小时 LP Fee", "预计手续费收入", "结论 / 原因"]);
   assert.doesNotMatch(await page.locator(".terminal-table thead").innerText(), /更新时间/, "主表不应再显示更新时间列");
+  assert.match(await page.locator('[data-testid="default-research-filters"]').innerText(), /24h成交 > \$1,000 · 24h LP Fee > \$30 · TVL > \$5,000/);
   assert.equal(await page.locator('[data-testid^="pair-row-"]').count() > 0, true);
+  assert.equal(await page.locator('[data-testid="spacex-comparison"]').count(), 0, "主表下方不应再显示SpaceX短窗口对比");
 
   await page.locator('[data-testid="window-24h"]').click();
   await page.locator(".progress-drawer").waitFor();

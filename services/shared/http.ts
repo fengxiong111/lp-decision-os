@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
+import type { RpcFailureCategory } from "@/packages/models/src";
 
 type SqliteModule = typeof import("node:sqlite");
 type ThrottleDatabase = InstanceType<SqliteModule["DatabaseSync"]>;
@@ -118,11 +119,34 @@ export type HttpMetricsSnapshot = {
   lastRetryAfterMs: number | null;
   requestsLast5m: number;
   rateLimit429Last5m: number;
+  requestsLast15m: number;
+  rateLimit429Last15m: number;
+  requestsLast30m: number;
+  rateLimit429Last30m: number;
+  requestsLast1h: number;
+  rateLimit429Last1h: number;
+  rpcFailureStats: RpcFailureStats;
+};
+
+export type RpcFailureStatsWindow = {
+  requests: number;
+  failures: number;
+  networkErrors: number;
+  rateLimit429: number;
+  byCategory: Record<string, number>;
+};
+
+export type RpcFailureStats = {
+  lifetime: RpcFailureStatsWindow;
+  last15m: RpcFailureStatsWindow;
+  last30m: RpcFailureStatsWindow;
+  last1h: RpcFailureStatsWindow;
+  currentRun: RpcFailureStatsWindow;
 };
 
 const BACKOFF_MS = [2_000, 4_000, 8_000, 16_000, 32_000, 60_000];
-// 官方免费 RPC 的保守上限：全局不超过 5 RPS，给 429/重试留出余量。
-const GLOBAL_INTERVAL_MS = Math.ceil(1_000 / 5);
+// 官方免费 RPC 的保守上限：全局不超过 3 RPS；getTransaction 也不超过 3 RPS。
+const GLOBAL_INTERVAL_MS = Math.ceil(1_000 / 3);
 const MAX_HTTP_CONCURRENCY = 6;
 
 type MutableHttpMetrics = {
@@ -136,7 +160,8 @@ type MutableHttpMetrics = {
   inFlight: number;
   latenciesMs: number[];
   lastRetryAfterMs: number | null;
-  recentRequests: Array<{ at: number; status: number | null }>;
+  failureCategories: Record<string, number>;
+  recentRequests: Array<{ at: number; status: number | null; error: string | null; category: string | null }>;
 };
 
 const metrics: MutableHttpMetrics = {
@@ -150,6 +175,7 @@ const metrics: MutableHttpMetrics = {
   inFlight: 0,
   latenciesMs: [],
   lastRetryAfterMs: null,
+  failureCategories: {},
   recentRequests: [],
 };
 
@@ -209,6 +235,19 @@ class RequestGovernor {
 
 const governor = new RequestGovernor();
 
+function classifyRpcFailure(meta: HttpMeta): string | null {
+  if (meta.status === 429) return "RPC_429";
+  if (meta.status !== null && (meta.status < 200 || meta.status >= 300)) return "HTTP_NON_200";
+  const error = (meta.error ?? "").toLowerCase();
+  if (!error) return null;
+  if (/enotfound|eai_again|dns|name resolution|域名解析/.test(error)) return "DNS_ERROR" satisfies RpcFailureCategory;
+  if (/econnreset|connection reset|socket hang up|连接重置/.test(error)) return "CONNECTION_RESET" satisfies RpcFailureCategory;
+  if (/json|unexpected token|解析响应/.test(error)) return "JSON_PARSE_ERROR" satisfies RpcFailureCategory;
+  if (/transaction.*null|返回空|gettransaction 返回空|not available/.test(error)) return "TRANSACTION_NULL" satisfies RpcFailureCategory;
+  if (/closed|endpoint.*(close|down)|连接关闭/.test(error)) return "ENDPOINT_CLOSED" satisfies RpcFailureCategory;
+  return "OTHER_NETWORK_ERROR" satisfies RpcFailureCategory;
+}
+
 function recordRequest(meta: HttpMeta, options: RequestOptions = {}) {
   const method = options.logicalMethod ?? options.rateKey ?? "http";
   const count = Math.max(1, options.logicalCount ?? 1);
@@ -218,8 +257,10 @@ function recordRequest(meta: HttpMeta, options: RequestOptions = {}) {
   const status = meta.status === null ? "network_error" : String(meta.status);
   metrics.statusCounts[status] = (metrics.statusCounts[status] ?? 0) + 1;
   if (meta.status === 429) metrics.rateLimit429Count += 1;
-  metrics.recentRequests.push({ at: Date.now(), status: meta.status });
-  const cutoff = Date.now() - 5 * 60_000;
+  const category = classifyRpcFailure(meta);
+  if (category) metrics.failureCategories[category] = (metrics.failureCategories[category] ?? 0) + 1;
+  metrics.recentRequests.push({ at: Date.now(), status: meta.status, error: meta.error, category });
+  const cutoff = Date.now() - 60 * 60_000;
   while (metrics.recentRequests[0] && metrics.recentRequests[0].at < cutoff) metrics.recentRequests.shift();
   if (meta.retryAfterMs !== null) metrics.lastRetryAfterMs = meta.retryAfterMs;
   if (meta.latencyMs !== null && Number.isFinite(meta.latencyMs)) {
@@ -228,10 +269,40 @@ function recordRequest(meta: HttpMeta, options: RequestOptions = {}) {
   }
 }
 
+function summarizeRequestWindow(items: Array<{ at: number; status: number | null; error: string | null; category: string | null }>): RpcFailureStatsWindow {
+  const byCategory: Record<string, number> = {};
+  let failures = 0;
+  let networkErrors = 0;
+  let rateLimit429 = 0;
+  for (const item of items) {
+    if (item.status === null || item.status < 200 || item.status >= 300) failures += 1;
+    if (item.status === null) networkErrors += 1;
+    if (item.status === 429) rateLimit429 += 1;
+    if (item.category) byCategory[item.category] = (byCategory[item.category] ?? 0) + 1;
+  }
+  return { requests: items.length, failures, networkErrors, rateLimit429, byCategory };
+}
+
 export function getHttpMetricsSnapshot(): HttpMetricsSnapshot {
   const sorted = [...metrics.latenciesMs].sort((a, b) => a - b);
   const average = sorted.length > 0 ? sorted.reduce((sum, value) => sum + value, 0) / sorted.length : null;
   const p95 = sorted.length > 0 ? sorted[Math.min(sorted.length - 1, Math.ceil(sorted.length * 0.95) - 1)] : null;
+  const now = Date.now();
+  const last5mItems = metrics.recentRequests.filter((item) => item.at >= now - 5 * 60_000);
+  const last15mItems = metrics.recentRequests.filter((item) => item.at >= now - 15 * 60_000);
+  const last30mItems = metrics.recentRequests.filter((item) => item.at >= now - 30 * 60_000);
+  const last1hItems = metrics.recentRequests.filter((item) => item.at >= now - 60 * 60_000);
+  const lifetime = {
+    requests: metrics.totalHttpRequests,
+    failures: Object.entries(metrics.statusCounts).reduce((sum, [status, count]) => sum + (status === "200" || (Number(status) >= 200 && Number(status) < 300) ? 0 : count), 0),
+    networkErrors: metrics.statusCounts.network_error ?? 0,
+    rateLimit429: metrics.rateLimit429Count,
+    byCategory: { ...metrics.failureCategories },
+  } satisfies RpcFailureStatsWindow;
+  const last15m = summarizeRequestWindow(last15mItems);
+  const last30m = summarizeRequestWindow(last30mItems);
+  const last1h = summarizeRequestWindow(last1hItems);
+  const currentRun = { ...lifetime, byCategory: { ...lifetime.byCategory } };
   return {
     startedAt: metrics.startedAt,
     totalHttpRequests: metrics.totalHttpRequests,
@@ -243,8 +314,15 @@ export function getHttpMetricsSnapshot(): HttpMetricsSnapshot {
     averageLatencyMs: average === null ? null : Math.round(average),
     p95LatencyMs: p95 === null ? null : Math.round(p95),
     lastRetryAfterMs: metrics.lastRetryAfterMs,
-    requestsLast5m: metrics.recentRequests.length,
-    rateLimit429Last5m: metrics.recentRequests.filter((item) => item.status === 429).length,
+    requestsLast5m: last5mItems.length,
+    rateLimit429Last5m: last5mItems.filter((item) => item.status === 429).length,
+    requestsLast15m: last15m.requests,
+    rateLimit429Last15m: last15m.rateLimit429,
+    requestsLast30m: last30m.requests,
+    rateLimit429Last30m: last30m.rateLimit429,
+    requestsLast1h: last1h.requests,
+    rateLimit429Last1h: last1h.rateLimit429,
+    rpcFailureStats: { lifetime, last15m, last30m, last1h, currentRun },
   };
 }
 

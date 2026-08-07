@@ -4,6 +4,12 @@ export const RAW_BACKFILL_JOB_ID = "rwa-raw-swaps-12h";
 export const RAW_BACKFILL_HOURS = 12;
 export const SHORT_WINDOWS: Array<"1h" | "6h" | "12h"> = ["1h", "6h", "12h"];
 
+export const EXPECTED_BUCKET_COUNTS: Record<"1h" | "6h" | "12h", number> = {
+  "1h": 60,
+  "6h": 360,
+  "12h": 720,
+};
+
 const WINDOW_MS: Record<"1h" | "6h" | "12h", number> = {
   "1h": 60 * 60_000,
   "6h": 6 * 60 * 60_000,
@@ -25,6 +31,43 @@ export function timeCoveragePercent(cursor: BackfillPoolCursor | null, window: "
 export function isCursorComplete(cursor: BackfillPoolCursor | null, target: Date): boolean {
   if (!cursor || !cursor.oldestFetchedBlockTime) return false;
   return cursor.status === "COMPLETE" && Date.parse(cursor.oldestFetchedBlockTime) <= target.getTime() && cursor.transactionsFailed === 0 && cursor.unknownInstructions === 0;
+}
+
+/**
+ * 1h/6h/12h 的完成语义只看可审计事实，不看四舍五入后的 coverage 百分比。
+ * 零成交分钟也必须已经物化，因此 metricsBucketCount 可以与 expectedBucketCount
+ * 直接比较。oldestCoveredBlockTime 与 windowStart 使用同一 UTC 时间轴。
+ */
+export function deterministicWindowComplete(input: {
+  window: "1h" | "6h" | "12h";
+  windowStart: string | null | undefined;
+  oldestCoveredBlockTime: string | null | undefined;
+  unresolvedRetryableTransactions: number | null | undefined;
+  gapCount: number | null | undefined;
+  metricsBucketCount: number | null | undefined;
+}): boolean {
+  const start = input.windowStart ? Date.parse(input.windowStart) : Number.NaN;
+  const oldest = input.oldestCoveredBlockTime ? Date.parse(input.oldestCoveredBlockTime) : Number.NaN;
+  return Number.isFinite(start)
+    && Number.isFinite(oldest)
+    && oldest <= start
+    && input.unresolvedRetryableTransactions === 0
+    && input.gapCount === 0
+    && typeof input.metricsBucketCount === "number"
+    && input.metricsBucketCount >= EXPECTED_BUCKET_COUNTS[input.window];
+}
+
+export function coverageIsDeterministicallyComplete(coverage: EventWindowCoverage | null | undefined, window: "1h" | "6h" | "12h"): boolean {
+  if (!coverage) return false;
+  return (coverage.backfillStatus === "COMPLETE" || coverage.backfillStatus === "LIVE")
+    && deterministicWindowComplete({
+      window,
+      windowStart: coverage.windowStart,
+      oldestCoveredBlockTime: coverage.oldestCoveredBlockTime ?? coverage.oldestCoveredAt,
+      unresolvedRetryableTransactions: coverage.unresolvedRetryableTransactions,
+      gapCount: coverage.gapCount ?? coverage.gapSlots,
+      metricsBucketCount: coverage.metricsBucketCount,
+    });
 }
 
 export function estimateEtaMs(history: BackfillJobSnapshot["progressHistory"], completedPoolCount: number, targetPoolCount: number, now: Date): number | null {
@@ -139,8 +182,17 @@ export function progressForWindows(cursors: BackfillPoolCursor[], targetPoolCoun
   return result;
 }
 
-export function windowIsComplete(status: BackfillStatus | undefined, coverageRatio: number | null | undefined, gapSlots: number | null | undefined, unknownInstructions: number | null | undefined): boolean {
-  return (status === "COMPLETE" || status === "LIVE") && coverageRatio === 100 && gapSlots === 0 && unknownInstructions === 0;
+/** @deprecated 旧调用方没有足够证据，必须迁移到 coverageIsDeterministicallyComplete。 */
+export function windowIsComplete(status: BackfillStatus | undefined, _coverageRatio: number | null | undefined, gapSlots: number | null | undefined, unresolvedRetryableTransactions: number | null | undefined, evidence?: Partial<Omit<Parameters<typeof deterministicWindowComplete>[0], "window">>): boolean {
+  if (!evidence || (status !== "COMPLETE" && status !== "LIVE")) return false;
+  return deterministicWindowComplete({
+    window: "1h",
+    windowStart: evidence.windowStart,
+    oldestCoveredBlockTime: evidence.oldestCoveredBlockTime,
+    metricsBucketCount: evidence.metricsBucketCount,
+    gapCount: gapSlots,
+    unresolvedRetryableTransactions,
+  });
 }
 
 export function formatEta(etaMs: number | null | undefined): string {

@@ -88,6 +88,81 @@ export type SwapEventRecord = {
   feeUsd: number | null;
 };
 
+/**
+ * 交易事实层的失败语义。RPC 获取失败、链上失败、非目标交易和解析器
+ * 不支持必须保持可区分，否则回补进度会把不同问题错误地合并成一个数字。
+ */
+export type SwapErrorCategory =
+  | "RPC_429"
+  | "RPC_TIMEOUT"
+  | "RPC_NETWORK_ERROR"
+  | "TRANSACTION_NOT_AVAILABLE"
+  | "TRANSACTION_VERSION_UNSUPPORTED"
+  | "ADDRESS_LOOKUP_TABLE_FAILED"
+  | "ONCHAIN_TRANSACTION_FAILED"
+  | "NOT_TARGET_POOL"
+  | "NOT_RAYDIUM_SWAP"
+  | "PROGRAM_UNSUPPORTED"
+  | "INSTRUCTION_DISCRIMINATOR_UNKNOWN"
+  | "INNER_INSTRUCTIONS_MISSING"
+  | "ACCOUNT_INDEX_INVALID"
+  | "TOKEN_BALANCE_MISSING"
+  | "TOKEN_DECIMALS_MISSING"
+  | "AMOUNT_RECONCILIATION_FAILED"
+  | "FEE_CONFIG_MISSING"
+  | "FEE_VERSION_UNSUPPORTED"
+  | "PARSE_EXCEPTION"
+  | "PARSED_SWAP";
+
+export type RpcFailureCategory =
+  | "DNS_ERROR"
+  | "CONNECTION_RESET"
+  | "HTTP_NON_200"
+  | "JSON_PARSE_ERROR"
+  | "TRANSACTION_NULL"
+  | "ENDPOINT_CLOSED"
+  | "OTHER_NETWORK_ERROR";
+
+export type RawTransactionRecord = {
+  signature: string;
+  slot: number | null;
+  blockTime: number | null;
+  transactionJson: string | null;
+  fetchStatus: "SUCCESS" | "FAILED";
+  fetchedAt: string;
+  rpcEndpoint: string | null;
+  sha256: string | null;
+  errorCategory: SwapErrorCategory | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+  retryable: boolean;
+  attemptCount: number;
+  firstSeenAt: string;
+  lastAttemptAt: string;
+  parserVersion: string;
+};
+
+export type TransactionClassification = {
+  signature: string;
+  slot: number | null;
+  blockTime: number | null;
+  poolAddress: string | null;
+  programId: string | null;
+  transactionVersion: string | number | null;
+  errorCategory: SwapErrorCategory;
+  errorCode: string;
+  errorMessage: string;
+  retryable: boolean;
+  attemptCount: number;
+  firstSeenAt: string;
+  lastAttemptAt: string;
+  rawTransactionPath: string | null;
+  parserVersion: string;
+  instructionIndex: number | null;
+  discriminator: string | null;
+  accountCount: number | null;
+};
+
 export type EventWindowCoverage = {
   eventCount: number;
   poolCount: number;
@@ -133,6 +208,12 @@ export type EventWindowCoverage = {
   transactionsPerMinute?: number | null;
   completedPoolsLast5m?: number;
   progressReason?: string | null;
+  /** Deterministic zero-exit evidence; never inferred from a rounded percentage. */
+  expectedBucketCount?: number;
+  metricsBucketCount?: number;
+  unresolvedRetryableTransactions?: number | null;
+  gapCount?: number | null;
+  oldestCoveredBlockTime?: string | null;
 };
 
 export type BackfillJobStatus = "RUNNING" | "LIVE" | "STALLED" | "BLOCKED" | "FAILED" | "STOPPED" | "BACKFILL_PROGRESS_INVALID";
@@ -578,6 +659,8 @@ export type PoolSnapshot = {
   id: string;
   pair: string;
   pairKey: string;
+  universeStatus: PoolUniverseStatus;
+  universeReason: string;
   identity: PoolIdentity;
   asset: {
     symbol: string;
@@ -725,12 +808,41 @@ export type DiscoverySummary = {
   assetCoverage: AssetCoverageSummary;
 };
 
+export type PoolUniverseStatus = "ACTIVE_INDEXED" | "OFFICIAL_ONLY" | "QUARANTINED";
+
+export type ResearchUniverseEntry = {
+  poolId: string;
+  status: PoolUniverseStatus;
+  tvl: number | null;
+  aboveThresholdSince: string | null;
+  belowExitThresholdSince: string | null;
+  lastEvaluatedAt: string;
+  reason: string;
+};
+
+export type ResearchUniverse = {
+  generatedAt: string;
+  entryTvlUsd: number;
+  exitTvlUsd: number;
+  entryDelayMs: number;
+  exitDelayMs: number;
+  poolCountBeforeFilter: number;
+  activePoolCount: number;
+  officialOnlyPoolCount: number;
+  quarantinedPoolCount: number;
+  activePairCount: number;
+  officialOnlyPairCount: number;
+  activePoolIds: string[];
+  entries: Record<string, ResearchUniverseEntry>;
+};
+
 export type DashboardSnapshot = {
   status: "LIVE_RWA_DATA_BETA_VALIDATING" | "LIVE_RWA_DATA_FULLY_CONNECTED" | "LIVE_RWA_DATA_PARTIAL" | "NO_TRUSTED_DATA";
   generatedAt: string;
   network: "Solana Mainnet";
   pools: PoolSnapshot[];
   pairs: string[];
+  universe: ResearchUniverse;
   discovery: DiscoverySummary;
   session: MarketSession;
   rpc: RpcPoolSnapshot;

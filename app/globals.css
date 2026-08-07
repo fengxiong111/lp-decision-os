@@ -315,6 +315,10 @@ td small { display: block; max-width: 145px; margin-top: 4px; overflow: hidden; 
 .ranking-basis small { display: block; margin-top: 3px; color: var(--terminal-orange); font-size: 10px; }
 .terminal-count { color: var(--terminal-ink); font-size: 12px; line-height: 1.35; text-align: right; white-space: nowrap; }
 .terminal-count small { color: var(--terminal-muted); font-size: 10px; }
+.window-selection-notice { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; max-width: 1920px; margin: 10px auto 0; padding: 8px 10px; border: 1px solid #eadfcf; border-radius: 4px; color: var(--terminal-orange); background: #fffaf2; font-size: 10px; }
+.window-selection-notice span { color: var(--terminal-muted); }
+.window-selection-notice.active { color: var(--terminal-green); border-color: #d7eadc; background: #f5fbf6; }
+.window-selection-notice.partial_data { color: var(--terminal-orange); }
 .terminal-table-wrap { max-width: 1920px; margin: 13px auto 0; overflow: hidden; border: 1px solid var(--terminal-line); border-radius: 6px; background: var(--terminal-paper); }
 .table-caption { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 42px; padding: 8px 12px; border-bottom: 1px solid var(--terminal-line); }
 .table-caption > div { display: flex; align-items: baseline; gap: 12px; }
@@ -719,6 +723,7 @@ td small { display: block; max-width: 145px; margin-top: 4px; overflow: hidden; 
 @media (max-width: 860px) {
   .terminal-controls { min-height: 0; padding: 8px 0; }
   .terminal-controls .ranking-basis { min-width: 0; }
+  .ranking-filter-badge { width: 100%; max-width: none; order: 4; }
   .terminal-controls .terminal-count { margin-left: auto; }
   .terminal-table { min-width: 1320px; }
 }
@@ -730,6 +735,9 @@ td small { display: block; max-width: 145px; margin-top: 4px; overflow: hidden; 
 .terminal-controls .control-group > span, .terminal-controls .ranking-basis span, .terminal-count { font-size: 10px; line-height: 12px; }
 .terminal-controls .control-buttons button { min-width: 78px; padding: 4px 12px; font-size: 12px; line-height: 15px; }
 .terminal-controls .ranking-basis strong { font-size: 13px; }
+.ranking-filter-badge { align-self: center; max-width: 340px; overflow: hidden; color: var(--terminal-muted); font-size: 10px; line-height: 12px; white-space: nowrap; text-overflow: ellipsis; }
+.ranking-filter-badge span { margin-right: 7px; color: var(--terminal-faint); }
+.ranking-filter-badge strong { color: var(--terminal-ink); font-size: 10px; font-weight: 500; }
 .terminal-table { min-width: 1180px; table-layout: fixed; }
 .terminal-table th { height: 38px; padding: 8px 10px; font-size: 11px; }
 .terminal-table td { height: 58px; max-height: 58px; overflow: hidden; padding: 7px 10px; font-size: 15px; line-height: 16px; }
@@ -898,7 +906,7 @@ td { padding-top: 13px; padding-bottom: 13px; }
 /* Field-level null semantics and the single public decision table. */
 .public-ranking-table {
   width: 100%;
-  min-width: 1432px;
+  min-width: 1320px;
   table-layout: fixed;
   border-collapse: collapse;
   font-variant-numeric: tabular-nums;
@@ -907,12 +915,12 @@ td { padding-top: 13px; padding-bottom: 13px; }
 .public-ranking-table col.col-pair { width: 170px !important; }
 .public-ranking-table col.col-pool { width: 210px !important; }
 .public-ranking-table col.col-price { width: 120px !important; }
-.public-ranking-table col.col-range24h { width: 175px !important; }
+.public-ranking-table col.col-band { width: 160px !important; }
 .public-ranking-table col.col-tvl { width: 130px !important; }
 .public-ranking-table col.col-volume { width: 145px !important; }
 .public-ranking-table col.col-fee { width: 135px !important; }
 .public-ranking-table col.col-estimate { width: 145px !important; }
-.public-ranking-table col.col-verdict { width: 150px !important; }
+.public-ranking-table col.col-verdict { width: 185px !important; }
 .public-ranking-table th,
 .public-ranking-table td { vertical-align: middle; }
 .public-ranking-table th { height: 38px; padding: 8px 10px; font-size: 14px; font-weight: 600; }
@@ -923,9 +931,14 @@ td { padding-top: 13px; padding-bottom: 13px; }
 .public-ranking-table th:nth-child(2), .public-ranking-table td:nth-child(2) { position: sticky; left: 52px; z-index: 3; background: #fff; }
 .public-ranking-table th:nth-child(1), .public-ranking-table th:nth-child(2) { z-index: 4; }
 .public-ranking-table th:nth-child(n+4):nth-child(-n+9), .public-ranking-table td:nth-child(n+4):nth-child(-n+9) { text-align: right; }
+.public-ranking-table th:nth-child(10), .public-ranking-table td:nth-child(10) { text-align: left; }
 .public-ranking-table .metric-unavailable { color: var(--terminal-orange); font-size: 12px; }
 .public-ranking-table .row-reason { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .public-ranking-table .rank { font-size: 15px; }
+.public-ranking-table .price-band-cell strong,
+.public-ranking-table .price-band-cell small { display: block; }
+.universe-toggle { display: block; margin-top: 6px; padding: 3px 7px; border: 1px solid var(--terminal-line); border-radius: 4px; color: var(--terminal-muted); background: #fff; font-size: 10px; cursor: pointer; }
+.universe-toggle.active { color: var(--terminal-blue); border-color: var(--terminal-blue); background: #f2f7ff; }
 
 @media (max-width: 1366px) {
   .public-ranking-table th, .public-ranking-table td { padding-left: 8px; padding-right: 8px; }
