@@ -132,6 +132,13 @@ app.get("/api/rankings", async (request, reply) => {
   return reply.header("cache-control", "no-store").header("x-data-version", String(projection.projectionVersion)).send(normalizeNullSemantics(ranking));
 });
 
+app.get("/api/ping", async (_request, reply) => reply.header("cache-control", "no-store").send({
+  ok: true,
+  host,
+  port,
+  lan: process.env.LP_ENABLE_LAN === "1",
+}));
+
 app.get("/api/health", async (_request, reply) => {
   const projection = currentProjection();
   const integrity = checkEventDatabaseIntegrity();

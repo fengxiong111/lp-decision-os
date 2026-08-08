@@ -4,9 +4,11 @@
 
 ## 界面预览
 
-![1,000U 研究简报](terminal-e2e-1000u.jpg)
+![桌面端排名](terminal-e2e-desktop.jpg)
 
-![手机端研究简报](terminal-e2e-mobile.jpg)
+![iPad 端排名](terminal-e2e-ipad.jpg)
+
+![手机端排名](terminal-e2e-mobile.jpg)
 
 > GitHub 仓库用于在手机上查看代码、文档和界面快照。系统依赖常驻后端、Solana/Raydium 数据源与 SQLite，因此不是可直接托管在 GitHub Pages 的纯静态页面。
 

@@ -131,17 +131,6 @@ function PoolSubtable({ pair, positionPoolIds, onCopied, showNet }: { pair: Rank
   </div>;
 }
 
-function FeaturedOpportunity({ pair, rank, onEvidence }: { pair: RankingPair; rank: number; onEvidence: () => void }) {
-  const pool = pair.recommendedPool ?? pair.allPools[0] ?? null;
-  return <button className="kami-feature-card" onClick={onEvidence} data-testid={`featured-rank-${rank}`}>
-    <span className="kami-rank">0{rank}</span>
-    <span className="kami-feature-title"><strong>{pair.symbol}</strong><small>{pair.underlying}</small></span>
-    <span className="kami-feature-yield"><small>1,000U 预计 24h 手续费</small><strong>{money(pair.estimatedFeeIncome.value, 4)}</strong></span>
-    <span className="kami-feature-metrics"><span>TVL <b>{money(pair.tvl ?? pool?.tvl ?? null, 0)}</b></span><span>24h LP Fee <b>{money(pair.lpFee ?? pool?.lpFee ?? null, 2)}</b></span></span>
-    <span className="kami-feature-reason">{pair.shortReason}</span>
-  </button>;
-}
-
 function RankingListItem({ pair, rank, expanded, onToggle, onEvidence, positionPoolIds, onCopied, showNet }: { pair: RankingPair; rank: number; expanded: boolean; onToggle: () => void; onEvidence: () => void; positionPoolIds: Set<string>; onCopied: (label: string) => void; showNet: boolean }) {
   const pool = pair.recommendedPool ?? pair.allPools[0] ?? null;
   const rowId = pair.symbol.replace(/[^a-zA-Z0-9]+/g, "-");
@@ -247,16 +236,11 @@ export default function DashboardClient({ initialSnapshot, initialRanking }: { i
   const showNet = ranking?.rankingBasis === "NET_PROFIT";
   const showSelectionNotice = Boolean(rankingMatches && ranking && (ranking.rankingStatus !== "ACTIVE" || ranking.fallbackWindow));
   return <main className="terminal-shell">
-    <header className="kami-hero">
-      <span className="kami-overline">RWA LIQUIDITY NOTE · 1,000U</span>
-      <div className="kami-hero-grid"><div><h1>今天，流动性把机会放在哪里？</h1><p>基于 Raydium RWA/USDC 官方 24 小时数据，按 1,000U 投入后的可执行手续费收入排序。数字是决策的起点，不是收益承诺。</p></div><aside><span>今日研究口径</span><strong>1,000 USDC</strong><small>24h 官方市场基线</small></aside></div>
-    </header>
     {copiedMessage ? <div className="copy-toast" role="status">{copiedMessage}</div> : null}
     {loading ? <div className="ranking-loading" data-testid="ranking-loading">正在刷新 1,000U 排名</div> : null}
     {error ? <div className="ranking-error" data-testid="ranking-error">{error}</div> : null}
     {showSelectionNotice && ranking ? <div className={`window-selection-notice ${ranking.rankingStatus.toLowerCase()}`} data-testid="window-selection-notice"><strong>{ranking.selectionNotice}</strong>{ranking.fallbackWindow ? <span>排名依据：{ranking.rankingWindowStatus.label} · 不是 {ranking.windowStatus.label} 排名</span> : null}</div> : null}
-    {pairs.length > 0 ? <section className="kami-featured"><div className="kami-section-heading"><span>00 · TOP THREE</span><h2>优先查看</h2></div><div className="kami-feature-grid">{pairs.slice(0, 3).map((pair, index) => <FeaturedOpportunity key={pair.pairId} pair={pair} rank={index + 1} onEvidence={() => setEvidencePairId(pair.pairId)} />)}</div></section> : null}
-    <section className="kami-ranking"><div className="kami-section-heading"><span>01 · FULL RANKING</span><h2>1,000U 手续费排名</h2><p>点击任意一行展开 Pool 级证据。</p></div><div className="kami-ranking-list">{displayPairs.map((pair) => <RankingListItem key={pair.pairId} pair={pair} rank={pairs.findIndex((item) => item.pairId === pair.pairId) + 1} expanded={expandedPair === pair.pairId} onToggle={() => setExpandedPair((value) => value === pair.pairId ? null : pair.pairId)} onEvidence={() => setEvidencePairId(pair.pairId)} positionPoolIds={positionPoolIds} onCopied={copied} showNet={showNet} />)}</div></section>
+    <section className="kami-ranking"><div className="kami-ranking-list">{displayPairs.map((pair) => <RankingListItem key={pair.pairId} pair={pair} rank={pairs.findIndex((item) => item.pairId === pair.pairId) + 1} expanded={expandedPair === pair.pairId} onToggle={() => setExpandedPair((value) => value === pair.pairId ? null : pair.pairId)} onEvidence={() => setEvidencePairId(pair.pairId)} positionPoolIds={positionPoolIds} onCopied={copied} showNet={showNet} />)}</div></section>
     {!loading && displayPairs.length === 0 ? <div className="terminal-empty">{error || (selectedStatus.status === "UNAVAILABLE" ? "等待当前窗口数据源" : "等待可执行排名数据")}<small>{selectedStatus.reason ?? "官方 API 市场数据仍可在公开模式下使用"}</small></div> : null}
     <footer className="kami-footer">数据来源：Raydium 官方 API · 预计值未扣除无常损失、进出滑点与再平衡成本。</footer>
     {evidencePair ? <EvidenceDrawer pair={evidencePair} onClose={() => setEvidencePairId(null)} /> : null}

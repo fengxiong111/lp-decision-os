@@ -21,7 +21,7 @@ async function waitForBackend(url, child) {
   while (Date.now() < deadline) {
     if (child.exitCode !== null) throw new Error(`Fastify exited with ${child.exitCode}`);
     try {
-      const response = await fetch(`${url}/api/health`);
+      const response = await fetch(`${url}/api/ping`);
       if (response.ok) return;
     } catch {
       // server booting
@@ -41,6 +41,8 @@ const baseUrl = `http://127.0.0.1:${port}`;
 let browser;
 try {
   await waitForBackend(baseUrl, child);
+  const ping = await (await fetch(`${baseUrl}/api/ping`)).json();
+  assert.equal(ping.ok, true);
   const health = await (await fetch(`${baseUrl}/api/health`)).json();
   assert.equal(health.runtime.backend, "FASTIFY");
   assert.equal(health.runtime.frontend, "VITE_STATIC");
@@ -67,18 +69,18 @@ try {
   page.on("pageerror", (error) => consoleErrors.push(error.message));
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await page.locator('[data-testid^="pair-row-"]').first().waitFor({ timeout: 30_000 });
-  assert.match(await page.locator("h1").innerText(), /流动性把机会放在哪里/);
-  assert.equal(await page.locator(".kami-feature-card").count(), 3);
-  assert.equal(await page.getByText("1,000U 手续费排名", { exact: true }).count(), 1);
+  assert.equal(await page.locator("h1").count(), 0);
+  assert.equal(await page.locator(".kami-feature-card").count(), 0);
   assert.equal(await page.getByText("10,000U", { exact: true }).count(), 0);
   assert.ok(await page.locator('[data-testid^="pair-row-"]').count() > 0);
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "桌面不应产生整页横向滚动");
   assert.equal(consoleErrors.length, 0, `frontend console errors: ${consoleErrors.join(" | ")}`);
   await page.screenshot({ path: `${projectRoot}/terminal-backend-e2e.jpg`, fullPage: false, type: "jpeg", quality: 88 });
 
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await mobile.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await mobile.locator('[data-testid^="pair-row-"]').first().waitFor({ timeout: 30_000 });
-  assert.equal(await mobile.locator(".kami-feature-card").count(), 3);
+  assert.equal(await mobile.locator(".kami-feature-card").count(), 0);
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "手机首屏不应产生整页横向滚动");
   await mobile.close();
   await page.close();

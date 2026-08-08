@@ -6,6 +6,19 @@ cd "$project_root"
 
 action="${1:-start}"
 
+lan_ip() {
+  if [ -n "${LP_LAN_IP:-}" ]; then echo "$LP_LAN_IP"; return; fi
+  if command -v ipconfig >/dev/null 2>&1; then
+    for interface in en0 en1; do
+      candidate="$(ipconfig getifaddr "$interface" 2>/dev/null || true)"
+      if [ -n "$candidate" ]; then echo "$candidate"; return; fi
+    done
+  fi
+  if command -v ifconfig >/dev/null 2>&1; then
+    ifconfig | awk '/inet (10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/ { print $2; exit }'
+  fi
+}
+
 case "$action" in
   start)
     runtime_port="${LP_BACKEND_PORT:-${LP_PORT:-3838}}"
@@ -15,8 +28,11 @@ case "$action" in
       exit 1
     fi
     if [ ! -f apps/frontend/dist/index.html ]; then npm run build:frontend; fi
-    echo "LP Alpha Terminal backend: http://localhost:$runtime_port"
-    if [ "$lan_enabled" = "1" ]; then echo "LAN 模式已启用：仅允许私有网段，访问地址见系统详情"; fi
+    echo "本机：http://127.0.0.1:$runtime_port"
+    if [ "$lan_enabled" = "1" ]; then
+      detected_lan_ip="$(lan_ip)"
+      if [ -n "$detected_lan_ip" ]; then echo "局域网：http://$detected_lan_ip:$runtime_port"; else echo "局域网模式已启用，但未检测到 Wi-Fi IPv4 地址"; fi
+    fi
     exec bash scripts/supervisor.sh start
     ;;
   stop)
@@ -55,7 +71,7 @@ case "$action" in
 
     wait_for_health() {
       local deadline=$((SECONDS + 45))
-      local health_url="http://127.0.0.1:${LP_BACKEND_PORT:-${LP_PORT:-3838}}/api/health"
+      local health_url="http://127.0.0.1:${LP_BACKEND_PORT:-${LP_PORT:-3838}}/api/ping"
       while [ "$SECONDS" -lt "$deadline" ]; do
         if curl -fsS --max-time 2 "$health_url" >/dev/null 2>&1; then return 0; fi
         sleep 1

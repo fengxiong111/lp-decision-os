@@ -46,38 +46,26 @@ function rankPools(pools, capital) {
   return [...byAsset.values()].sort((a, b) => b.estimatedFee - a.estimatedFee);
 }
 
-function rankingCards(rows) {
-  return rows.slice(0, 3).map((row, index) => `
-    <article class="card rank-${index + 1}">
-      <div class="rank">0${index + 1}</div>
-      <div class="asset"><strong>${escapeHtml(row.symbol)}/USDC</strong><span>${escapeHtml(row.name)}</span></div>
-      <div class="score"><strong>${money(row.estimatedFee, 4)}</strong><span>预估 24h LP 手续费</span></div>
-      <dl>
-        <div><dt>TVL</dt><dd>${money(row.tvl, 0)}</dd></div>
-        <div><dt>24h 成交量</dt><dd>${money(row.volume24h, 0)}</dd></div>
-        <div><dt>24h LP Fee</dt><dd>${money(row.lpFee24h, 2)}</dd></div>
-        <div><dt>Pool</dt><dd><a href="https://raydium.io/liquidity-pools/?id=${encodeURIComponent(row.poolAddress)}">${shortAddress(row.poolAddress)}</a></dd></div>
-      </dl>
-    </article>`).join("");
-}
-
-function tableRows(rows) {
+function rankingRows(rows) {
   return rows.slice(0, 20).map((row, index) => `
-    <tr>
-      <td>${index + 1}</td><td><strong>${escapeHtml(row.symbol)}</strong><small>${escapeHtml(row.name)}</small></td>
-      <td>${money(row.estimatedFee, 4)}</td><td>${money(row.tvl, 0)}</td><td>${money(row.volume24h, 0)}</td><td>${money(row.lpFee24h, 2)}</td>
-    </tr>`).join("");
+    <article class="ranking-row">
+      <span class="rank">${String(index + 1).padStart(2, "0")}</span>
+      <span class="asset"><strong>${escapeHtml(row.symbol)}/USDC</strong><small>${escapeHtml(row.name)}</small></span>
+      <span class="metric volume"><small>24h 成交量</small><strong>${money(row.volume24h, 0)}</strong></span>
+      <span class="metric fee"><small>24h LP Fee</small><strong>${money(row.lpFee24h, 2)}</strong></span>
+      <span class="metric tvl"><small>TVL</small><strong>${money(row.tvl, 0)}</strong></span>
+      <span class="estimate"><small>预计手续费</small><strong>${money(row.estimatedFee, 4)}</strong></span>
+      <a class="pool" href="https://raydium.io/liquidity-pools/?id=${encodeURIComponent(row.poolAddress)}"><small>Pool</small><strong>${shortAddress(row.poolAddress)}</strong></a>
+    </article>`).join("");
 }
 
 function html(rankings, updatedAt) {
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="300">
 <title>Raydium RWA LP 移动看板</title><style>
-:root{--paper:#f5f4ed;--ivory:#faf9f5;--ink:#141413;--muted:#6b6a64;--line:#dedbd0;--blue:#1b365d}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:980px;margin:auto;padding:52px 16px 64px}.overline{color:var(--blue);font-size:11px;font-weight:600;letter-spacing:.15em}.hero{padding-bottom:40px;border-bottom:1px solid var(--line)}h1,h2,.asset strong,.score strong{font-family:"Iowan Old Style","Songti SC",STSong,Georgia,serif;font-weight:500}.hero h1{max-width:760px;margin:20px 0 0;font-size:clamp(42px,8vw,72px);line-height:1.07;letter-spacing:-.045em}.hero p{max-width:650px;margin:22px 0 0;color:var(--muted);line-height:1.75}.section{padding-top:40px}.section h2{margin:8px 0 18px;font-size:29px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.card{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--ivory);box-shadow:0 4px 24px rgba(20,20,19,.04)}.rank{color:var(--blue);font:500 17px/1 Georgia,serif}.asset,.score{display:grid;gap:4px;margin-top:16px}.asset strong{font-size:23px}.asset span,.score span{color:var(--muted);font-size:10px}.score{padding-top:14px;border-top:1px solid var(--line)}.score strong{color:var(--blue);font-size:29px}dl{margin:12px 0 0}dl div{display:flex;justify-content:space-between;margin-top:6px;font-size:11px}dt{color:var(--muted)}dd{margin:0}a{color:var(--blue)}.table-wrap{overflow:auto;border-top:1px solid var(--line)}table{border-collapse:collapse;width:100%;min-width:700px}th,td{text-align:right;padding:13px 9px;border-bottom:1px solid var(--line);font-size:11px}th{color:var(--muted)}th:nth-child(2),td:nth-child(2){text-align:left}td small{display:block;color:var(--muted)}footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:10px;line-height:1.7}@media(max-width:760px){main{padding-top:42px}.cards{grid-template-columns:1fr}.card{padding:18px}.hero h1{font-size:43px}.table-wrap{margin-left:-16px;margin-right:-16px;padding-left:16px}}
+:root{--paper:#f5f4ed;--ink:#141413;--muted:#6b6a64;--line:#dedbd0;--blue:#1b365d}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1240px;margin:auto;padding:34px 28px 60px}.ranking{border-top:1px solid var(--line)}.ranking-row{display:grid;grid-template-columns:52px minmax(180px,1.3fr) repeat(3,minmax(120px,.8fr)) minmax(145px,.9fr) 120px;gap:16px;align-items:center;padding:22px 10px;border-bottom:1px solid var(--line)}.rank{color:var(--blue);font:500 19px/1 Georgia,serif}.asset,.metric,.estimate,.pool{display:grid;gap:5px;min-width:0}.asset strong,.estimate strong{font-family:"Iowan Old Style","Songti SC",STSong,Georgia,serif;font-weight:500}.asset strong{font-size:22px}.asset small,.metric small,.estimate small,.pool small{overflow:hidden;color:var(--muted);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.metric strong,.pool strong{overflow:hidden;color:var(--ink);font-size:15px;font-weight:500;text-overflow:ellipsis;white-space:nowrap}.estimate strong{color:var(--blue);font-size:24px;font-variant-numeric:tabular-nums}.pool{text-decoration:none}.pool:hover strong{text-decoration:underline}footer{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}footer a{color:var(--blue)}@media(max-width:960px){main{padding:26px 22px 50px}.ranking-row{grid-template-columns:42px minmax(160px,1.2fr) repeat(2,minmax(105px,.8fr)) 140px}.volume,.pool{display:none}}@media(max-width:680px){main{padding:20px 16px 40px}.ranking-row{grid-template-columns:34px minmax(0,1fr) 120px;gap:10px;padding:19px 2px}.metric,.pool{display:none}.rank{font-size:17px}.asset strong{font-size:20px}.asset small,.estimate small{font-size:11px}.estimate{text-align:right}.estimate strong{font-size:21px}footer{font-size:11px}}
 </style></head><body><main>
-<header class="hero"><span class="overline">RWA LIQUIDITY NOTE · 1,000U</span><h1>今天，流动性把机会放在哪里？</h1><p>基于 Raydium RWA/USDC 官方 24 小时数据，按 1,000U 投入后的预计手续费收入排序。数字是决策的起点，不是收益承诺。</p></header>
-<section class="section"><span class="overline">00 · TOP THREE</span><h2>优先查看</h2><div class="cards">${rankingCards(rankings.get(1_000))}</div></section>
-<section class="section"><span class="overline">01 · FULL RANKING</span><h2>1,000U 手续费排名</h2><div class="table-wrap"><table><thead><tr><th>#</th><th>资产</th><th>预估手续费</th><th>TVL</th><th>24h 成交量</th><th>24h LP Fee</th></tr></thead><tbody>${tableRows(rankings.get(1_000))}</tbody></table></div></section>
+<section class="ranking">${rankingRows(rankings.get(1_000))}</section>
 <footer>每 15 分钟刷新 Raydium 官方 24h 数据。预估公式：24h LP Fee × 1,000 / (TVL + 1,000)。未扣除无常损失、进出滑点与再平衡成本。数据生成：${escapeHtml(updatedAt)} · <a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main></body></html>`;
 }
 

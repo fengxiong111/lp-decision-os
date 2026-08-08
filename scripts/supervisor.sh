@@ -131,8 +131,8 @@ start_child backfill scripts/backfill-worker.ts
 start_child metrics scripts/metrics-worker.ts
 
 for _ in {1..60}; do
-  if curl -fsS "http://127.0.0.1:$backend_port/api/health" >/dev/null 2>&1; then
-    echo "[supervisor] Fastify health ready on $backend_port"
+  if curl -fsS --max-time 2 "http://127.0.0.1:$backend_port/api/ping" >/dev/null 2>&1; then
+    echo "[supervisor] Fastify ready on $backend_port"
     break
   fi
   sleep 0.5
