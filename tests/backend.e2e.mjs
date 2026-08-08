@@ -73,6 +73,8 @@ try {
   assert.equal(await page.locator(".kami-feature-card").count(), 0);
   assert.equal(await page.getByText("10,000U", { exact: true }).count(), 0);
   assert.ok(await page.locator('[data-testid^="pair-row-"]').count() > 0);
+  assert.ok(await page.locator('.kami-list-price').count() > 0);
+  assert.ok(await page.locator('[data-testid^="copy-ranked-pool-"]').count() > 0);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "桌面不应产生整页横向滚动");
   assert.equal(consoleErrors.length, 0, `frontend console errors: ${consoleErrors.join(" | ")}`);
   await page.screenshot({ path: `${projectRoot}/terminal-backend-e2e.jpg`, fullPage: false, type: "jpeg", quality: 88 });

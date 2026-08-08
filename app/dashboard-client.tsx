@@ -137,15 +137,16 @@ function RankingListItem({ pair, rank, expanded, onToggle, onEvidence, positionP
   return <article className={`kami-ranking-item ${expanded ? "expanded" : ""}`}>
     <button className="kami-ranking-main ranking-row" onClick={onToggle} data-testid={`pair-row-${rowId}`}>
       <span className="kami-list-rank">{rank > 0 ? String(rank).padStart(2, "0") : "—"}</span>
-      <span className="kami-list-asset"><strong>{pair.symbol}</strong><small>{pair.underlying} · {pair.allPools.length} 个 Pool</small></span>
+      <span className="kami-list-asset"><strong>{pair.symbol}</strong><small>{pair.underlying} · {pair.allPools.length} 个 Pool</small><em className="kami-asset-price">实时价格 {stockPrice(pair.currentPrice ?? pool?.currentPrice ?? null)}</em></span>
       <span className="kami-list-metric"><small>TVL</small><strong>{money(pair.tvl ?? pool?.tvl ?? null, 0)}</strong></span>
       <span className="kami-list-metric"><small>24h 成交量</small><strong>{money(pair.volume ?? pool?.volume ?? null, 0)}</strong></span>
       <span className="kami-list-metric"><small>24h LP Fee</small><strong>{money(pair.lpFee ?? pool?.lpFee ?? null, 2)}</strong></span>
       <span className="kami-list-estimate"><small>预计手续费</small><strong>{money(pair.estimatedFeeIncome.value, 4)}</strong></span>
+      <span className="kami-list-price"><small>实时价格</small><strong>{stockPrice(pair.currentPrice ?? pool?.currentPrice ?? null)}</strong></span>
       <span className="kami-list-pool"><small>{pool?.feeTier ?? "Fee Tier暂无"}</small><b>{shortAddress(pool?.poolAddress)}</b></span>
       <span className="kami-list-arrow" aria-hidden="true">{expanded ? "−" : "+"}</span>
     </button>
-    <div className="kami-list-reason"><span>{pair.shortReason}</span><button onClick={onEvidence} data-testid={`decision-${rowId}`}>查看依据</button></div>
+    <div className="kami-list-reason"><span>{pair.shortReason}</span><div className="kami-list-actions"><CopyButton value={pool?.poolAddress} label="复制 Pool" testId={`copy-ranked-pool-${rowId}`} onCopied={onCopied} /><button onClick={onEvidence} data-testid={`decision-${rowId}`}>查看依据</button></div></div>
     {expanded ? <PoolSubtable pair={pair} positionPoolIds={positionPoolIds} onCopied={onCopied} showNet={showNet} /> : null}
   </article>;
 }

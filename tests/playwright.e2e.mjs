@@ -78,12 +78,18 @@ try {
   assert.equal(await page.locator(".kami-feature-card").count(), 0, "首页应直接展示排名");
   assert.equal(await page.locator("h1").count(), 0);
   assert.equal(await page.locator('[data-testid^="pair-row-"]').count() > 0, true);
+  assert.equal(await page.locator('.kami-list-price').count() > 0, true, "本地排名行必须直接显示实时价格");
+  assert.equal(await page.locator('[data-testid^="copy-ranked-pool-"]').count() > 0, true, "Pool复制入口必须常驻");
   assert.equal(await page.locator('[data-testid="spacex-comparison"]').count(), 0, "主表下方不应再显示SpaceX短窗口对比");
   assert.ok(requests.some((url) => url.includes("capital=1000&window=24h")));
   assert.ok(!requests.some((url) => url.includes("capital=10000")), "前端不应请求 10,000U 排名");
   const bodyText = await page.locator("body").innerText();
   for (const removed of ["公开市场：", "实时索引：", "最近 Swap：", "最近成功更新：", "REST兜底", "我的仓位", "系统详情", "投入金额", "决策窗口", "唯一默认排名", "默认筛选", "显示低TVL/隔离池", "10,000U", "1小时", "6小时", "12小时", "RWA LIQUIDITY NOTE", "今天，流动性把机会放在哪里？", "00 · TOP THREE", "优先查看", "01 · FULL RANKING", "1,000U 手续费排名"]) assert.ok(!bodyText.includes(removed), `页面仍显示已移除内容：${removed}`);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "桌面不应产生整页横向滚动");
+
+  await page.locator('[data-testid^="copy-ranked-pool-"]').first().click();
+  await page.locator('[role="status"]').waitFor({ timeout: 5_000 });
+  assert.equal(await page.locator(".pool-subtable").count(), 0, "复制 Pool 不应要求展开排名");
 
   const spcxxRow = page.locator('[data-testid="pair-row-SPCXx-USDC"]');
   assert.equal(await spcxxRow.count(), 1, "公开市场必须包含SPCXx/USDC");
