@@ -37,12 +37,12 @@ async function waitForHttp(url, child) {
 }
 
 async function waitForRows(page) {
-  await page.waitForFunction(() => document.querySelectorAll(".terminal-table tbody .ranking-row").length > 0, null, { timeout: 90_000 });
+  await page.waitForFunction(() => document.querySelectorAll(".kami-ranking-list .ranking-row").length > 0, null, { timeout: 90_000 });
   await page.waitForSelector('[data-testid="ranking-loading"]', { state: "detached", timeout: 90_000 }).catch(() => undefined);
 }
 
 async function firstRowText(page) {
-  return (await page.locator(".terminal-table tbody .ranking-row").first().innerText()).trim();
+  return (await page.locator(".kami-ranking-list .ranking-row").first().innerText()).trim();
 }
 
 const port = await freePort();
@@ -75,39 +75,15 @@ try {
   await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: "domcontentloaded" });
   await waitForRows(page);
   const oneKRow = await firstRowText(page);
-  assert.equal(await page.locator('[data-testid="capital-1000"]').getAttribute("class"), "active");
-  assert.match(await page.locator(".ranking-basis").innerText(), /可执行手续费收益|可执行净收益/);
-  assert.doesNotMatch(await page.locator(".terminal-table thead").innerText(), /预计净利润/, "净收益模型未完成时主表不得显示预计净利润列");
-  assert.deepEqual(await page.locator(".terminal-table thead th").allTextContents(), ["排名", "交易对", "推荐 Pool / Fee Tier", "股票价格", "24小时上下限", "TVL", "24小时成交量", "24小时 LP Fee", "预计手续费收入", "结论 / 原因"]);
-  assert.doesNotMatch(await page.locator(".terminal-table thead").innerText(), /更新时间/, "主表不应再显示更新时间列");
-  assert.match(await page.locator('[data-testid="default-research-filters"]').innerText(), /24h成交 > \$1,000 · 24h LP Fee > \$30 · TVL > \$5,000/);
+  assert.equal(await page.locator(".kami-feature-card").count(), 3, "首屏必须只突出前三名");
+  assert.match(await page.locator("h1").innerText(), /流动性把机会放在哪里/);
+  assert.equal(await page.getByText("1,000U 手续费排名", { exact: true }).count(), 1);
   assert.equal(await page.locator('[data-testid^="pair-row-"]').count() > 0, true);
   assert.equal(await page.locator('[data-testid="spacex-comparison"]').count(), 0, "主表下方不应再显示SpaceX短窗口对比");
-
-  await page.locator('[data-testid="window-24h"]').click();
-  await page.locator(".progress-drawer").waitFor();
-  assert.match(await page.locator(".progress-drawer").innerText(), /窗口证据|官方API|完整/);
-  await page.locator('[aria-label="关闭窗口进度"]').click();
-
-  const tenKResponse = page.waitForResponse((response) => response.url().includes(`/api/rankings?capital=10000&window=24h`) && response.ok(), { timeout: 90_000 });
-  await page.locator('[data-testid="capital-10000"]').click();
-  await tenKResponse;
-  await waitForRows(page);
-  const tenKRow = await firstRowText(page);
-  assert.equal(await page.locator('[data-testid="capital-10000"]').getAttribute("class"), "active");
-  assert.notEqual(tenKRow, oneKRow, "切换资金后主排名行必须重新计算并改变结果或数值");
   assert.ok(requests.some((url) => url.includes("capital=1000&window=24h")));
-  assert.ok(requests.some((url) => url.includes("capital=10000&window=24h")));
-  await page.screenshot({ path: `${projectRoot}/terminal-e2e-10000u.jpg`, fullPage: false, type: "jpeg", quality: 88 });
-
-  const layout = await page.evaluate(() => {
-    const controls = document.querySelector(".terminal-controls")?.getBoundingClientRect();
-    const rows = [...document.querySelectorAll(".terminal-table tbody .ranking-row")].map((row) => row.getBoundingClientRect());
-    const visible = rows.filter((row) => row.top >= 0 && row.bottom <= window.innerHeight).length;
-    return { controlsBottom: controls?.bottom ?? Infinity, visibleRows: visible, fifteenthBottom: rows[14]?.bottom ?? Infinity };
-  });
-  assert.ok(layout.controlsBottom <= 90, `顶部状态与控件应控制在90px内，实际 ${layout.controlsBottom}px`);
-  assert.ok(layout.visibleRows >= 15 || layout.fifteenthBottom <= 1080, `1920×1080应至少容纳15行，实际可见 ${layout.visibleRows} 行`);
+  assert.ok(!requests.some((url) => url.includes("capital=10000")), "前端不应请求 10,000U 排名");
+  const bodyText = await page.locator("body").innerText();
+  for (const removed of ["公开市场：", "实时索引：", "最近 Swap：", "最近成功更新：", "REST兜底", "我的仓位", "系统详情", "投入金额", "决策窗口", "唯一默认排名", "默认筛选", "显示低TVL/隔离池", "10,000U", "1小时", "6小时", "12小时"]) assert.ok(!bodyText.includes(removed), `页面仍显示已移除内容：${removed}`);
 
   const spcxxRow = page.locator('[data-testid="pair-row-SPCXx-USDC"]');
   assert.equal(await spcxxRow.count(), 1, "公开市场必须包含SPCXx/USDC");
@@ -130,31 +106,27 @@ try {
   assert.match(drawerText, /官方 APR 不参与默认推荐/);
   await page.locator('[aria-label="关闭排名依据"]').click();
 
-  const copyButton = page.locator('[data-testid^="main-copy-pool-"]').first();
+  const copyButton = page.locator('[data-testid^="copy-pool-"]').first();
   await copyButton.click();
   await page.locator('[role="status"]').waitFor({ timeout: 5_000 });
   assert.match(await page.locator('[role="status"]').innerText(), /已复制/);
   assert.equal(consoleErrors.length, 0, `浏览器控制台出现错误：${consoleErrors.join(" | ")}`);
 
   await page.waitForTimeout(1_600);
-  await page.locator('[data-testid="capital-1000"]').click();
-  await waitForRows(page);
-  await page.waitForTimeout(1_600);
   await page.screenshot({ path: `${projectRoot}/terminal-e2e-1000u.jpg`, fullPage: false, type: "jpeg", quality: 88 });
 
-  const ipad = await browser.newPage({ viewport: { width: 1024, height: 768 } });
-  await ipad.goto(`http://127.0.0.1:${port}/`, { waitUntil: "domcontentloaded" });
-  await waitForRows(ipad);
-  assert.equal(await ipad.locator(".terminal-table thead th").count(), 10, "iPad 主表应保持十个决策字段");
-  assert.ok(await ipad.locator(".table-scroll").evaluate((scroll) => scroll.scrollWidth > scroll.clientWidth), "iPad 主表应保持真实表格横向滚动");
-  await ipad.screenshot({ path: `${projectRoot}/terminal-e2e-ipad.jpg`, fullPage: false, type: "jpeg", quality: 88 });
-  await ipad.close();
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await mobile.goto(`http://127.0.0.1:${port}/`, { waitUntil: "domcontentloaded" });
+  await waitForRows(mobile);
+  assert.equal(await mobile.locator(".kami-feature-card").count(), 3);
+  assert.equal(await mobile.getByText("10,000U", { exact: true }).count(), 0);
+  assert.ok(await mobile.locator(".kami-hero h1").isVisible());
+  await mobile.screenshot({ path: `${projectRoot}/terminal-e2e-mobile.jpg`, fullPage: false, type: "jpeg", quality: 88 });
+  await mobile.close();
   console.log(JSON.stringify({
     oneKTop: oneKRow.split("\n").slice(0, 3).join(" / "),
-    tenKTop: tenKRow.split("\n").slice(0, 3).join(" / "),
     rankingRequests: requests,
-    layout,
-    screenshots: ["terminal-e2e-1000u.jpg", "terminal-e2e-10000u.jpg", "terminal-e2e-ipad.jpg"],
+    screenshots: ["terminal-e2e-1000u.jpg", "terminal-e2e-mobile.jpg"],
   }, null, 2));
 } finally {
   if (browser) await browser.close();

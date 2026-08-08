@@ -67,19 +67,20 @@ try {
   page.on("pageerror", (error) => consoleErrors.push(error.message));
   await page.goto(baseUrl, { waitUntil: "domcontentloaded" });
   await page.locator('[data-testid^="pair-row-"]').first().waitFor({ timeout: 30_000 });
-  const headers = await page.locator(".terminal-table thead th").allTextContents();
-  assert.deepEqual(headers, ["排名", "交易对", "推荐 Pool / Fee Tier", "股票价格", "24小时上下限", "TVL", "24小时成交量", "24小时 LP Fee", "预计手续费收入", "结论 / 原因"]);
-  assert.doesNotMatch(headers.join(" "), /更新时间/);
+  assert.match(await page.locator("h1").innerText(), /流动性把机会放在哪里/);
+  assert.equal(await page.locator(".kami-feature-card").count(), 3);
+  assert.equal(await page.getByText("1,000U 手续费排名", { exact: true }).count(), 1);
+  assert.equal(await page.getByText("10,000U", { exact: true }).count(), 0);
   assert.ok(await page.locator('[data-testid^="pair-row-"]').count() > 0);
   assert.equal(consoleErrors.length, 0, `frontend console errors: ${consoleErrors.join(" | ")}`);
   await page.screenshot({ path: `${projectRoot}/terminal-backend-e2e.jpg`, fullPage: false, type: "jpeg", quality: 88 });
 
-  const ipad = await browser.newPage({ viewport: { width: 1024, height: 768 } });
-  await ipad.goto(baseUrl, { waitUntil: "domcontentloaded" });
-  await ipad.locator('[data-testid^="pair-row-"]').first().waitFor({ timeout: 30_000 });
-  assert.equal(await ipad.locator(".terminal-table thead th").count(), 10);
-  assert.ok(await ipad.locator(".table-scroll").evaluate((node) => node.scrollWidth > node.clientWidth));
-  await ipad.close();
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await mobile.goto(baseUrl, { waitUntil: "domcontentloaded" });
+  await mobile.locator('[data-testid^="pair-row-"]').first().waitFor({ timeout: 30_000 });
+  assert.equal(await mobile.locator(".kami-feature-card").count(), 3);
+  assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, "手机首屏不应产生整页横向滚动");
+  await mobile.close();
   await page.close();
   console.log(JSON.stringify({ port, projectionVersion: projection.projectionVersion, pairCount: ranking.pairs.length, screenshot: "terminal-backend-e2e.jpg" }, null, 2));
 } finally {

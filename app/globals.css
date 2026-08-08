@@ -243,6 +243,96 @@ td small { display: block; max-width: 145px; margin-top: 4px; overflow: hidden; 
   .terminal-table col.col-verdict { width: 220px; }
 }
 
+/* Kami-inspired research note: warm paper, one ink accent, restrained depth. */
+.terminal-shell {
+  --terminal-bg: #f5f4ed;
+  --terminal-paper: #faf9f5;
+  --terminal-ink: #141413;
+  --terminal-muted: #6b6a64;
+  --terminal-faint: #918f87;
+  --terminal-line: #dedbd0;
+  --terminal-blue: #1b365d;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 34px 60px;
+  background: var(--terminal-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.kami-hero { padding: 72px 0 58px; border-bottom: 1px solid var(--terminal-line); }
+.kami-overline, .kami-section-heading > span { color: var(--terminal-blue); font-size: 11px; font-weight: 600; letter-spacing: .15em; }
+.kami-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 70px; align-items: end; margin-top: 26px; }
+.kami-hero h1, .kami-section-heading h2, .kami-feature-title strong, .kami-feature-yield strong, .kami-list-asset strong, .kami-list-estimate strong {
+  font-family: "Iowan Old Style", "Songti SC", STSong, Georgia, serif;
+  font-weight: 500;
+}
+.kami-hero h1 { max-width: 760px; margin: 0; font-size: clamp(44px, 6.2vw, 78px); line-height: 1.06; letter-spacing: -.045em; }
+.kami-hero p { max-width: 650px; margin: 28px 0 0; color: var(--terminal-muted); font-size: 14px; line-height: 1.75; }
+.kami-hero aside { display: grid; gap: 8px; padding: 5px 0 5px 24px; border-left: 2px solid var(--terminal-blue); }
+.kami-hero aside span, .kami-hero aside small { color: var(--terminal-muted); font-size: 11px; }
+.kami-hero aside strong { font-family: "Iowan Old Style", Georgia, serif; font-size: 28px; font-weight: 500; }
+.kami-featured, .kami-ranking { padding-top: 48px; }
+.kami-section-heading { display: grid; gap: 9px; margin-bottom: 20px; }
+.kami-section-heading h2 { margin: 0; font-size: 30px; line-height: 1.2; }
+.kami-section-heading p { margin: 0; color: var(--terminal-muted); font-size: 12px; }
+.kami-feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.kami-feature-card { display: grid; gap: 17px; padding: 22px; border: 1px solid var(--terminal-line); border-radius: 16px; color: var(--terminal-ink); background: var(--terminal-paper); text-align: left; box-shadow: 0 4px 24px rgba(20,20,19,.04); }
+.kami-feature-card:hover { box-shadow: 0 0 0 1px var(--terminal-blue), 0 8px 30px rgba(20,20,19,.05); }
+.kami-rank { color: var(--terminal-blue); font: 500 16px/1 "Iowan Old Style", Georgia, serif; }
+.kami-feature-title { display: grid; gap: 5px; }
+.kami-feature-title strong { font-size: 25px; }
+.kami-feature-title small, .kami-feature-yield small { color: var(--terminal-muted); font-size: 11px; }
+.kami-feature-yield { display: grid; gap: 5px; padding-top: 15px; border-top: 1px solid var(--terminal-line); }
+.kami-feature-yield strong { color: var(--terminal-blue); font-size: 31px; font-variant-numeric: tabular-nums; }
+.kami-feature-metrics { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--terminal-muted); font-size: 10px; }
+.kami-feature-metrics b { margin-left: 4px; color: var(--terminal-ink); font-weight: 500; }
+.kami-feature-reason { min-height: 42px; color: var(--terminal-muted); font-size: 11px; line-height: 1.55; }
+.kami-ranking-list { border-top: 1px solid var(--terminal-line); }
+.kami-ranking-item { border-bottom: 1px solid var(--terminal-line); }
+.kami-ranking-main { display: grid; grid-template-columns: 46px minmax(155px, 1.25fr) repeat(3, minmax(105px, .8fr)) minmax(120px, .85fr) 115px 24px; gap: 15px; align-items: center; width: 100%; padding: 18px 8px; border: 0; color: var(--terminal-ink); background: transparent; text-align: left; }
+.kami-ranking-main:hover { background: #faf9f5; }
+.kami-list-rank { color: var(--terminal-blue); font: 500 15px/1 "Iowan Old Style", Georgia, serif; }
+.kami-list-asset, .kami-list-metric, .kami-list-estimate, .kami-list-pool { display: grid; gap: 5px; min-width: 0; }
+.kami-list-asset strong { font-size: 18px; }
+.kami-list-asset small, .kami-list-metric small, .kami-list-estimate small, .kami-list-pool small { overflow: hidden; color: var(--terminal-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.kami-list-metric strong, .kami-list-pool b { overflow: hidden; font-size: 12px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.kami-list-estimate strong { color: var(--terminal-blue); font-size: 19px; font-variant-numeric: tabular-nums; }
+.kami-list-arrow { color: var(--terminal-blue); font: 400 21px/1 Georgia, serif; text-align: right; }
+.kami-list-reason { display: flex; justify-content: space-between; gap: 20px; padding: 0 40px 15px 69px; color: var(--terminal-muted); font-size: 11px; line-height: 1.55; }
+.kami-list-reason button { flex: 0 0 auto; padding: 0; border: 0; color: var(--terminal-blue); background: transparent; font-size: 11px; }
+.kami-ranking-item .pool-subtable { margin: 0 0 18px; border: 1px solid var(--terminal-line); border-radius: 10px; background: var(--terminal-paper); }
+.kami-footer { margin-top: 44px; padding-top: 18px; border-top: 1px solid var(--terminal-line); color: var(--terminal-muted); font-size: 10px; line-height: 1.6; }
+.ranking-loading, .ranking-error, .window-selection-notice { max-width: none; margin-top: 18px; }
+.evidence-drawer, .wallet-modal { background: var(--terminal-paper); }
+
+@media (max-width: 960px) {
+  .kami-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+  .kami-hero aside { max-width: 270px; }
+  .kami-feature-grid { grid-template-columns: 1fr; }
+  .kami-feature-card { grid-template-columns: 36px 1fr auto; align-items: start; }
+  .kami-feature-yield { padding-top: 0; border-top: 0; text-align: right; }
+  .kami-feature-metrics, .kami-feature-reason { grid-column: 2 / -1; }
+  .kami-ranking-main { grid-template-columns: 38px minmax(145px, 1.2fr) repeat(2, minmax(100px, .8fr)) 125px 24px; }
+  .kami-ranking-main .kami-list-metric:nth-of-type(4), .kami-list-pool { display: none; }
+}
+
+@media (max-width: 680px) {
+  .terminal-shell { padding: 0 16px 40px; }
+  .kami-hero { padding: 44px 0 38px; }
+  .kami-hero h1 { font-size: 43px; }
+  .kami-hero p { margin-top: 20px; font-size: 13px; }
+  .kami-featured, .kami-ranking { padding-top: 38px; }
+  .kami-feature-card { display: grid; grid-template-columns: 32px 1fr; gap: 12px; padding: 18px; }
+  .kami-feature-yield, .kami-feature-metrics, .kami-feature-reason { grid-column: 2; text-align: left; }
+  .kami-feature-yield { padding-top: 13px; border-top: 1px solid var(--terminal-line); }
+  .kami-feature-yield strong { font-size: 28px; }
+  .kami-ranking-main { grid-template-columns: 32px minmax(0, 1fr) 112px 18px; gap: 10px; padding: 16px 2px; }
+  .kami-ranking-main .kami-list-metric, .kami-ranking-main .kami-list-pool { display: none; }
+  .kami-list-estimate { text-align: right; }
+  .kami-list-estimate strong { font-size: 17px; }
+  .kami-list-reason { align-items: start; padding: 0 2px 15px 44px; }
+  .kami-list-reason span { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+}
+
 /* Final accessibility and LAN hand-off overrides. */
 .terminal-shell { font-size: 16px; }
 .terminal-table { table-layout: fixed; font-variant-numeric: tabular-nums; }
@@ -946,3 +1036,7 @@ td { padding-top: 13px; padding-bottom: 13px; }
   .public-ranking-table td strong { font-size: 15px; }
   .public-ranking-table td small { font-size: 11px; }
 }
+
+/* Final precedence for the current Kami research-note surface. */
+.terminal-shell { max-width: 1240px; margin: 0 auto; padding: 0 34px 60px; background: #f5f4ed; color: #141413; }
+@media (max-width: 680px) { .terminal-shell { padding: 0 16px 40px; } }

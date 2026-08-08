@@ -63,14 +63,18 @@ test("Next.js serves the Chinese real-data RWA decision surface", async () => {
     const html = await response.text();
     assert.equal(response.status, 200);
     assert.match(html, /<title>LP Alpha Terminal · RWA Liquidity Intelligence<\/title>/i);
-    for (const label of ["投入金额", "决策窗口", "唯一默认排名", "添加只读钱包", "1小时", "6小时", "12小时", "24小时", "系统详情"]) {
+    for (const label of ["今天，流动性把机会放在哪里？", "1,000U 手续费排名", "优先查看", "RWA LIQUIDITY NOTE"] ) {
       assert.ok(html.includes(label), `missing label: ${label}`);
     }
     const forbiddenCopy = ["B" + "ONK", "R" + "AY / USDC", "S" + "OL / USDC", "演示", "示例", "SkeletonPreview", "Next.js error", "RWA / USDC 决策证据", "校准闭锁", "ONE QUESTION", "Top Opportunities", "WATCH", "★", "$5k", "$50k", "$100k"];
     // Next RSC 会在 script payload 中序列化内部 decision enum；验收用户实际可见的 HTML，
     // 而不是把内部协议值误判成页面文案。
     const visibleHtml = html.replace(/<script[\s\S]*?<\/script>/gi, "");
+    const visibleBody = visibleHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] ?? visibleHtml;
     assert.ok(forbiddenCopy.every((value) => !visibleHtml.toLowerCase().includes(value.toLowerCase())));
+    for (const removed of ["公开市场：", "实时索引：", "最近 Swap：", "最近成功更新：", "REST兜底", "我的仓位", "系统详情", "投入金额", "决策窗口", "唯一默认排名", "默认筛选", "显示低TVL/隔离池", "10,000U", "1小时", "6小时", "12小时"]) {
+      assert.ok(!visibleBody.includes(removed), `removed UI is still visible: ${removed}`);
+    }
 
     const healthResponse = await fetchWithTimeout(`http://127.0.0.1:${port}/api/health`);
     assert.equal(healthResponse.status, 200);
