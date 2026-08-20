@@ -74,9 +74,10 @@ footer{display:flex;gap:16px;flex-wrap:wrap;margin-top:26px;padding:16px 10px 0;
 `;
 }
 
-export function renderPage({ fetchedAt, snapshotHash = null, config }) {
+export function renderPage({ fetchedAt, snapshotHash = null, runtimeVersion = null, config }) {
   const initialTimestamp = formatTimestamp(fetchedAt);
-  const runtimeVersion = snapshotHash ? `?v=${encodeURIComponent(snapshotHash.slice(0, 12))}` : "";
+  const runtimeQuery = runtimeVersion ?? snapshotHash;
+  const runtimeSrc = runtimeQuery ? `?v=${encodeURIComponent(runtimeQuery.slice(0, 12))}` : "";
   return `<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><meta name="data-source" content="./top3.json"><title>RWA / USDC LP Optimizer</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
 <header class="masthead"><div><h1>RWA / USDC LP Optimizer</h1><p>Raydium · 固定资金 ${escapeHtml(`$${config.capital.toLocaleString("en-US")}`)} · 只保留 Top 3</p></div><p>自动执行：关闭</p></header>
@@ -84,7 +85,7 @@ export function renderPage({ fetchedAt, snapshotHash = null, config }) {
 <section class="ranking" aria-label="RWA / USDC Top 3" role="table"><div class="table-header" role="row"><div role="columnheader">#</div><div role="columnheader">Pair</div><div role="columnheader">Net 24H</div><div role="columnheader">Core</div><div role="columnheader">Buffer</div><div role="columnheader">Action</div></div><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
 <section class="diagnostics-section" aria-label="WHY / 正在验证"><details id="verification-panel" class="verification-panel"><summary>正在验证</summary><div id="verification-list" class="verification-list"></div></details></section>
 <aside id="why-drawer" class="why-drawer" aria-label="WHY evidence" hidden></aside>
-<footer>唯一数据源：mobile-dashboard/top3.json · 仅展示完整证据门槛通过的 Top 3 · <span id="observed-wrap"${initialTimestamp ? "" : " hidden"}>读取：<span id="observed-at">${escapeHtml(initialTimestamp ?? "")}</span></span><a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js${runtimeVersion}"></script></body></html>`;
+<footer>唯一数据源：mobile-dashboard/top3.json · 仅展示完整证据门槛通过的 Top 3 · <span id="observed-wrap"${initialTimestamp ? "" : " hidden"}>读取：<span id="observed-at">${escapeHtml(initialTimestamp ?? "")}</span></span><a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;
 }
 
 export { renderStyles };

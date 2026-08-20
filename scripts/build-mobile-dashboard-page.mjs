@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile, unlink, writeFile } from "node:fs/promises";
 import { DASHBOARD_CONFIG } from "./mobile-dashboard/config.mjs";
 import { renderPage } from "./mobile-dashboard/presentation.mjs";
@@ -12,13 +13,15 @@ const snapshot = JSON.parse(data);
 verifySnapshot(snapshot, DASHBOARD_CONFIG);
 verifyDataJson(data);
 
+const runtime = renderRuntime(DASHBOARD_CONFIG);
+const runtimeVersion = createHash("sha256").update(runtime).digest("hex");
 const page = renderPage({
   fetchedAt: snapshot.generatedAt,
   poolCount: snapshot.publicPoolCount ?? null,
   snapshotHash: snapshot.snapshotHash,
+  runtimeVersion,
   config: DASHBOARD_CONFIG,
 });
-const runtime = renderRuntime(DASHBOARD_CONFIG);
 verifyPageMarkup(page);
 
 await writeFile(new URL("index.html", outputDir), page);

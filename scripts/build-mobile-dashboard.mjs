@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { DASHBOARD_CONFIG } from "./mobile-dashboard/config.mjs";
 import { displayAction, renderPage } from "./mobile-dashboard/presentation.mjs";
@@ -181,8 +182,9 @@ const data = JSON.stringify(snapshot, null, 2);
 verifySnapshot(snapshot, DASHBOARD_CONFIG);
 verifyDataJson(data);
 
-const page = renderPage({ optimizerSummary, evidenceSummary: evidenceRun.evidenceSummary, fetchedAt, poolCount: pools.length, snapshotHash: snapshot.snapshotHash, config: DASHBOARD_CONFIG });
 const runtime = renderRuntime(DASHBOARD_CONFIG);
+const runtimeVersion = createHash("sha256").update(runtime).digest("hex");
+const page = renderPage({ optimizerSummary, evidenceSummary: evidenceRun.evidenceSummary, fetchedAt, poolCount: pools.length, snapshotHash: snapshot.snapshotHash, runtimeVersion, config: DASHBOARD_CONFIG });
 verifyPageMarkup(page);
 
 const outputDir = new URL("../mobile-dashboard/", import.meta.url);
