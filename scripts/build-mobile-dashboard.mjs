@@ -1,103 +1,211 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
+import { DASHBOARD_CONFIG } from "./mobile-dashboard/config.mjs";
+import { displayAction, renderPage } from "./mobile-dashboard/presentation.mjs";
+import { formatTimestamp } from "./mobile-dashboard/format.mjs";
+import { normalizePools } from "./mobile-dashboard/market-data.mjs";
+import { collectProductionEvidence, snapshotFreshness, snapshotHash } from "./mobile-dashboard/evidence.mjs";
+import { buildOptimizerResults } from "./mobile-dashboard/optimizer.mjs";
+import { renderRuntime } from "./mobile-dashboard/runtime.mjs";
+import { fetchRaydiumPools } from "./mobile-dashboard/source.mjs";
+import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "./mobile-dashboard/verify.mjs";
 
-const API_URL = "https://api-v3.raydium.io/pools/info/list-v2?size=1000&hasReward=false&sortField=liquidity&sortType=desc&mintFilter=RWA";
-const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-const OUTPUT_DIR = new URL("../mobile-dashboard/", import.meta.url);
-const CAPITALS = [1_000];
+const fetchedAt = new Date().toISOString();
+const rawPools = await fetchRaydiumPools(DASHBOARD_CONFIG);
+const apiPools = normalizePools(rawPools, DASHBOARD_CONFIG);
+const evidenceRun = await collectProductionEvidence(apiPools, DASHBOARD_CONFIG);
+const pools = evidenceRun.pools;
+const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
+const top3ForPage = optimizerSummary.top3.slice(0, 3).map((row) => ({
+  rank: row.rank,
+  pair: `${row.symbol}/USDC`,
+  poolAddress: row.poolAddress,
+  net24h: row.best?.expectedNetFee24h ?? null,
+  coreCapital: row.best?.coreCapital ?? null,
+  coreLower: row.best?.core?.lowerPrice ?? null,
+  coreUpper: row.best?.core?.upperPrice ?? null,
+  bufferCapital: row.best?.bufferCapital ?? null,
+  bufferLower: row.best?.buffer?.lowerPrice ?? null,
+  bufferUpper: row.best?.buffer?.upperPrice ?? null,
+  action: displayAction(row.action),
+  dataQuality: row.dataQuality ?? null,
+  evidence: row.evidence ?? null,
+}));
+const updatedAt = formatTimestamp(fetchedAt);
+if (!updatedAt) throw new Error("Could not produce a valid observation timestamp");
 
-const number = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
-const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
-const money = (value, digits = 2) => value === null ? "等待数据" : `$${value.toLocaleString("en-US", { maximumFractionDigits: digits })}`;
-const price = (value) => value === null ? "等待数据" : `$${value.toLocaleString("en-US", { minimumFractionDigits: value < 1 ? 4 : 2, maximumFractionDigits: value < 1 ? 6 : 4 })}`;
+verifyMarketData(pools, optimizerSummary, DASHBOARD_CONFIG);
 
-function normalizePool(pool) {
-  if (!Array.isArray(pool.pooltype) || !pool.pooltype.includes("RWA")) return null;
-  const mintA = pool.mintA ?? {};
-  const mintB = pool.mintB ?? {};
-  const asset = mintA.address === USDC_MINT ? mintB : mintB.address === USDC_MINT ? mintA : null;
-  if (!asset?.address) return null;
-  const tvl = number(pool.tvl);
-  const rawPrice = number(pool.price);
-  const volume24h = number(pool.day?.volume);
-  const lpFee24h = number(pool.day?.volumeFee);
-  if (tvl === null || volume24h === null || lpFee24h === null) return null;
-  return {
-    assetMint: asset.address,
-    symbol: asset.symbol || asset.address.slice(0, 6),
-    name: asset.name || "未命名资产",
-    poolAddress: pool.id,
-    poolType: Array.isArray(pool.pooltype) && pool.pooltype.includes("Clmm") ? "CLMM" : pool.type || "Pool",
-    tvl,
-    price: mintA.address === USDC_MINT && rawPrice !== null && rawPrice !== 0 ? 1 / rawPrice : rawPrice,
-    volume24h,
-    lpFee24h,
-    apr: number(pool.day?.feeApr ?? pool.day?.apr),
-    feeTier: number(pool.feeRate),
-  };
-}
-
-function rankPools(pools, capital) {
-  const eligible = pools.filter((pool) => pool.volume24h > 1_000 && pool.lpFee24h > 30 && pool.tvl > 5_000);
-  const byAsset = new Map();
-  for (const pool of eligible) {
-    const estimatedFee = pool.lpFee24h * capital / (pool.tvl + capital);
-    const candidate = { ...pool, estimatedFee };
-    const current = byAsset.get(pool.assetMint);
-    if (!current || candidate.estimatedFee > current.estimatedFee) byAsset.set(pool.assetMint, candidate);
-  }
-  return [...byAsset.values()].sort((a, b) => b.estimatedFee - a.estimatedFee);
-}
-
-function rankingRows(rows) {
-  return rows.slice(0, 20).map((row, index) => `
-    <article class="ranking-row">
-      <span class="rank">${String(index + 1).padStart(2, "0")}</span>
-      <span class="asset"><strong>${escapeHtml(row.symbol)}/USDC</strong><small>${escapeHtml(row.name)}</small><button class="copy-pool" data-pool="${escapeHtml(row.poolAddress)}">复制 Pool</button></span>
-      <span class="metric volume"><small>24h 成交量</small><strong>${money(row.volume24h, 0)}</strong></span>
-      <span class="metric fee"><small>24h LP Fee</small><strong>${money(row.lpFee24h, 2)}</strong></span>
-      <span class="metric tvl"><small>TVL</small><strong>${money(row.tvl, 0)}</strong></span>
-      <span class="estimate"><small>预计手续费</small><strong>${money(row.estimatedFee, 4)}</strong><small class="mobile-price">现价 ${price(row.price)}</small></span>
-      <span class="price"><small>实时价格</small><strong>${price(row.price)}</strong></span>
-    </article>`).join("");
-}
-
-function html(rankings, updatedAt) {
-  return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="300">
-<title>Raydium RWA LP 移动看板</title><style>
-:root{--paper:#f5f4ed;--ink:#141413;--muted:#6b6a64;--line:#dedbd0;--sand:#e8e6dc;--blue:#1b365d}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}main{max-width:1280px;margin:auto;padding:34px 30px 60px}.ranking{border-top:1px solid var(--line)}.ranking-row{display:grid;grid-template-columns:52px minmax(200px,1.3fr) repeat(3,minmax(120px,.8fr)) minmax(145px,.9fr) 125px;gap:18px;align-items:center;padding:24px 10px;border-bottom:1px solid var(--line)}.rank{color:var(--blue);font:500 19px/1 Georgia,serif}.asset,.metric,.estimate,.price{display:grid;gap:5px;min-width:0}.asset strong,.estimate strong{font-family:"Iowan Old Style","Songti SC",STSong,Georgia,serif;font-weight:500}.asset strong{font-size:23px}.asset small,.metric small,.estimate small,.price small{overflow:hidden;color:var(--muted);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.metric strong,.price strong{overflow:hidden;color:var(--ink);font-size:16px;font-weight:500;text-overflow:ellipsis;white-space:nowrap}.estimate strong{color:var(--blue);font-size:25px;font-variant-numeric:tabular-nums}.price strong{color:var(--blue);font:500 22px/1.25 "Iowan Old Style",Georgia,serif;font-variant-numeric:tabular-nums}.mobile-price{display:none}.copy-pool{justify-self:start;margin-top:3px;padding:5px 9px;border:0;border-radius:8px;color:var(--blue);background:var(--sand);font-size:11px;font-weight:500;cursor:pointer}.copy-pool:hover{box-shadow:0 0 0 1px #c9c6ba}footer{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}footer a{color:var(--blue)}@media(max-width:1180px){main{padding:26px 22px 50px}.ranking-row{grid-template-columns:42px minmax(180px,1.2fr) repeat(2,minmax(110px,.8fr)) 145px}.volume,.price{display:none}}@media(max-width:680px){main{padding:20px 16px 40px}.ranking-row{grid-template-columns:34px minmax(0,1fr) 122px;gap:10px;padding:20px 2px}.metric,.price{display:none}.rank{font-size:17px}.asset strong{font-size:20px}.asset small,.estimate small{font-size:11px}.copy-pool{padding:5px 8px;font-size:10px}.estimate{text-align:right}.estimate strong{font-size:21px}.estimate .mobile-price{display:block;color:var(--ink);font-size:11px}footer{font-size:11px}}
-</style></head><body><main>
-<section class="ranking">${rankingRows(rankings.get(1_000))}</section>
-<footer>每 15 分钟刷新 Raydium 官方 24h 数据。预估公式：24h LP Fee × 1,000 / (TVL + 1,000)。未扣除无常损失、进出滑点与再平衡成本。数据生成：${escapeHtml(updatedAt)} · <a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script>document.querySelectorAll('.copy-pool').forEach((button)=>button.addEventListener('click',async()=>{const label=button.textContent;try{await navigator.clipboard.writeText(button.dataset.pool);button.textContent='已复制';setTimeout(()=>button.textContent=label,1400)}catch{button.textContent='复制失败';setTimeout(()=>button.textContent=label,1400)}}));</script></body></html>`;
-}
-
-async function sendTelegram(rows, updatedAt) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) {
-    console.log("Telegram secrets are not configured; dashboard generation continues without push.");
-    return;
-  }
-  const lines = rows.slice(0, 3).map((row, index) => `${index + 1}. ${row.symbol}/USDC\n预估手续费 ${money(row.estimatedFee, 4)} · TVL ${money(row.tvl, 0)}\n24h Fee ${money(row.lpFee24h, 2)}`);
-  const text = `Raydium RWA LP 前三名（1,000U）\n${updatedAt}\n\n${lines.join("\n\n")}\n\n看板：https://fengxiong111.github.io/lp-decision-os/`;
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+const blockersByPool = optimizerSummary.results.map(({ pool, optimizer }) => ({
+  poolAddress: pool.poolAddress,
+  pair: `${pool.symbol}/USDC`,
+  universeStatus: pool.universeStatus,
+  executable: optimizer.executable,
+  blockers: [...new Set([...(optimizer.blockers ?? []), ...(pool.evidence?.blockers ?? [])])],
+  dataFreshness: pool.evidence?.dataFreshness ?? null,
+}));
+const blockerMatrix = optimizerSummary.results
+  .filter(({ pool }) => pool.evidence)
+  .map(({ pool, optimizer }) => {
+    const evidence = pool.evidence;
+    const window24 = evidence.swaps?.windows?.["24"] ?? null;
+    const path = evidence.swaps?.path ?? null;
+    const shadow = evidence.shadowReplay ?? null;
+    return {
+      pool: pool.poolAddress,
+      pair: `${pool.symbol}/USDC`,
+      coverage24h: {
+        status: window24?.windowComplete === true ? "PASS" : "INCOMPLETE",
+        coverageRatio: window24?.coverageRatio ?? null,
+        expectedBucketCount: window24?.expectedBucketCount ?? null,
+        metricsBucketCount: window24?.metricsBucketCount ?? null,
+        gapCount: window24?.gapCount ?? null,
+        unknownInstructions: window24?.unknownInstructions ?? null,
+        unresolvedRetryableTransactions: window24?.unresolvedRetryableTransactions ?? null,
+        firstEventTime: window24?.firstEventTime ?? null,
+        lastEventTime: window24?.lastEventTime ?? null,
+        replayCoverageSeconds: window24?.replayCoverageSeconds ?? null,
+        totalSwaps: window24?.totalSwaps ?? null,
+        validSwaps: window24?.validSwaps ?? null,
+        invalidSwaps: window24?.invalidSwaps ?? null,
+        pathCoverage: window24?.pathCoverage ?? null,
+        feeCoverage: window24?.feeCoverage ?? null,
+      },
+      swapPath: {
+        status: path?.coverageRatio === 1 && path?.divergence !== true && path?.transactionOrderComplete === true && path?.stateContinuityPass !== false ? "PASS" : "INCOMPLETE",
+        valid: path?.valid ?? null,
+        total: path?.total ?? null,
+        coverageRatio: path?.coverageRatio ?? null,
+        divergence: path?.divergence ?? null,
+        currentMatchesLast: path?.currentMatchesLast ?? null,
+        currentStateAfterReplay: path?.currentStateAfterReplay ?? null,
+        transactionOrderComplete: path?.transactionOrderComplete ?? null,
+        orderIncompleteSlots: path?.orderIncompleteSlots ?? [],
+      },
+      fee: {
+        status: evidence.feeConfigVerified === true && (evidence.swaps?.parser?.amountReconciliationFailed ?? 1) === 0 ? "PASS" : "INCOMPLETE",
+        parsedSwap: evidence.swaps?.parser?.parsedSwap ?? null,
+        reconciliationFailed: evidence.swaps?.parser?.amountReconciliationFailed ?? null,
+        feeGrowthReconciliation: evidence.feeGrowthReconciliation?.status ?? "UNAVAILABLE",
+        replayFeeUsd: evidence.feeGrowthReconciliation?.replayFeeUsd ?? null,
+        feeGrowthExpected: evidence.feeGrowthReconciliation?.feeGrowthExpected ?? null,
+        diffBps: evidence.feeGrowthReconciliation?.diffBps ?? null,
+        evidence: "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT",
+      },
+      activeLiquidityReplay: {
+        status: shadow?.status === "SHADOW_FEE_REPLAY_COMPLETE_NET_PENDING" ? "PASS" : "INCOMPLETE",
+        candidateCount: shadow?.candidateCount ?? 0,
+        method: shadow?.feeAllocationMethod ?? null,
+        blockers: shadow?.blockers ?? [],
+      },
+      replay: {
+        status: evidence.replayEvidence ? "PARTIAL_OR_COMPLETE" : "UNAVAILABLE",
+        blockers: evidence.replayEvidence?.blockers ?? (evidence.blockers ?? []),
+        executionCostQuality: evidence.replayEvidence?.executionCostQuality ?? null,
+        markoutQuality: evidence.replayEvidence?.markoutQuality ?? null,
+      },
+      cost: {
+        status: evidence.executionCostEvidence?.quality ?? "UNAVAILABLE",
+        simulation: evidence.executionCostEvidence?.simulation ?? null,
+      },
+      markout: {
+        status: evidence.markout?.quality ?? "INCOMPLETE",
+        source: evidence.markout?.source ?? null,
+      },
+      executable: optimizer.executable === true,
+    };
   });
-  if (!response.ok) throw new Error(`Telegram push failed: ${response.status} ${await response.text()}`);
-}
+const slot = pools.reduce((highest, pool) => {
+  const candidate = Number(pool.evidence?.poolState?.slot);
+  return Number.isFinite(candidate) ? Math.max(highest ?? candidate, candidate) : highest;
+}, null);
+const baseSnapshot = {
+  schemaVersion: 1,
+  generatedAt: fetchedAt,
+  slot,
+  dataFreshness: snapshotFreshness(fetchedAt, DASHBOARD_CONFIG.evidence.freshnessSlaMs),
+  strategyVersion: "shadow-v1",
+  snapshotType: "VERIFIED_RAYDIUM_RWA_USDC_EVIDENCE",
+  sourceEvidence: {
+    api: { provider: "Raydium API v3", url: DASHBOARD_CONFIG.apiUrl, fetchedAt },
+    rpc: { urls: DASHBOARD_CONFIG.rpcUrls, methodLimits: { globalRps: 6, getTransactionRps: 3, getSignaturesForAddressRps: 1, maxConcurrency: 6 } },
+    layer: evidenceRun.evidenceSummary.activeIndexedCount > 0 ? "API_METADATA_PLUS_ONCHAIN_EVIDENCE" : "API_METADATA_ONLY",
+    evidenceSummary: evidenceRun.evidenceSummary,
+  },
+  scope: {
+    protocol: "Raydium",
+    universe: "RWA / USDC",
+    status: "ACTIVE_INDEXED_REQUIRED",
+    capital: DASHBOARD_CONFIG.capital,
+    tvlEnterThreshold: DASHBOARD_CONFIG.tvlEnterThreshold,
+    tvlExitHysteresis: DASHBOARD_CONFIG.tvlExitHysteresis,
+    objective: "EXPECTED_NET_FEE_24H_USD_1000",
+    autoExecution: DASHBOARD_CONFIG.autoExecution,
+    displayLimit: 3,
+  },
+  publicPoolCount: pools.length,
+  stage1CandidateCount: evidenceRun.evidenceSummary.stage1CandidateCount,
+  activeIndexedPoolCount: evidenceRun.evidenceSummary.activeIndexedCount,
+  executablePoolCount: optimizerSummary.executablePoolCount,
+  shadowState: optimizerSummary.shadowState,
+  top3Change: optimizerSummary.top3Change,
+  top3: top3ForPage,
+  blockersByPool,
+  blockerMatrix,
+  optimizerAudit: {
+    blockedPoolCount: optimizerSummary.results.filter(({ optimizer }) => !optimizer.executable).length,
+    completeEvidencePoolCount: optimizerSummary.results.filter(({ optimizer }) => optimizer.executable).length,
+    noWallet: true,
+    noRealPosition: true,
+    autoExecution: false,
+  },
+};
+const snapshot = { ...baseSnapshot, snapshotHash: snapshotHash(baseSnapshot) };
+const data = JSON.stringify(snapshot, null, 2);
+verifySnapshot(snapshot, DASHBOARD_CONFIG);
+verifyDataJson(data);
 
-const response = await fetch(API_URL, { headers: { accept: "application/json" } });
-if (!response.ok) throw new Error(`Raydium API failed: ${response.status}`);
-const payload = await response.json();
-const pools = (payload?.data?.data ?? []).map(normalizePool).filter(Boolean);
-if (pools.length === 0) throw new Error("Raydium API returned no usable RWA/USDC pools");
-const rankings = new Map(CAPITALS.map((capital) => [capital, rankPools(pools, capital)]));
-if (rankings.get(1_000).length < 3) throw new Error("Fewer than three pools passed the ranking filters");
-const updatedAt = new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", dateStyle: "medium", timeStyle: "medium", hour12: false }).format(new Date());
-await mkdir(OUTPUT_DIR, { recursive: true });
-await writeFile(new URL("index.html", OUTPUT_DIR), html(rankings, updatedAt));
-await writeFile(new URL("data.json", OUTPUT_DIR), JSON.stringify({ updatedAt, rankings: Object.fromEntries(rankings) }, null, 2));
-if (process.argv.includes("--telegram")) await sendTelegram(rankings.get(1_000), updatedAt);
-console.log(JSON.stringify({ updatedAt, poolCount: pools.length, top3: rankings.get(1_000).slice(0, 3).map((row) => row.symbol) }, null, 2));
+const page = renderPage({ optimizerSummary, evidenceSummary: evidenceRun.evidenceSummary, fetchedAt, poolCount: pools.length, snapshotHash: snapshot.snapshotHash, config: DASHBOARD_CONFIG });
+const runtime = renderRuntime(DASHBOARD_CONFIG);
+verifyPageMarkup(page);
+
+const outputDir = new URL("../mobile-dashboard/", import.meta.url);
+await mkdir(outputDir, { recursive: true });
+await writeFile(new URL("index.html", outputDir), page);
+await writeFile(new URL("runtime.js", outputDir), runtime);
+for (const legacyFile of ["data.json", "top3-next.json"]) {
+  try {
+    await unlink(new URL(legacyFile, outputDir));
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+}
+const nextSnapshot = new URL("top3-next.json", outputDir);
+const currentSnapshot = new URL("top3.json", outputDir);
+await writeFile(nextSnapshot, data);
+await rename(nextSnapshot, currentSnapshot);
+const manifest = {
+  schemaVersion: 1,
+  sourceDirectory: "mobile-dashboard",
+  top3Json: "mobile-dashboard/top3.json",
+  indexHtml: "mobile-dashboard/index.html",
+  runtimeJs: "mobile-dashboard/runtime.js",
+  pageDataSource: "./top3.json",
+  top3Count: top3ForPage.length,
+  snapshotHash: snapshot.snapshotHash,
+  generatedAt: fetchedAt,
+  legacyColumnsPresent: false,
+  staleFallbackRemoved: true,
+  serviceWorker: false,
+};
+await writeFile(new URL("deployment-manifest.json", outputDir), JSON.stringify(manifest, null, 2));
+
+console.log(JSON.stringify({
+  updatedAt,
+  publicPoolCount: pools.length,
+  stage1CandidateCount: evidenceRun.evidenceSummary.stage1CandidateCount,
+  activeIndexedPoolCount: evidenceRun.evidenceSummary.activeIndexedCount,
+  executablePoolCount: optimizerSummary.executablePoolCount,
+  top3: top3ForPage.map((row) => ({ rank: row.rank, pair: row.pair, action: row.action })),
+  rpc: evidenceRun.evidenceSummary.rpc,
+  status: optimizerSummary.top3.length > 0 ? "RWA_TOP3_PRODUCTION_EVIDENCE_READY_CANDIDATE" : "UNAVAILABLE_REAL_EVIDENCE_INCOMPLETE",
+}, null, 2));

@@ -1,10 +1,11 @@
-name: Mobile dashboard and Telegram Top 3
+name: Mobile dashboard
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: "7,22,37,52 * * * *"
-    - cron: "2 * * * *"
 
 permissions:
   contents: read
@@ -23,15 +24,28 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+      - name: Restore evidence checkpoint cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/rwa-evidence
+          key: rwa-evidence-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            rwa-evidence-${{ runner.os }}-
+      - name: Install external dashboard dependencies
+        run: npm ci --ignore-scripts
       - uses: actions/configure-pages@v5
       - name: Build mobile dashboard
         run: node scripts/build-mobile-dashboard.mjs
-      - name: Push Telegram Top 3 hourly
-        if: github.event.schedule == '2 * * * *'
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node scripts/build-mobile-dashboard.mjs --telegram
+      - name: Verify GitHub Pages artifact
+        run: node scripts/verify-pages-artifact.mjs
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Verify Top 3 rendering contract
+        run: npm run test:e2e:mobile-dashboard
       - uses: actions/upload-pages-artifact@v3
         with:
           path: mobile-dashboard
