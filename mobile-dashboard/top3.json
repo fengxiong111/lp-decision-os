@@ -1,0 +1,1483 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-20T10:58:05.414Z",
+  "slot": 440460016,
+  "dataFreshness": {
+    "state": "FRESH",
+    "ageMs": 41166,
+    "slaMs": 1800000
+  },
+  "strategyVersion": "shadow-v1",
+  "snapshotType": "VERIFIED_RAYDIUM_RWA_USDC_EVIDENCE",
+  "sourceEvidence": {
+    "api": {
+      "provider": "Raydium API v3",
+      "url": "https://api-v3.raydium.io/pools/info/list-v2?size=1000&hasReward=false&sortField=liquidity&sortType=desc&mintFilter=RWA",
+      "fetchedAt": "2026-08-20T10:58:05.414Z"
+    },
+    "rpc": {
+      "urls": [
+        "https://api.mainnet.solana.com"
+      ],
+      "methodLimits": {
+        "globalRps": 6,
+        "getTransactionRps": 3,
+        "getSignaturesForAddressRps": 1,
+        "maxConcurrency": 6
+      }
+    },
+    "layer": "API_METADATA_ONLY",
+    "evidenceSummary": {
+      "stage1CandidateCount": 52,
+      "stage1ProcessedThisBuild": 5,
+      "activeIndexedCount": 0,
+      "freshCount": 5,
+      "rpc": {
+        "requests": 91,
+        "rateLimited": 5,
+        "failures": 0,
+        "methods": {
+          "getRecentPrioritizationFees": 1,
+          "getAccountInfo": 8,
+          "getMultipleAccounts": 8,
+          "getSignaturesForAddress": 5,
+          "getTransaction": 3,
+          "getBlock": 66
+        },
+        "averageLatencyMs": 270.7032967032967,
+        "p95LatencyMs": 842,
+        "endpoints": {
+          "https://api.mainnet.solana.com": 91
+        }
+      },
+      "source": "Raydium API metadata + Solana RPC PoolState/TickArray + SQLite checkpoint replay",
+      "status": "UNAVAILABLE"
+    }
+  },
+  "scope": {
+    "protocol": "Raydium",
+    "universe": "RWA / USDC",
+    "status": "ACTIVE_INDEXED_REQUIRED",
+    "capital": 1000,
+    "tvlEnterThreshold": 5000,
+    "tvlExitHysteresis": 4000,
+    "objective": "EXPECTED_NET_FEE_24H_USD_1000",
+    "autoExecution": false,
+    "displayLimit": 3
+  },
+  "publicPoolCount": 52,
+  "stage1CandidateCount": 52,
+  "activeIndexedPoolCount": 0,
+  "executablePoolCount": 0,
+  "shadowState": "NO_WALLET_NO_REAL_POSITION",
+  "top3Change": {
+    "status": "NO_PRIOR_SHADOW_STATE",
+    "entered": [],
+    "exited": [],
+    "noForcedExit": true
+  },
+  "top3": [],
+  "blockersByPool": [
+    {
+      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
+      "pair": "CRCLx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-20T10:58:45.864Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
+      "pair": "QQQx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-20T10:58:15.818Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
+      "pair": "SPYx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-20T10:58:30.279Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+      "pair": "NVDAx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE",
+        "REPLAY_STATE_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-20T10:58:13.402Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
+      "pair": "TSLAx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
+      "pair": "CRCLx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-20T10:58:46.540Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "AHNN6JmvaGG6XUoSg7sEr38gRYDB2jTbUvqXVuqaRHpq",
+      "pair": "SPCXx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "w7SGmPeXoMCsjvXqgsAmUn56uypyDsjAtsxeVkaiqxa",
+      "pair": "COINx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "6eqxMn5wxwBfkA9pH5sfq94Bc3zZEWGrwLNSMrefUjaP",
+      "pair": "SKHY/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "HHQUnUbmWLrYzkscDY1C3deEFbGtiGBGoHjpANogmvum",
+      "pair": "TSLAx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "6m5aXAve4uh6Kt4ytKyCLWNMjd8PYP5vujwNCtycrUiD",
+      "pair": "AMZNx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "97r9NLqYoyGFbQesPduwuTHq4fJjbk8pHVUGawEqfnva",
+      "pair": "HOOD/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "DXWbip5LducMAbDSSpLYz9Xik3253EPeAYQufQtx7LXs",
+      "pair": "HOODx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "RyhF4cksVZY7vcqJpoytHcxcGNKRp27PEGhSnEPpbGv",
+      "pair": "MSTRx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "ECkcSDJvKiyoVU5f1L6CgpSmMVd1S4KGRkXW56f1bEWN",
+      "pair": "DRAM/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "FjuBy7jjf9DXj9d3R7cHpvcnoFW2iQxf7F7P3vqx4Jza",
+      "pair": "SPCX/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
+      "pair": "GLDx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "64ynMUTTrJHswDAU6sc6cubjsxUxSxL788FC3NFY4SyG",
+      "pair": "PAXG/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "B8YAwjGYk6qidWzGBXMAxP7nYfG8g74EZ3Y4gFSsobRw",
+      "pair": "GOOGLx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "3Hro9bWkxiyV7ZfH2ZBdqyuNEVZt69ixNyQbAmcvyvys",
+      "pair": "MSTR/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "FE8jVZHEytGkEv2wmFS8faFWnGXqJLUbrw1qJMrk7RTv",
+      "pair": "NBIS/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "4pCZCVEiYyT4efNdXUdL2tJF8VGMgiMXrZWq6FiNXhRw",
+      "pair": "SPYx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "CLu4kFM4nb67xrdN7vJnMxXXir8Z5hA4HJUzPFccXjsL",
+      "pair": "MSFTx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y",
+      "pair": "AAPLx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
+      "pair": "SNDK/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "DU9dgBU6Yh2JjsYcjtRY21G14dhQxn6Xm5PT949Sa4tA",
+      "pair": "STRCx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "25bztR81eg6CTvxVm5sJkDcXJavVUZeqHf6kSkbhawoM",
+      "pair": "TTWO/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "DQcg3DtWrGRhdBmQh9MpgjuFQYdjN47xB7Do99kPzZRC",
+      "pair": "MRNAzX/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "4KqQN6u1pFKroFE2jVEhoepAMRKPcuAzWVDCgm9zRBYN",
+      "pair": "NVDAx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "7sHMnvE7WqP7vQFWJGEnMT4vZg6Za9K7PpddDoXJCqME",
+      "pair": "SPYx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "FknDV1F5n6QaA7rLmjquDjuU6wcPMNm5RYq7zWbqhpZw",
+      "pair": "QQQx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
+      "pair": "METAx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "EkpbWmPzrzFsv2xkJRdvWs61aRuDBVdrJK7WQmctBFnB",
+      "pair": "AVGOx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "bhL1PjyXeRhb2kk3ru2qx7cb8pKoXNWAiwTpJrZc1gt",
+      "pair": "deJAAA/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "HHNPd8DpneXbaYBiGC7SU28mYxocbkMznPABPN3sGTyU",
+      "pair": "INTC/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "3LbRQkdRnahJfAEBBRajCMki8ZBMhBhidmxbgMzp8nVu",
+      "pair": "COINx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "DppCVaAGq5VA9gGK32u21JNqBf5d7jqH7RGDEvj39gQY",
+      "pair": "STRCx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "B4UdLnvzCrnfRndLdgGTYZjcKTDsaFKB54cmKb2GoSne",
+      "pair": "BRK.Bx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "2EbY6YYKdQY9mmn9voiadgMcEnmZ5oe7qkcFVmywNrrE",
+      "pair": "PLTRx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "6KoZB86BFDk6TZbB4CTBoAA8PPbpmEwSWFjCyfkt1Uw4",
+      "pair": "INTCx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "cPK91ascbHz3pXHVqLbhBbbQs3ztMvu1681w5EfoGyP",
+      "pair": "BOT/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "7HNwUP5rSUo9GfdDthJn4UCdw2Px6h2aprSedD7r7J3C",
+      "pair": "KOx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "GWjPMHYsmdosbMCPx14N627qf5WhpaxAwNBRCfqP9CM9",
+      "pair": "ORCLx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "5MGvNj9RNKNmzwp1LtZuQkZonEYtKJ3JuiyNQEUU2DsF",
+      "pair": "MCDx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "GmcGvaTDhwScEKcmDPsBiLxbgHtvTEGp89kHjpsHZjD2",
+      "pair": "PEPx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "2DHt38DfCB4tSzbKrfgUBsiwUQMBc1oGAwWQWfRJCPut",
+      "pair": "AMBRx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "H3qMpQnUiod9qfEMZL84nvoYd2pXrscHA6NQAb6icwxD",
+      "pair": "XOMx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "5xm6QUDxRyMg3Gx59CxXB6VZnRKs4bVu44DS6DzZr3Bp",
+      "pair": "UNHx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "CYyfSk8EjZ9aNQZsZM5oxRpskSFzzmU3XcEgq4WzxshG",
+      "pair": "GLDx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "7RQXW5KEBgHCcy1eSNs1Kh7BWaEL46q8jb9t18S151bL",
+      "pair": "NFLXx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "5v5prv4UMT8fhzYjYwxUmvFuSQiGqF45vuNcmTkHTmi",
+      "pair": "CVXx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    },
+    {
+      "poolAddress": "D6qd9W868h6Jw318vhLSYyymDycydYPEkfsCGDKSzf34",
+      "pair": "LLYx/USDC",
+      "universeStatus": null,
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "CURRENT_PRICE_UNAVAILABLE",
+        "CURRENT_TICK_UNAVAILABLE",
+        "TICK_SPACING_UNAVAILABLE",
+        "ACTIVE_LIQUIDITY_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "FEE_CONFIGURATION_UNAVAILABLE",
+        "EXECUTION_COST_UNAVAILABLE"
+      ],
+      "dataFreshness": null
+    }
+  ],
+  "blockerMatrix": [
+    {
+      "pool": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
+      "pair": "CRCLx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": "2026-08-20T10:16:17.000Z",
+        "lastEventTime": "2026-08-20T10:42:27.000Z",
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 78,
+        "validSwaps": 66,
+        "invalidSwaps": 12,
+        "pathCoverage": 0.8461538461538461,
+        "feeCoverage": 1
+      },
+      "swapPath": {
+        "status": "INCOMPLETE",
+        "valid": 66,
+        "total": 78,
+        "coverageRatio": 0.8461538461538461,
+        "divergence": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 0,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 71.93770759941556,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "INCOMPLETE",
+        "candidateCount": 0,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    },
+    {
+      "pool": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
+      "pair": "QQQx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": "2026-08-20T09:52:49.000Z",
+        "lastEventTime": "2026-08-20T10:44:58.000Z",
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 81,
+        "validSwaps": 81,
+        "invalidSwaps": 0,
+        "pathCoverage": 1,
+        "feeCoverage": 1
+      },
+      "swapPath": {
+        "status": "PASS",
+        "valid": 81,
+        "total": 81,
+        "coverageRatio": 1,
+        "divergence": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 0,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 9.211753078437368,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "PASS",
+        "candidateCount": 87,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "EXECUTION_COST_UNAVAILABLE",
+          "MARKOUT_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    },
+    {
+      "pool": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
+      "pair": "SPYx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": "2026-08-20T01:48:26.000Z",
+        "lastEventTime": "2026-08-20T10:43:12.000Z",
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 77,
+        "validSwaps": 73,
+        "invalidSwaps": 4,
+        "pathCoverage": 0.948051948051948,
+        "feeCoverage": 1
+      },
+      "swapPath": {
+        "status": "INCOMPLETE",
+        "valid": 73,
+        "total": 77,
+        "coverageRatio": 0.948051948051948,
+        "divergence": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 0,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 21.764171950383226,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "INCOMPLETE",
+        "candidateCount": 0,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    },
+    {
+      "pool": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+      "pair": "NVDAx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": null,
+        "lastEventTime": null,
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 0,
+        "validSwaps": 0,
+        "invalidSwaps": 0,
+        "pathCoverage": null,
+        "feeCoverage": null
+      },
+      "swapPath": {
+        "status": "INCOMPLETE",
+        "valid": 0,
+        "total": 0,
+        "coverageRatio": null,
+        "divergence": false,
+        "currentMatchesLast": false,
+        "currentStateAfterReplay": false,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 0,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 0,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "INCOMPLETE",
+        "candidateCount": 0,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE",
+          "REPLAY_STATE_INCOMPLETE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    },
+    {
+      "pool": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
+      "pair": "CRCLx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": "2026-08-20T10:31:36.000Z",
+        "lastEventTime": "2026-08-20T10:57:51.000Z",
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 104,
+        "validSwaps": 93,
+        "invalidSwaps": 11,
+        "pathCoverage": 0.8942307692307693,
+        "feeCoverage": 1
+      },
+      "swapPath": {
+        "status": "INCOMPLETE",
+        "valid": 93,
+        "total": 104,
+        "coverageRatio": 0.8942307692307693,
+        "divergence": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 1,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 30.55155681169064,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "INCOMPLETE",
+        "candidateCount": 0,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    }
+  ],
+  "optimizerAudit": {
+    "blockedPoolCount": 52,
+    "completeEvidencePoolCount": 0,
+    "noWallet": true,
+    "noRealPosition": true,
+    "autoExecution": false
+  },
+  "snapshotHash": "75b3799fcdace51745097f78491d44fbfc6b4e5490018abfa991eb31d21491d4"
+}

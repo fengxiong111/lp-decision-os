@@ -4,8 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: "7,22,37,52 * * * *"
 
 permissions:
   contents: read
@@ -38,8 +36,8 @@ jobs:
       - name: Install external dashboard dependencies
         run: npm ci --ignore-scripts
       - uses: actions/configure-pages@v5
-      - name: Build mobile dashboard
-        run: node scripts/build-mobile-dashboard.mjs
+      - name: Package mobile dashboard from verified Top 3 snapshot
+        run: node scripts/build-mobile-dashboard-page.mjs
       - name: Verify GitHub Pages artifact
         run: node scripts/verify-pages-artifact.mjs
       - name: Install Playwright Chromium
