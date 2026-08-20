@@ -27,6 +27,21 @@ function isPass(itemValue) {
   return itemValue?.status === "PASS";
 }
 
+function blockerClass(pool, items) {
+  const evidence = pool.evidence ?? {};
+  const parser = evidence.swaps?.parser ?? {};
+  const path = evidence.swaps?.path ?? null;
+  const hardInvalid = [
+    pool.currentPrice !== null && finite(pool.currentPrice) !== null && pool.currentPrice <= 0,
+    pool.tickSpacing !== null && finite(pool.tickSpacing) !== null && pool.tickSpacing <= 0,
+    pool.activeLiquidity !== null && finite(pool.activeLiquidity) !== null && pool.activeLiquidity < 0,
+    ["INVALID", "REJECTED", "IDENTITY_CONFLICT"].includes(pool.universeStatus),
+    path?.divergence === true || path?.stateContinuityPass === false || path?.currentStateAfterReplay === false,
+    (parser.amountReconciliationFailed ?? 0) > 0,
+  ].some(Boolean);
+  return hardInvalid ? "HARD_INVALID" : items.some((entry) => entry.status !== "PASS") ? "EVIDENCE_MISSING" : null;
+}
+
 function pathStatus(path) {
   if (path?.divergence === true || path?.stateContinuityPass === false || path?.currentStateAfterReplay === false) {
     return item("tickPath", "Tick path", "FAIL", "回放状态发生 divergence 或连续性失败");
@@ -131,12 +146,14 @@ export function buildPoolDiagnostic(pool, optimizer, matrixRow = null) {
   const primary = failures[0] ?? warnings[0] ?? null;
   const range = netBounds(pool, optimizer);
   const volatilityRegime = pool.volatilityRegime ?? deriveVolatilityRegime(pool);
+  const classification = blockerClass(pool, items);
 
   return {
     poolAddress: pool.poolAddress,
     pair: `${pool.symbol}/USDC`,
     status,
     readyForTop3: status === "READY" && optimizer?.executable === true,
+    blockerClass: classification,
     primaryBlocker: primary ? { key: primary.key, label: primary.label, display: primary.display, reason: primary.reason } : null,
     passCount: items.filter(isPass).length,
     totalChecks: items.length,
@@ -144,7 +161,7 @@ export function buildPoolDiagnostic(pool, optimizer, matrixRow = null) {
     netRange: range,
     volatilityRegime,
     action: status === "READY" ? optimizer?.action ?? "UNAVAILABLE" : "UNAVAILABLE",
-    rankingImpact: status === "READY" ? "可进入 Top3" : status === "NEAR_READY" ? "仅诊断，不进入 Top3" : "不进入 Top3",
+    rankingImpact: status === "READY" ? "可进入执行验证 Top3" : classification === "EVIDENCE_MISSING" ? "机会层保留为 WATCH，等待验证" : status === "NEAR_READY" ? "仅诊断，不进入执行 Top3" : "机会层保留，但禁止执行",
     sourceBlockers: [...new Set([...(pool.evidence?.blockers ?? []), ...(matrixRow?.replay?.blockers ?? [])])],
   };
 }

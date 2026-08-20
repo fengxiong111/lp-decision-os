@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-20T11:37:57.172Z",
-  "slot": 440465707,
+  "generatedAt": "2026-08-20T12:11:40.258Z",
+  "slot": 440470620,
   "dataFreshness": {
     "state": "FRESH",
-    "ageMs": 10563,
+    "ageMs": 17298,
     "slaMs": 1800000
   },
   "strategyVersion": "shadow-v1",
@@ -13,7 +13,7 @@
     "api": {
       "provider": "Raydium API v3",
       "url": "https://api-v3.raydium.io/pools/info/list-v2?size=1000&hasReward=false&sortField=liquidity&sortType=desc&mintFilter=RWA",
-      "fetchedAt": "2026-08-20T11:37:57.172Z"
+      "fetchedAt": "2026-08-20T12:11:40.258Z"
     },
     "rpc": {
       "urls": [
@@ -33,7 +33,7 @@
       "activeIndexedCount": 0,
       "freshCount": 6,
       "rpc": {
-        "requests": 19,
+        "requests": 18,
         "rateLimited": 0,
         "failures": 0,
         "methods": {
@@ -41,12 +41,12 @@
           "getAccountInfo": 5,
           "getMultipleAccounts": 5,
           "getSignaturesForAddress": 5,
-          "getTransaction": 3
+          "getTransaction": 2
         },
-        "averageLatencyMs": 610.8421052631579,
-        "p95LatencyMs": 1404,
+        "averageLatencyMs": 1680.888888888889,
+        "p95LatencyMs": 10108,
         "endpoints": {
-          "https://api.mainnet.solana.com": 19
+          "https://api.mainnet.solana.com": 18
         }
       },
       "source": "Raydium API metadata + Solana RPC PoolState/TickArray + SQLite checkpoint replay",
@@ -60,7 +60,8 @@
     "capital": 1000,
     "tvlEnterThreshold": 5000,
     "tvlExitHysteresis": 4000,
-    "objective": "EXPECTED_NET_FEE_24H_USD_1000",
+    "objective": "OPPORTUNITY_SCORE_WITH_VERIFICATION_OVERLAY",
+    "verificationObjective": "EXPECTED_NET_FEE_24H_USD_1000",
     "autoExecution": false,
     "displayLimit": 3
   },
@@ -69,6 +70,7 @@
   "activeIndexedPoolCount": 0,
   "executablePoolCount": 0,
   "optimizerExecutablePoolCount": 0,
+  "opportunityCandidateCount": 52,
   "nearReadyPoolCount": 0,
   "blockedPoolCount": 52,
   "shadowState": "NO_WALLET_NO_REAL_POSITION",
@@ -77,9 +79,449 @@
     "entered": [],
     "exited": [],
     "noForcedExit": true,
-    "readyOnly": true
+    "opportunityLayer": true
   },
-  "top3": [],
+  "top3": [
+    {
+      "rank": 1,
+      "pair": "CRCLx/USDC",
+      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
+      "opportunityScore": 88.1,
+      "opportunityStatus": "WATCH",
+      "netEstimate": null,
+      "coreCapital": null,
+      "coreLower": null,
+      "coreUpper": null,
+      "bufferCapital": null,
+      "bufferLower": null,
+      "bufferUpper": null,
+      "confidence": 81.5,
+      "action": "WATCH",
+      "evidence": [
+        {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        {
+          "key": "poolState",
+          "label": "PoolState",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "PoolState identity、decimals、price、config 通过"
+        },
+        {
+          "key": "tickArray",
+          "label": "TickArray",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "TickArray 已解码"
+        },
+        {
+          "key": "currentPrice",
+          "label": "Current price",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "当前价格为正且可用于区间计算"
+        },
+        {
+          "key": "tick",
+          "label": "Tick",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Current Tick / TickSpacing 可用于合法 snap"
+        },
+        {
+          "key": "activeLiquidity",
+          "label": "Active liquidity",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Active liquidity 可用于 replay"
+        },
+        {
+          "key": "swapReplay",
+          "label": "Swap replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Swap window / replay 尚未完成"
+        },
+        {
+          "key": "tickPath",
+          "label": "Tick path",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Tick path 尚未完成"
+        },
+        {
+          "key": "shadowReplay",
+          "label": "Shadow replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Shadow replay 尚未产生候选"
+        },
+        {
+          "key": "feeReplay",
+          "label": "Fee replay",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Pool fee 配置与 Swap fee 证据通过"
+        },
+        {
+          "key": "markout",
+          "label": "Markout",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "外部参考价格 Markout 尚未完成"
+        },
+        {
+          "key": "feeGrowth",
+          "label": "Fee-growth",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee-growth reconciliation 尚未完成"
+        },
+        {
+          "key": "executionCost",
+          "label": "Execution cost",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Open / rebalance cost 已有可复用估计"
+        }
+      ],
+      "opportunity": {
+        "score": 88.1,
+        "breakdown": {
+          "raw": {
+            "volume24h": 2512515.688228388,
+            "lpFee24h": 6281.2909447823495,
+            "tvl": 3064119.82,
+            "feeTier": 0.0025,
+            "liquidity": 8412820251264,
+            "priceActivity": 0.8199795816824121
+          },
+          "scores": {
+            "volume24h": 97.19515385160722,
+            "lpFee24h": 100,
+            "tvl": 100,
+            "feeTier": 24.333030203879364,
+            "liquidity": 100,
+            "priceActivity": 30.369148474897724
+          },
+          "value": 88.11030659961499,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "source": "Raydium API v3 public RWA/USDC market data"
+      }
+    },
+    {
+      "rank": 2,
+      "pair": "CRCLx/USDC",
+      "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
+      "opportunityScore": 81.9,
+      "opportunityStatus": "WATCH",
+      "netEstimate": null,
+      "coreCapital": null,
+      "coreLower": null,
+      "coreUpper": null,
+      "bufferCapital": null,
+      "bufferLower": null,
+      "bufferUpper": null,
+      "confidence": 81.5,
+      "action": "WATCH",
+      "evidence": [
+        {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        {
+          "key": "poolState",
+          "label": "PoolState",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "PoolState identity、decimals、price、config 通过"
+        },
+        {
+          "key": "tickArray",
+          "label": "TickArray",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "TickArray 已解码"
+        },
+        {
+          "key": "currentPrice",
+          "label": "Current price",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "当前价格为正且可用于区间计算"
+        },
+        {
+          "key": "tick",
+          "label": "Tick",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Current Tick / TickSpacing 可用于合法 snap"
+        },
+        {
+          "key": "activeLiquidity",
+          "label": "Active liquidity",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Active liquidity 可用于 replay"
+        },
+        {
+          "key": "swapReplay",
+          "label": "Swap replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Swap window / replay 尚未完成"
+        },
+        {
+          "key": "tickPath",
+          "label": "Tick path",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Tick path 尚未完成"
+        },
+        {
+          "key": "shadowReplay",
+          "label": "Shadow replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Shadow replay 尚未产生候选"
+        },
+        {
+          "key": "feeReplay",
+          "label": "Fee replay",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Pool fee 配置与 Swap fee 证据通过"
+        },
+        {
+          "key": "markout",
+          "label": "Markout",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "外部参考价格 Markout 尚未完成"
+        },
+        {
+          "key": "feeGrowth",
+          "label": "Fee-growth",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee-growth reconciliation 尚未完成"
+        },
+        {
+          "key": "executionCost",
+          "label": "Execution cost",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Open / rebalance cost 已有可复用估计"
+        }
+      ],
+      "opportunity": {
+        "score": 81.9,
+        "breakdown": {
+          "raw": {
+            "volume24h": 3723575.9483424267,
+            "lpFee24h": 3723.580503545407,
+            "tvl": 1870374.7,
+            "feeTier": 0.001,
+            "liquidity": 5703067531108,
+            "priceActivity": 1.9908181758138765
+          },
+          "scores": {
+            "volume24h": 100,
+            "lpFee24h": 94.02209595744986,
+            "tvl": 92.1570247164132,
+            "feeTier": 9.131722473109994,
+            "liquidity": 61.294099865433424,
+            "priceActivity": 55.561161237527045
+          },
+          "value": 81.85082279042763,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "source": "Raydium API v3 public RWA/USDC market data"
+      }
+    },
+    {
+      "rank": 3,
+      "pair": "COINx/USDC",
+      "poolAddress": "w7SGmPeXoMCsjvXqgsAmUn56uypyDsjAtsxeVkaiqxa",
+      "opportunityScore": 81.8,
+      "opportunityStatus": "WATCH",
+      "netEstimate": null,
+      "coreCapital": null,
+      "coreLower": null,
+      "coreUpper": null,
+      "bufferCapital": null,
+      "bufferLower": null,
+      "bufferUpper": null,
+      "confidence": 54,
+      "action": "WATCH",
+      "evidence": [
+        {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        {
+          "key": "poolState",
+          "label": "PoolState",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "PoolState 尚未通过"
+        },
+        {
+          "key": "tickArray",
+          "label": "TickArray",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "TickArray 尚未完整解码"
+        },
+        {
+          "key": "currentPrice",
+          "label": "Current price",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "当前价格缺失或无效"
+        },
+        {
+          "key": "tick",
+          "label": "Tick",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Current Tick 或 TickSpacing 缺失"
+        },
+        {
+          "key": "activeLiquidity",
+          "label": "Active liquidity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Active liquidity 缺失或无效"
+        },
+        {
+          "key": "swapReplay",
+          "label": "Swap replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Swap window / replay 尚未完成"
+        },
+        {
+          "key": "tickPath",
+          "label": "Tick path",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Tick path 尚未完成"
+        },
+        {
+          "key": "shadowReplay",
+          "label": "Shadow replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Shadow replay 尚未产生候选"
+        },
+        {
+          "key": "feeReplay",
+          "label": "Fee replay",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee 配置或金额对账仍在验证"
+        },
+        {
+          "key": "markout",
+          "label": "Markout",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "外部参考价格 Markout 尚未完成"
+        },
+        {
+          "key": "feeGrowth",
+          "label": "Fee-growth",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee-growth reconciliation 尚未完成"
+        },
+        {
+          "key": "executionCost",
+          "label": "Execution cost",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Execution cost evidence 缺失"
+        }
+      ],
+      "opportunity": {
+        "score": 81.8,
+        "breakdown": {
+          "raw": {
+            "volume24h": 394265.45762976987,
+            "lpFee24h": 3154.12407145511,
+            "tvl": 781243.2,
+            "feeTier": 0.008,
+            "liquidity": null,
+            "priceActivity": 0.504664178363114
+          },
+          "scores": {
+            "volume24h": 83.99074529567663,
+            "lpFee24h": 92.12475629767329,
+            "tvl": 78.28612804857347,
+            "feeTier": 79.87722212110391,
+            "liquidity": null,
+            "priceActivity": 20.72004295547534
+          },
+          "value": 81.77921560575017,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "source": "Raydium API v3 public RWA/USDC market data"
+      }
+    }
+  ],
+  "opportunityRanking": {
+    "version": 1,
+    "featureWeights": {
+      "volume24h": 0.3,
+      "lpFee24h": 0.3,
+      "tvl": 0.15,
+      "feeTier": 0.1,
+      "liquidity": 0.1,
+      "priceActivity": 0.05
+    },
+    "candidateCount": 52,
+    "top3Count": 3
+  },
   "diagnostics": {
     "version": 1,
     "statusCounts": {
@@ -92,10 +534,172 @@
     "blockedCount": 52,
     "matrix": [
       {
+        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+        "pair": "NVDAx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 9,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "逐笔 Tick path 与当前状态连续"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "已评估 87 个 Core + Buffer 候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 555404.8582435887,
+            "lpFee24h": 555.4059382448472,
+            "tvl": 2439826.02,
+            "feeTier": 0.001,
+            "liquidity": 6811620995996,
+            "priceActivity": 0.2276411734651427
+          },
+          "scores": {
+            "volume24h": 86.4339152761054,
+            "lpFee24h": 72.28207411140819,
+            "tvl": 96.38003345418666,
+            "feeTier": 9.131722473109994,
+            "liquidity": 78.97931163048312,
+            "priceActivity": 10.400484543776088
+          },
+          "value": 71.40292947193018,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 71.4,
+        "opportunityStatus": "WATCH"
+      },
+      {
         "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
         "pair": "CRCLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -215,17 +819,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2512515.688228388,
+            "lpFee24h": 6281.2909447823495,
+            "tvl": 3064119.82,
+            "feeTier": 0.0025,
+            "liquidity": 8412820251264,
+            "priceActivity": 0.8199795816824121
+          },
+          "scores": {
+            "volume24h": 97.19515385160722,
+            "lpFee24h": 100,
+            "tvl": 100,
+            "feeTier": 24.333030203879364,
+            "liquidity": 100,
+            "priceActivity": 30.369148474897724
+          },
+          "value": 88.11030659961499,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 88.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
         "pair": "CRCLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -345,17 +981,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 3723575.9483424267,
+            "lpFee24h": 3723.580503545407,
+            "tvl": 1870374.7,
+            "feeTier": 0.001,
+            "liquidity": 5703067531108,
+            "priceActivity": 1.9908181758138765
+          },
+          "scores": {
+            "volume24h": 100,
+            "lpFee24h": 94.02209595744986,
+            "tvl": 92.1570247164132,
+            "feeTier": 9.131722473109994,
+            "liquidity": 61.294099865433424,
+            "priceActivity": 55.561161237527045
+          },
+          "value": 81.85082279042763,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 81.9,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
         "pair": "QQQx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -475,17 +1143,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 730798.0386683661,
+            "lpFee24h": 730.8020861367173,
+            "tvl": 2484055.96,
+            "feeTier": 0.001,
+            "liquidity": 4406226221526,
+            "priceActivity": 0.2941954812758591
+          },
+          "scores": {
+            "volume24h": 88.39060204967322,
+            "lpFee24h": 75.41535340138054,
+            "tvl": 96.66548809972676,
+            "feeTier": 9.131722473109994,
+            "liquidity": 35.6079288892019,
+            "priceActivity": 13.078048185723171
+          },
+          "value": 68.76947739579249,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 68.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
         "pair": "SPYx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -605,148 +1305,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
-      },
-      {
-        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
-        "pair": "NVDAx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "primaryBlocker": {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        "passCount": 6,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "回放状态发生 divergence 或连续性失败"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "WARN",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
         ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
+        "opportunity": {
+          "raw": {
+            "volume24h": 106729.20321654878,
+            "lpFee24h": 106.73031588518941,
+            "tvl": 2453012.55,
+            "feeTier": 0.001,
+            "liquidity": 3249936995475,
+            "priceActivity": 0.043509440347766985
+          },
+          "scores": {
+            "volume24h": 74.67412634515458,
+            "lpFee24h": 53.507608967098605,
+            "tvl": 96.46567557404207,
+            "feeTier": 9.131722473109994,
+            "liquidity": 5.302232693742632,
+            "priceActivity": 2.1587865754527376
+          },
+          "value": 54.475706775240155,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
         },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
-        ]
+        "opportunityScore": 54.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
         "pair": "TSLAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "HARD_INVALID",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -866,18 +1467,50 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留，但禁止执行",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE",
           "REPLAY_STATE_INCOMPLETE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 657855.84788275,
+            "lpFee24h": 657.858181879813,
+            "tvl": 1947210.28,
+            "feeTier": 0.001,
+            "liquidity": 3081391513967,
+            "priceActivity": 0.3378453034269879
+          },
+          "scores": {
+            "volume24h": 87.64089960219165,
+            "lpFee24h": 74.2146761260551,
+            "tvl": 92.79668440211033,
+            "feeTier": 9.131722473109994,
+            "liquidity": 0,
+            "priceActivity": 14.760371288209347
+          },
+          "value": 64.12736619051203,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 64.1,
+        "opportunityStatus": "BLOCKED"
       },
       {
         "poolAddress": "CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y",
         "pair": "AAPLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -997,14 +1630,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 22856.96154593408,
+            "lpFee24h": 57.14258962114015,
+            "tvl": 225292.71,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.10145451020556359
+          },
+          "scores": {
+            "volume24h": 63.68713370880793,
+            "lpFee24h": 46.455378880137786,
+            "tvl": 58.52886880658755,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 4.899615311148821
+          },
+          "value": 49.44485320401913,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 49.4,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "2DHt38DfCB4tSzbKrfgUBsiwUQMBc1oGAwWQWfRJCPut",
         "pair": "AMBRx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1124,14 +1789,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2.017644071769207,
+            "lpFee24h": 0.005044932816797247,
+            "tvl": 11970.37,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.0001685531919037763
+          },
+          "scores": {
+            "volume24h": 0,
+            "lpFee24h": 0.054383880896782755,
+            "tvl": 11.897487721670185,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 0.007341940409072019
+          },
+          "value": 4.705120488808836,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 4.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "6m5aXAve4uh6Kt4ytKyCLWNMjd8PYP5vujwNCtycrUiD",
         "pair": "AMZNx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1251,14 +1948,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 50019.39739050837,
+            "lpFee24h": 125.04870905251437,
+            "tvl": 461527.31,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.10837797960538537
+          },
+          "scores": {
+            "volume24h": 69.27067201404769,
+            "lpFee24h": 55.30330416433038,
+            "tvl": 69.92322830263052,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 5.217409220257229
+          },
+          "value": 56.172056200343114,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 56.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "EkpbWmPzrzFsv2xkJRdvWs61aRuDBVdrJK7WQmctBFnB",
         "pair": "AVGOx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1378,14 +2107,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 22241.955865732933,
+            "lpFee24h": 222.41978725417405,
+            "tvl": 120525.43,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.18454160143409515
+          },
+          "scores": {
+            "volume24h": 63.4926758332414,
+            "lpFee24h": 61.84841628584292,
+            "tvl": 48.58995067686416,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 8.587939978570295
+          },
+          "value": 61.46690804020382,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 61.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "cPK91ascbHz3pXHVqLbhBbbQs3ztMvu1681w5EfoGyP",
         "pair": "BOT/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1505,14 +2266,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 168943.35766223463,
+            "lpFee24h": 422.3695965638107,
+            "tvl": 36594.11,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 4.616681691732211
+          },
+          "scores": {
+            "volume24h": 77.94857690786782,
+            "lpFee24h": 69.15747827235809,
+            "tvl": 29.65140809148999,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 87.52243156598132
+          },
+          "value": 61.543280407198075,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 61.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "B4UdLnvzCrnfRndLdgGTYZjcKTDsaFKB54cmKb2GoSne",
         "pair": "BRK.Bx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1632,14 +2425,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 23879.104151172145,
+            "lpFee24h": 59.69791605307674,
+            "tvl": 72548.78,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.3291454956399287
+          },
+          "scores": {
+            "volume24h": 63.99903334918814,
+            "lpFee24h": 46.947201397330055,
+            "tvl": 40.52493545923142,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 14.429492134673172
+          },
+          "value": 47.24154263329085,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 47.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "w7SGmPeXoMCsjvXqgsAmUn56uypyDsjAtsxeVkaiqxa",
         "pair": "COINx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1759,14 +2584,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 394265.45762976987,
+            "lpFee24h": 3154.12407145511,
+            "tvl": 781243.2,
+            "feeTier": 0.008,
+            "liquidity": null,
+            "priceActivity": 0.504664178363114
+          },
+          "scores": {
+            "volume24h": 83.99074529567663,
+            "lpFee24h": 92.12475629767329,
+            "tvl": 78.28612804857347,
+            "feeTier": 79.87722212110391,
+            "liquidity": null,
+            "priceActivity": 20.72004295547534
+          },
+          "value": 81.77921560575017,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 81.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "3LbRQkdRnahJfAEBBRajCMki8ZBMhBhidmxbgMzp8nVu",
         "pair": "COINx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -1886,14 +2743,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 43403.76726525066,
+            "lpFee24h": 434.0377635789281,
+            "tvl": 104760.08,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.41431590416168695
+          },
+          "scores": {
+            "volume24h": 68.25923301933517,
+            "lpFee24h": 69.4683602324257,
+            "tvl": 46.36257320118417,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 17.57948218618729
+          },
+          "value": 65.72404229446138,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 65.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "5v5prv4UMT8fhzYjYwxUmvFuSQiGqF45vuNcmTkHTmi",
         "pair": "CVXx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2013,14 +2902,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 605.0094284258388,
+            "lpFee24h": 6.0500971875603735,
+            "tvl": 5875.45,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.10297244099189659
+          },
+          "scores": {
+            "volume24h": 37.804972189014805,
+            "lpFee24h": 22.329530178994663,
+            "tvl": 0.5916810390229585,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 4.969460428519879
+          },
+          "value": 31.53063987520253,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 31.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "bhL1PjyXeRhb2kk3ru2qx7cb8pKoXNWAiwTpJrZc1gt",
         "pair": "deJAAA/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2140,14 +3061,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2.7606485631944446,
+            "lpFee24h": 0.0002763013271981834,
+            "tvl": 116115.18,
+            "feeTier": 0.0001,
+            "liquidity": null,
+            "priceActivity": 0.000023775087488082478
+          },
+          "scores": {
+            "volume24h": 1.569367076204746,
+            "lpFee24h": 0,
+            "tvl": 47.997656523992674,
+            "feeTier": 0,
+            "liquidity": null,
+            "priceActivity": 0
+          },
+          "value": 8.52273177940036,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 8.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "ECkcSDJvKiyoVU5f1L6CgpSmMVd1S4KGRkXW56f1bEWN",
         "pair": "DRAM/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2267,14 +3220,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 265375.08332447626,
+            "lpFee24h": 663.4518075500873,
+            "tvl": 370373.96,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.7165057806020603
+          },
+          "scores": {
+            "volume24h": 81.16822354165811,
+            "lpFee24h": 74.31134662566062,
+            "tvl": 66.42728920173921,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 27.40047630715709
+          },
+          "value": 67.12365696244699,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 67.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "78ReVNMLGRWmjtf2HmBoHUe2pRcsctXTTbxJnbhchyze",
         "pair": "GLDx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2394,14 +3379,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 147749.81866681538,
+            "lpFee24h": 147.75165499050638,
+            "tvl": 336198.23,
+            "feeTier": 0.001,
+            "liquidity": null,
+            "priceActivity": 0.4394723275813064
+          },
+          "scores": {
+            "volume24h": 76.99288814792439,
+            "lpFee24h": 57.197022985101874,
+            "tvl": 64.88907809024039,
+            "feeTier": 9.131722473109994,
+            "liquidity": null,
+            "priceActivity": 18.473648137087075
+          },
+          "value": 57.585766341788094,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 57.6,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "CYyfSk8EjZ9aNQZsZM5oxRpskSFzzmU3XcEgq4WzxshG",
         "pair": "GLDx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2521,14 +3538,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 785.3676153609936,
+            "lpFee24h": 1.9635278132843799,
+            "tvl": 7310.99,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.10742288190258688
+          },
+          "scores": {
+            "volume24h": 39.662480133702374,
+            "lpFee24h": 12.419412010567992,
+            "tvl": 4.064345351786543,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 5.173687541789345
+          },
+          "value": 21.029118715029437,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 21,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "B8YAwjGYk6qidWzGBXMAxP7nYfG8g74EZ3Y4gFSsobRw",
         "pair": "GOOGLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2648,14 +3697,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 39414.5748417833,
+            "lpFee24h": 98.5366548530521,
+            "tvl": 318414.8,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.12378374008300903
+          },
+          "scores": {
+            "volume24h": 67.57186546337108,
+            "lpFee24h": 52.60305632001673,
+            "tvl": 64.02559602151044,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 5.917483475094917
+          },
+          "value": 53.76165903598399,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 53.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "97r9NLqYoyGFbQesPduwuTHq4fJjbk8pHVUGawEqfnva",
         "pair": "HOOD/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2775,14 +3856,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 167810.91839923017,
+            "lpFee24h": 419.5513015847247,
+            "tvl": 452758.42,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.3706411874112251
+          },
+          "scores": {
+            "volume24h": 77.9006250186251,
+            "lpFee24h": 69.08110421067731,
+            "tvl": 69.61844445845873,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 15.988640652106914
+          },
+          "value": 64.1889116561698,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 64.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "DXWbip5LducMAbDSSpLYz9Xik3253EPeAYQufQtx7LXs",
         "pair": "HOODx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -2902,14 +4015,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 129859.27447906624,
+            "lpFee24h": 1298.5929175441129,
+            "tvl": 396825.04,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.32724566594654975
+          },
+          "scores": {
+            "volume24h": 76.07266339914742,
+            "lpFee24h": 81.98233127664099,
+            "tvl": 67.5233214001519,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 14.356947976687188
+          },
+          "value": 75.8476044573263,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 75.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "HHNPd8DpneXbaYBiGC7SU28mYxocbkMznPABPN3sGTyU",
         "pair": "INTC/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3029,14 +4174,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 73491.21902286808,
+            "lpFee24h": 183.75366869065473,
+            "tvl": 110258.6,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.6665350278605758
+          },
+          "scores": {
+            "volume24h": 72.01383740837211,
+            "lpFee24h": 59.67546723552112,
+            "tvl": 47.1753609816228,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 25.90210320411896
+          },
+          "value": 55.90167080111697,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 55.9,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "6KoZB86BFDk6TZbB4CTBoAA8PPbpmEwSWFjCyfkt1Uw4",
         "pair": "INTCx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3156,14 +4333,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 14732.823779537108,
+            "lpFee24h": 147.32827228842626,
+            "tvl": 40963.71,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.35965550433632865
+          },
+          "scores": {
+            "volume24h": 60.55607355773014,
+            "lpFee24h": 57.164430335839164,
+            "tvl": 31.443589240366386,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 15.580509925526675
+          },
+          "value": 56.45746116711342,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 56.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "7HNwUP5rSUo9GfdDthJn4UCdw2Px6h2aprSedD7r7J3C",
         "pair": "KOx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3283,14 +4492,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 4745.140442699626,
+            "lpFee24h": 47.45142950323745,
+            "tvl": 21505.22,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.22065063471564697
+          },
+          "scores": {
+            "volume24h": 52.47938210634007,
+            "lpFee24h": 44.37039161412778,
+            "tvl": 21.205441743043632,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 10.110864660786243
+          },
+          "value": 47.49032401181801,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 47.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "D6qd9W868h6Jw318vhLSYyymDycydYPEkfsCGDKSzf34",
         "pair": "LLYx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3410,14 +4651,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 334.9699548670974,
+            "lpFee24h": 3.3497193305362023,
+            "tvl": 5660.64,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.05917527962687918
+          },
+          "scores": {
+            "volume24h": 33.59931390473317,
+            "lpFee24h": 16.807308586577935,
+            "tvl": 0,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 2.914517631273903
+          },
+          "value": 28.075236254396696,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 28.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "5MGvNj9RNKNmzwp1LtZuQkZonEYtKJ3JuiyNQEUU2DsF",
         "pair": "MCDx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3537,14 +4810,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 8172.904196947701,
+            "lpFee24h": 81.72919634027558,
+            "tvl": 17116.74,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.47748018588514524
+          },
+          "scores": {
+            "volume24h": 56.35522561530636,
+            "lpFee24h": 50.48814645487596,
+            "tvl": 17.579226143371887,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 19.795395172239395
+          },
+          "value": 50.75518366796938,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 50.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "3L7KbPVaAQA4UTecaGQYsm6UCq5F3sZM9zAYkxqYt63j",
         "pair": "METAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3664,14 +4969,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 27617.955259179776,
+            "lpFee24h": 69.04512942830675,
+            "tvl": 123153.41,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.22425652086434128
+          },
+          "scores": {
+            "volume24h": 65.0361044107199,
+            "lpFee24h": 48.58501585552081,
+            "tvl": 48.93266669656363,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 10.260464001355599
+          },
+          "value": 49.302847005347196,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 49.3,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "DQcg3DtWrGRhdBmQh9MpgjuFQYdjN47xB7Do99kPzZRC",
         "pair": "MRNAzX/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3791,14 +5128,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 516331.511763592,
+            "lpFee24h": 5568.208241847297,
+            "tvl": 159765.57,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 3.231807151963918
+          },
+          "scores": {
+            "volume24h": 85.9138124379654,
+            "lpFee24h": 98.62231134821118,
+            "tvl": 53.068082200203456,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 73.16397089361017
+          },
+          "value": 77.1250567010577,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 77.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "CLu4kFM4nb67xrdN7vJnMxXXir8Z5hA4HJUzPFccXjsL",
         "pair": "MSFTx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -3918,14 +5287,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 36960.676237237174,
+            "lpFee24h": 92.40198455353516,
+            "tvl": 243724.08,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.1516496697299552
+          },
+          "scores": {
+            "volume24h": 67.11356852500897,
+            "lpFee24h": 51.87564843877438,
+            "tvl": 59.778287449683056,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 7.159738733982893
+          },
+          "value": 52.72755351519394,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 52.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "3Hro9bWkxiyV7ZfH2ZBdqyuNEVZt69ixNyQbAmcvyvys",
         "pair": "MSTR/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4045,14 +5446,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 294034.54699730815,
+            "lpFee24h": 735.1344951302376,
+            "tvl": 302255.71,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.9728006362470643
+          },
+          "scores": {
+            "volume24h": 81.89939936746691,
+            "lpFee24h": 75.48285017037742,
+            "tvl": 63.1980932899744,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 34.458368051130456
+          },
+          "value": 67.6117891975488,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 67.6,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "RyhF4cksVZY7vcqJpoytHcxcGNKRp27PEGhSnEPpbGv",
         "pair": "MSTRx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4172,14 +5605,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 406070.64349742373,
+            "lpFee24h": 1015.177643115479,
+            "tvl": 390415.73,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 1.040098060335386
+          },
+          "scores": {
+            "volume24h": 84.20109199491404,
+            "lpFee24h": 79.1693308947481,
+            "tvl": 67.26460194530497,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 36.159588872485024
+          },
+          "value": 70.38011069189619,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 70.4,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "FE8jVZHEytGkEv2wmFS8faFWnGXqJLUbrw1qJMrk7RTv",
         "pair": "NBIS/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4299,14 +5764,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 112199.5399091363,
+            "lpFee24h": 280.59482962013925,
+            "tvl": 266455.71,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.42108138688090524
+          },
+          "scores": {
+            "volume24h": 75.0304975268405,
+            "lpFee24h": 64.49462728331282,
+            "tvl": 61.19509270574552,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 17.821510078488885
+          },
+          "value": 60.40131097024467,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 60.4,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "7RQXW5KEBgHCcy1eSNs1Kh7BWaEL46q8jb9t18S151bL",
         "pair": "NFLXx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4426,14 +5923,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 199.75043654428995,
+            "lpFee24h": 1.9975210015117566,
+            "tvl": 6331.06,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.031550867713193355
+          },
+          "scores": {
+            "volume24h": 29.927778687694897,
+            "lpFee24h": 12.549828797460469,
+            "tvl": 1.7781304268709521,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 1.5742211083476378
+          },
+          "value": 25.654125405549596,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 25.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "4KqQN6u1pFKroFE2jVEhoepAMRKPcuAzWVDCgm9zRBYN",
         "pair": "NVDAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4553,14 +6082,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 25527.363352948083,
+            "lpFee24h": 63.81851774248935,
+            "tvl": 154581.64,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.16513839129244637
+          },
+          "scores": {
+            "volume24h": 64.4749053736037,
+            "lpFee24h": 47.69826325388079,
+            "tvl": 52.54399563858407,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 7.750305653351104
+          },
+          "value": 49.282631374542724,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 49.3,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GWjPMHYsmdosbMCPx14N627qf5WhpaxAwNBRCfqP9CM9",
         "pair": "ORCLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4680,14 +6241,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 1781.2715941087135,
+            "lpFee24h": 17.81273199748075,
+            "tvl": 20958.85,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.08498899482121937
+          },
+          "scores": {
+            "volume24h": 45.49618908910824,
+            "lpFee24h": 33.55272611954163,
+            "tvl": 20.796571378014946,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 4.135735548446906
+          },
+          "value": 41.15660782968838,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 41.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "64ynMUTTrJHswDAU6sc6cubjsxUxSxL788FC3NFY4SyG",
         "pair": "PAXG/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4807,14 +6400,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 78427.39162111445,
+            "lpFee24h": 82.59042832056909,
+            "tvl": 332891.69,
+            "feeTier": 0.001,
+            "liquidity": null,
+            "priceActivity": 0.235594320846863
+          },
+          "scores": {
+            "volume24h": 72.47731784276729,
+            "lpFee24h": 50.60657055719581,
+            "tvl": 64.7320387631297,
+            "feeTier": 9.131722473109994,
+            "liquidity": null,
+            "priceActivity": 10.727986826420356
+          },
+          "value": 53.427271025656,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 53.4,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GmcGvaTDhwScEKcmDPsBiLxbgHtvTEGp89kHjpsHZjD2",
         "pair": "PEPx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -4934,14 +6559,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2112.101281916091,
+            "lpFee24h": 5.806919023129178,
+            "tvl": 15823.04,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.13348264820894662
+          },
+          "scores": {
+            "volume24h": 46.7101585434659,
+            "lpFee24h": 21.92814714817178,
+            "tvl": 16.330616074537758,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 6.353318801566157
+          },
+          "value": 28.65783675459801,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 28.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "2EbY6YYKdQY9mmn9voiadgMcEnmZ5oe7qkcFVmywNrrE",
         "pair": "PLTRx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5061,14 +6718,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 5866.279989971871,
+            "lpFee24h": 58.66281985067637,
+            "tvl": 44843,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.13081818767637918
+          },
+          "scores": {
+            "volume24h": 53.99131460635472,
+            "lpFee24h": 46.750518700032,
+            "tvl": 32.8811754683936,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 6.233959823776945
+          },
+          "value": 50.5182492259599,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 50.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "FknDV1F5n6QaA7rLmjquDjuU6wcPMNm5RYq7zWbqhpZw",
         "pair": "QQQx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5188,14 +6877,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 9324.81372428668,
+            "lpFee24h": 23.312208504159234,
+            "tvl": 123567.43,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.0754633621844096
+          },
+          "scores": {
+            "volume24h": 57.295209945457835,
+            "lpFee24h": 36.48512737531409,
+            "tvl": 48.9859915005754,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 3.6885047794492865
+          },
+          "value": 42.333031311864765,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 42.3,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "6eqxMn5wxwBfkA9pH5sfq94Bc3zZEWGrwLNSMrefUjaP",
         "pair": "SKHY/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5315,14 +7036,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 687436.0040801755,
+            "lpFee24h": 1718.656353746041,
+            "tvl": 732052.15,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.9390533230182788
+          },
+          "scores": {
+            "volume24h": 87.95448669178954,
+            "lpFee24h": 85.18492197484655,
+            "tvl": 77.25281539121104,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 33.58328943886364
+          },
+          "value": 75.1580137788929,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 75.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "4vRC6Qne8HPUN98mJr88vRkRD9N4cadyrGtPwVU3CV86",
         "pair": "SNDK/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5442,14 +7195,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 1137827.5879497328,
+            "lpFee24h": 1138.4342188152284,
+            "tvl": 195875.11,
+            "feeTier": 0.001,
+            "liquidity": null,
+            "priceActivity": 5.80894421935351
+          },
+          "scores": {
+            "volume24h": 91.54722077288136,
+            "lpFee24h": 80.4784316669128,
+            "tvl": 56.30568871306229,
+            "feeTier": 9.131722473109994,
+            "liquidity": null,
+            "priceActivity": 97.28516675655712
+          },
+          "value": 73.14553291559605,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 73.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "FjuBy7jjf9DXj9d3R7cHpvcnoFW2iQxf7F7P3vqx4Jza",
         "pair": "SPCX/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5569,14 +7354,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 137852.79561914713,
+            "lpFee24h": 345.1214220947706,
+            "tvl": 342458.82,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.402538312837576
+          },
+          "scores": {
+            "volume24h": 76.49855679710711,
+            "lpFee24h": 66.85386500335623,
+            "tvl": 65.18223007103119,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 17.155376235991554
+          },
+          "value": 62.30459209220133,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 62.3,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "AHNN6JmvaGG6XUoSg7sEr38gRYDB2jTbUvqXVuqaRHpq",
         "pair": "SPCXx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5696,14 +7513,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 239081.5511423888,
+            "lpFee24h": 1912.6528762725063,
+            "tvl": 1037106.42,
+            "feeTier": 0.008,
+            "liquidity": null,
+            "priceActivity": 0.23052750087342896
+          },
+          "scores": {
+            "volume24h": 80.42431081603674,
+            "lpFee24h": 86.40718415156398,
+            "tvl": 82.78742943904227,
+            "feeTier": 79.87722212110391,
+            "liquidity": null,
+            "priceActivity": 10.519585113410342
+          },
+          "value": 78.86807152657495,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 78.9,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "4pCZCVEiYyT4efNdXUdL2tJF8VGMgiMXrZWq6FiNXhRw",
         "pair": "SPYx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5823,14 +7672,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 1536826.1843025337,
+            "lpFee24h": 153.69671936005915,
+            "tvl": 248542.43,
+            "feeTier": 0.0001,
+            "liquidity": null,
+            "priceActivity": 6.183355430710699
+          },
+          "scores": {
+            "volume24h": 93.69041446506418,
+            "lpFee24h": 57.64513530974394,
+            "tvl": 60.08933519167462,
+            "feeTier": 0,
+            "liquidity": null,
+            "priceActivity": 100
+          },
+          "value": 66.01562801243736,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 66,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "7sHMnvE7WqP7vQFWJGEnMT4vZg6Za9K7PpddDoXJCqME",
         "pair": "SPYx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -5950,14 +7831,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 674.3916552581111,
+            "lpFee24h": 1.6860721476842886,
+            "tvl": 124053.82,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.005436282858989034
+          },
+          "scores": {
+            "volume24h": 38.577818194626765,
+            "lpFee24h": 11.295363678098365,
+            "tvl": 49.048409618793684,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 0.2737570399169765
+          },
+          "value": 27.518007641133746,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 27.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "DU9dgBU6Yh2JjsYcjtRY21G14dhQxn6Xm5PT949Sa4tA",
         "pair": "STRCx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6077,14 +7990,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 45452.56263722111,
+            "lpFee24h": 45.452645827303186,
+            "tvl": 182921.81,
+            "feeTier": 0.001,
+            "liquidity": null,
+            "priceActivity": 0.24848082706606234
+          },
+          "scores": {
+            "volume24h": 68.58807123341329,
+            "lpFee24h": 43.888660469346355,
+            "tvl": 55.21861760636186,
+            "feeTier": 9.131722473109994,
+            "liquidity": null,
+            "priceActivity": 11.254190746642056
+          },
+          "value": 48.335215484916965,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 48.3,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "DppCVaAGq5VA9gGK32u21JNqBf5d7jqH7RGDEvj39gQY",
         "pair": "STRCx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6204,14 +8149,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 31300.56909610609,
+            "lpFee24h": 62.601156556801755,
+            "tvl": 94690.24,
+            "feeTier": 0.002,
+            "liquidity": null,
+            "priceActivity": 0.3305575009220178
+          },
+          "scores": {
+            "volume24h": 65.92850719148835,
+            "lpFee24h": 47.48146266198086,
+            "tvl": 44.756853322773,
+            "feeTier": 19.26845633180659,
+            "liquidity": null,
+            "priceActivity": 14.483341792141125
+          },
+          "value": 48.20836853027159,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 48.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "HHQUnUbmWLrYzkscDY1C3deEFbGtiGBGoHjpANogmvum",
         "pair": "TSLAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6331,14 +8308,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 87015.94962773821,
+            "lpFee24h": 217.54022604285996,
+            "tvl": 682372.02,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.12751980895661316
+          },
+          "scores": {
+            "volume24h": 73.21822049429892,
+            "lpFee24h": 61.5959083640616,
+            "tvl": 76.13621435839106,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 6.085813249749697
+          },
+          "value": 60.66918277126915,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 60.7,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "25bztR81eg6CTvxVm5sJkDcXJavVUZeqHf6kSkbhawoM",
         "pair": "TTWO/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6458,14 +8467,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 47155.43542697424,
+            "lpFee24h": 117.9250474211617,
+            "tvl": 160924.64,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.29302806224686434
+          },
+          "scores": {
+            "volume24h": 68.85029868156745,
+            "lpFee24h": 54.63808347606992,
+            "tvl": 53.18293459113921,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 13.032279065076855
+          },
+          "value": 53.45430201067097,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 53.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "5xm6QUDxRyMg3Gx59CxXB6VZnRKs4bVu44DS6DzZr3Bp",
         "pair": "UNHx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6585,14 +8626,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 250.21505233730807,
+            "lpFee24h": 2.5021673348960536,
+            "tvl": 11071.9,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.022599106958815385
+          },
+          "scores": {
+            "volume24h": 31.526604593668452,
+            "lpFee24h": 14.329046618272626,
+            "tvl": 10.657898683653098,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 1.1321839350744642
+          },
+          "value": 28.23554373653779,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 28.2,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "H3qMpQnUiod9qfEMZL84nvoYd2pXrscHA6NQAb6icwxD",
         "pair": "XOMx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6712,16 +8785,209 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 723.6336972814815,
+            "lpFee24h": 7.236353091786092,
+            "tvl": 11575.62,
+            "feeTier": 0.01,
+            "liquidity": null,
+            "priceActivity": 0.0625136016283777
+          },
+          "scores": {
+            "volume24h": 39.07956452203982,
+            "lpFee24h": 24.10783157456362,
+            "tvl": 11.364734754188643,
+            "feeTier": 100,
+            "liquidity": null,
+            "priceActivity": 3.0741153238816614
+          },
+          "value": 34.23848312033712,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 34.2,
+        "opportunityStatus": "WATCH"
       }
     ],
     "nearest": [
+      {
+        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+        "pair": "NVDAx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 9,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "逐笔 Tick path 与当前状态连续"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "已评估 87 个 Core + Buffer 候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 555404.8582435887,
+            "lpFee24h": 555.4059382448472,
+            "tvl": 2439826.02,
+            "feeTier": 0.001,
+            "liquidity": 6811620995996,
+            "priceActivity": 0.2276411734651427
+          },
+          "scores": {
+            "volume24h": 86.4339152761054,
+            "lpFee24h": 72.28207411140819,
+            "tvl": 96.38003345418666,
+            "feeTier": 9.131722473109994,
+            "liquidity": 78.97931163048312,
+            "priceActivity": 10.400484543776088
+          },
+          "value": 71.40292947193018,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 71.4,
+        "opportunityStatus": "WATCH"
+      },
       {
         "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
         "pair": "CRCLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6841,17 +9107,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2512515.688228388,
+            "lpFee24h": 6281.2909447823495,
+            "tvl": 3064119.82,
+            "feeTier": 0.0025,
+            "liquidity": 8412820251264,
+            "priceActivity": 0.8199795816824121
+          },
+          "scores": {
+            "volume24h": 97.19515385160722,
+            "lpFee24h": 100,
+            "tvl": 100,
+            "feeTier": 24.333030203879364,
+            "liquidity": 100,
+            "priceActivity": 30.369148474897724
+          },
+          "value": 88.11030659961499,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 88.1,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
         "pair": "CRCLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -6971,17 +9269,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 3723575.9483424267,
+            "lpFee24h": 3723.580503545407,
+            "tvl": 1870374.7,
+            "feeTier": 0.001,
+            "liquidity": 5703067531108,
+            "priceActivity": 1.9908181758138765
+          },
+          "scores": {
+            "volume24h": 100,
+            "lpFee24h": 94.02209595744986,
+            "tvl": 92.1570247164132,
+            "feeTier": 9.131722473109994,
+            "liquidity": 61.294099865433424,
+            "priceActivity": 55.561161237527045
+          },
+          "value": 81.85082279042763,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 81.9,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
         "pair": "QQQx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -7101,17 +9431,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 730798.0386683661,
+            "lpFee24h": 730.8020861367173,
+            "tvl": 2484055.96,
+            "feeTier": 0.001,
+            "liquidity": 4406226221526,
+            "priceActivity": 0.2941954812758591
+          },
+          "scores": {
+            "volume24h": 88.39060204967322,
+            "lpFee24h": 75.41535340138054,
+            "tvl": 96.66548809972676,
+            "feeTier": 9.131722473109994,
+            "liquidity": 35.6079288892019,
+            "priceActivity": 13.078048185723171
+          },
+          "value": 68.76947739579249,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 68.8,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
         "pair": "SPYx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -7231,148 +9593,49 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
-      },
-      {
-        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
-        "pair": "NVDAx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "primaryBlocker": {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        "passCount": 6,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "回放状态发生 divergence 或连续性失败"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "WARN",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
         ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
+        "opportunity": {
+          "raw": {
+            "volume24h": 106729.20321654878,
+            "lpFee24h": 106.73031588518941,
+            "tvl": 2453012.55,
+            "feeTier": 0.001,
+            "liquidity": 3249936995475,
+            "priceActivity": 0.043509440347766985
+          },
+          "scores": {
+            "volume24h": 74.67412634515458,
+            "lpFee24h": 53.507608967098605,
+            "tvl": 96.46567557404207,
+            "feeTier": 9.131722473109994,
+            "liquidity": 5.302232693742632,
+            "priceActivity": 2.1587865754527376
+          },
+          "value": 54.475706775240155,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
         },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
-        ]
+        "opportunityScore": 54.5,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
         "pair": "TSLAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "HARD_INVALID",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -7492,18 +9755,50 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
+        "rankingImpact": "机会层保留，但禁止执行",
         "sourceBlockers": [
           "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE",
           "REPLAY_STATE_INCOMPLETE"
-        ]
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 657855.84788275,
+            "lpFee24h": 657.858181879813,
+            "tvl": 1947210.28,
+            "feeTier": 0.001,
+            "liquidity": 3081391513967,
+            "priceActivity": 0.3378453034269879
+          },
+          "scores": {
+            "volume24h": 87.64089960219165,
+            "lpFee24h": 74.2146761260551,
+            "tvl": 92.79668440211033,
+            "feeTier": 9.131722473109994,
+            "liquidity": 0,
+            "priceActivity": 14.760371288209347
+          },
+          "value": 64.12736619051203,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 64.1,
+        "opportunityStatus": "BLOCKED"
       },
       {
         "poolAddress": "CKwJZwm7oj3nu4653N1EpDrqXbXAYXoPFiPeEnLouF8y",
         "pair": "AAPLx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -7623,14 +9918,46 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 22856.96154593408,
+            "lpFee24h": 57.14258962114015,
+            "tvl": 225292.71,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.10145451020556359
+          },
+          "scores": {
+            "volume24h": 63.68713370880793,
+            "lpFee24h": 46.455378880137786,
+            "tvl": 58.52886880658755,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 4.899615311148821
+          },
+          "value": 49.44485320401913,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 49.4,
+        "opportunityStatus": "WATCH"
       },
       {
         "poolAddress": "2DHt38DfCB4tSzbKrfgUBsiwUQMBc1oGAwWQWfRJCPut",
         "pair": "AMBRx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
           "key": "poolIdentity",
           "label": "Pool identity",
@@ -7750,8 +10077,39 @@
           "optimizerImpact": "未参与策略偏好"
         },
         "action": "UNAVAILABLE",
-        "rankingImpact": "不进入 Top3",
-        "sourceBlockers": []
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [],
+        "opportunity": {
+          "raw": {
+            "volume24h": 2.017644071769207,
+            "lpFee24h": 0.005044932816797247,
+            "tvl": 11970.37,
+            "feeTier": 0.0025,
+            "liquidity": null,
+            "priceActivity": 0.0001685531919037763
+          },
+          "scores": {
+            "volume24h": 0,
+            "lpFee24h": 0.054383880896782755,
+            "tvl": 11.897487721670185,
+            "feeTier": 24.333030203879364,
+            "liquidity": null,
+            "priceActivity": 0.007341940409072019
+          },
+          "value": 4.705120488808836,
+          "knownWeight": 0.9,
+          "coverage": 0.9,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 4.7,
+        "opportunityStatus": "WATCH"
       }
     ]
   },
@@ -7774,7 +10132,7 @@
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T11:38:05.340Z",
+        "observedAt": "2026-08-20T12:11:57.529Z",
         "maxAgeMs": 1800000
       }
     },
@@ -7796,7 +10154,7 @@
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T11:38:07.185Z",
+        "observedAt": "2026-08-20T12:11:53.220Z",
         "maxAgeMs": 1800000
       }
     },
@@ -7818,7 +10176,7 @@
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T11:38:05.523Z",
+        "observedAt": "2026-08-20T12:11:49.690Z",
         "maxAgeMs": 1800000
       }
     },
@@ -7834,14 +10192,12 @@
         "REPLAY_INPUT_UNAVAILABLE",
         "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
         "MARKOUT_UNAVAILABLE",
-        "SWAP_TICK_PATH_UNAVAILABLE",
         "WINDOW_24H_COVERAGE_UNAVAILABLE",
-        "SWAP_BACKFILL_INCOMPLETE",
-        "REPLAY_STATE_INCOMPLETE"
+        "SWAP_BACKFILL_INCOMPLETE"
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T11:38:07.683Z",
+        "observedAt": "2026-08-20T12:11:50.812Z",
         "maxAgeMs": 1800000
       }
     },
@@ -7864,7 +10220,7 @@
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T11:38:02.725Z",
+        "observedAt": "2026-08-20T12:11:52.968Z",
         "maxAgeMs": 1800000
       }
     },
@@ -8845,7 +11201,7 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 1,
+        "parsedSwap": 0,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
         "replayFeeUsd": 72.77930459941557,
@@ -8913,7 +11269,7 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 1,
+        "parsedSwap": 0,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
         "replayFeeUsd": 9.212746078437368,
@@ -8959,20 +11315,20 @@
         "gapCount": null,
         "unknownInstructions": 0,
         "unresolvedRetryableTransactions": 0,
-        "firstEventTime": "2026-08-20T00:19:06.000Z",
+        "firstEventTime": "2026-08-19T21:06:21.000Z",
         "lastEventTime": "2026-08-20T10:43:12.000Z",
         "replayCoverageSeconds": 86400,
-        "totalSwaps": 78,
+        "totalSwaps": 79,
         "validSwaps": 74,
-        "invalidSwaps": 4,
-        "pathCoverage": 0.9487179487179487,
+        "invalidSwaps": 5,
+        "pathCoverage": 0.9367088607594937,
         "feeCoverage": 1
       },
       "swapPath": {
         "status": "INCOMPLETE",
         "valid": 74,
-        "total": 78,
-        "coverageRatio": 0.9487179487179487,
+        "total": 79,
+        "coverageRatio": 0.9367088607594937,
         "divergence": false,
         "currentMatchesLast": null,
         "currentStateAfterReplay": true,
@@ -8981,10 +11337,10 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 1,
+        "parsedSwap": 0,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 21.766999714265847,
+        "replayFeeUsd": 21.996907714265845,
         "feeGrowthExpected": null,
         "diffBps": null,
         "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
@@ -9027,23 +11383,23 @@
         "gapCount": null,
         "unknownInstructions": 0,
         "unresolvedRetryableTransactions": 0,
-        "firstEventTime": null,
-        "lastEventTime": null,
+        "firstEventTime": "2026-08-19T22:03:03.000Z",
+        "lastEventTime": "2026-08-19T22:03:03.000Z",
         "replayCoverageSeconds": 86400,
-        "totalSwaps": 0,
-        "validSwaps": 0,
+        "totalSwaps": 1,
+        "validSwaps": 1,
         "invalidSwaps": 0,
-        "pathCoverage": null,
-        "feeCoverage": null
+        "pathCoverage": 1,
+        "feeCoverage": 1
       },
       "swapPath": {
-        "status": "INCOMPLETE",
-        "valid": 0,
-        "total": 0,
-        "coverageRatio": null,
+        "status": "PASS",
+        "valid": 1,
+        "total": 1,
+        "coverageRatio": 1,
         "divergence": false,
-        "currentMatchesLast": false,
-        "currentStateAfterReplay": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
         "transactionOrderComplete": true,
         "orderIncompleteSlots": []
       },
@@ -9052,25 +11408,24 @@
         "parsedSwap": 0,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 0,
+        "replayFeeUsd": 0.251866,
         "feeGrowthExpected": null,
         "diffBps": null,
         "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
       },
       "activeLiquidityReplay": {
-        "status": "INCOMPLETE",
-        "candidateCount": 0,
+        "status": "PASS",
+        "candidateCount": 87,
         "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
         "blockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
+          "EXECUTION_COST_UNAVAILABLE",
+          "MARKOUT_UNAVAILABLE"
         ]
       },
       "replay": {
         "status": "UNAVAILABLE",
         "blockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
+          "SWAP_BACKFILL_INCOMPLETE"
         ],
         "executionCostQuality": null,
         "markoutQuality": null
@@ -9090,7 +11445,7 @@
       "pair": "TSLAx/USDC",
       "coverage24h": {
         "status": "INCOMPLETE",
-        "coverageRatio": 0.0002777777777777778,
+        "coverageRatio": 0.16672453703703705,
         "expectedBucketCount": 1440,
         "metricsBucketCount": 1440,
         "gapCount": null,
@@ -9098,7 +11453,7 @@
         "unresolvedRetryableTransactions": 0,
         "firstEventTime": null,
         "lastEventTime": null,
-        "replayCoverageSeconds": 24,
+        "replayCoverageSeconds": 14405,
         "totalSwaps": 0,
         "validSwaps": 0,
         "invalidSwaps": 0,
@@ -9232,5 +11587,5 @@
     "noRealPosition": true,
     "autoExecution": false
   },
-  "snapshotHash": "7d459a653db895a07ce3ec52f9abb4aa5bf2bc648985007b76e51cd2761c2583"
+  "snapshotHash": "ddc2c1c7d13f6c71ea8d7c2b72639867c06e0c9b3a0d1ff9916c5564d94de594"
 }

@@ -10,15 +10,18 @@ const makeRow = (rank) => ({
   rank,
   pair: `ASSET${rank}/USDC`,
   poolAddress: `Pool${rank}`,
-  status: "READY",
-  net24h: 18 - rank,
-  coreCapital: 700,
-  coreLower: 140.12,
-  coreUpper: 141.36,
-  bufferCapital: 300,
-  bufferLower: 136.5,
-  bufferUpper: 145,
-  action,
+  opportunityScore: 90 - rank,
+  opportunityStatus: rank === 1 ? "READY" : "WATCH",
+  netEstimate: null,
+  coreCapital: null,
+  coreLower: null,
+  coreUpper: null,
+  bufferCapital: null,
+  bufferLower: null,
+  bufferUpper: null,
+  confidence: 50,
+  action: rank === 1 ? "OPEN_READY" : action === "OPEN" ? "WATCH" : action,
+  evidence: [],
 });
 
 const makeDiagnostic = (rank, status = "READY") => ({
@@ -87,8 +90,8 @@ try {
     }
     assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `top3=${fixture.length} 行数错误`);
     if (expectedRows === 0) {
-      assert.equal(await page.locator("#empty-state").innerText(), "等待可验证机会\n当前没有满足全部链上证据要求的 RWA/USDC LP。", "空 Top 3 文案错误");
-      assert.equal(await page.locator(".rank").count(), 0, "空 Top 3 不得出现排名编号");
+      assert.equal(await page.locator("#empty-state").innerText(), "等待机会快照\n当前没有可展示的 RWA/USDC 机会候选。", "空机会层文案错误");
+      assert.equal(await page.locator(".pair").count(), 0, "空机会层不得出现候选行");
     }
   }
   currentTop3 = [makeRow(1)];

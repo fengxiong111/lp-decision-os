@@ -15,6 +15,7 @@ import { renderPage } from "../scripts/mobile-dashboard/presentation.mjs";
 import { renderRuntime } from "../scripts/mobile-dashboard/runtime.mjs";
 import { decodeSwapEventLog, snapshotFreshness, snapshotHash } from "../scripts/mobile-dashboard/evidence.mjs";
 import { buildDiagnosticReport, buildPoolDiagnostic, deriveVolatilityRegime, statusForTop3 } from "../scripts/mobile-dashboard/diagnostics.mjs";
+import { buildOpportunityRanking } from "../scripts/mobile-dashboard/opportunity.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "../scripts/mobile-dashboard/verify.mjs";
 
 function rawPool({
@@ -25,6 +26,7 @@ function rawPool({
   tvl = 10_000,
   volume = 2_000,
   fee = 100,
+  feeRate = 0.0025,
   price = 2,
   universeStatus = "ACTIVE_INDEXED",
   currentTick = 100_000,
@@ -43,7 +45,7 @@ function rawPool({
     currentTick,
     activeLiquidity,
     tvl,
-    feeRate: 0.0025,
+    feeRate,
     hasDynamicFee: false,
     config: { tickSpacing: 10, tradeFeeRate: 0.0025 },
     day: { volume, volumeFee: fee },
@@ -200,7 +202,22 @@ test("波动 regime 缺证据时不虚构，并且只作为优化器同净收益
   assert.equal(deriveVolatilityRegime({ evidence: { poolState: { dynamicFeeInfo: { volatilityAccumulator: 90, maxVolatilityAccumulator: 100 } } } }).regime, "HIGH_VOL");
 });
 
-test("外版页面只展示六列 Top 3，唯一运行时数据源为 top3.json", () => {
+test("Opportunity Ranking 保留验证不完整的公开 RWA/USDC Pool", () => {
+  const pools = normalizePools([
+    rawPool({ id: "pool-a", symbol: "AAA", tvl: 20_000, volume: 50_000, fee: 250 }),
+    rawPool({ id: "pool-b", symbol: "BBB", tvl: 8_000, volume: 12_000, fee: 120, feeRate: 0.008 }),
+  ], DASHBOARD_CONFIG);
+  const optimizerResults = pools.map((pool) => ({ pool, optimizer: searchOptimizer(pool, DASHBOARD_CONFIG) }));
+  const diagnostics = buildDiagnosticReport(optimizerResults);
+  const ranking = buildOpportunityRanking(pools, optimizerResults, diagnostics);
+  assert.equal(ranking.top3.length, 2);
+  assert.ok(ranking.top3[0].opportunityScore >= ranking.top3[1].opportunityScore);
+  assert.ok(["WATCH", "BLOCKED"].includes(ranking.top3[0].opportunityStatus));
+  assert.ok(["WATCH", "REVIEW", "BLOCKED"].includes(ranking.top3[0].action));
+  assert.equal(ranking.top3[0].netEstimate, null);
+});
+
+test("外版页面只展示七列机会 Top 3，唯一运行时数据源为 top3.json", () => {
   const pools = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
   const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
   const fetchedAt = new Date().toISOString();
@@ -210,16 +227,18 @@ test("外版页面只展示六列 Top 3，唯一运行时数据源为 top3.json"
   verifyMarketData(pools, optimizerSummary, DASHBOARD_CONFIG);
   verifyPageMarkup(page);
   verifyDataJson(data);
-  assert.match(page, /Net 24H/);
+  assert.match(page, /Opportunity Score/);
+  assert.match(page, /Net Estimate/);
   assert.match(page, /Core/);
   assert.match(page, /Buffer/);
+  assert.match(page, /Confidence/);
   assert.match(page, /Action/);
   assert.match(page, /WHY/);
   assert.match(page, /正在验证/);
   assert.match(page, /top3\.json/);
   assert.doesNotMatch(page, /24h 成交量|24h LP Fee|预计手续费/);
   assert.doesNotMatch(page, /#01/);
-  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 6);
+  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 7);
   assert.equal(formatTimestamp(fetchedAt) !== null, true);
 });
 
@@ -229,7 +248,7 @@ test("无 Top 3 页面只保留运行时空状态，不嵌入旧排名", () => {
   const page = renderPage({ optimizerSummary, fetchedAt: new Date().toISOString(), poolCount: pools.length, config: DASHBOARD_CONFIG });
   verifyPageMarkup(page);
   assert.match(page, /top3\.json/);
-  assert.doesNotMatch(page, /#01/);
+  assert.doesNotMatch(page, /Net 24H/);
 });
 
 test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
@@ -240,6 +259,7 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
     sourceEvidence: { api: {}, rpc: {}, evidenceSummary: {} },
     scope: { capital: 1_000, autoExecution: false },
     top3: [],
+    opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0 },
     diagnostics: { version: 1, statusCounts: { READY: 0, NEAR_READY: 0, BLOCKED: 0 }, nearest: [], matrix: [] },
     publicPoolCount: 0,
   };

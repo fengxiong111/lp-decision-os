@@ -1,12 +1,13 @@
 import { createHash } from "node:crypto";
 import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { DASHBOARD_CONFIG } from "./mobile-dashboard/config.mjs";
-import { displayAction, renderPage } from "./mobile-dashboard/presentation.mjs";
+import { renderPage } from "./mobile-dashboard/presentation.mjs";
 import { formatTimestamp } from "./mobile-dashboard/format.mjs";
 import { normalizePools } from "./mobile-dashboard/market-data.mjs";
 import { collectProductionEvidence, snapshotFreshness, snapshotHash } from "./mobile-dashboard/evidence.mjs";
 import { buildOptimizerResults } from "./mobile-dashboard/optimizer.mjs";
-import { buildDiagnosticReport, deriveVolatilityRegime, statusForTop3 } from "./mobile-dashboard/diagnostics.mjs";
+import { buildDiagnosticReport, deriveVolatilityRegime } from "./mobile-dashboard/diagnostics.mjs";
+import { FEATURE_WEIGHTS, buildOpportunityRanking } from "./mobile-dashboard/opportunity.mjs";
 import { renderRuntime } from "./mobile-dashboard/runtime.mjs";
 import { fetchRaydiumPools } from "./mobile-dashboard/source.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "./mobile-dashboard/verify.mjs";
@@ -106,26 +107,24 @@ const blockerMatrix = optimizerSummary.results
   });
 const blockerMatrixByPool = new Map(blockerMatrix.map((row) => [row.pool, row]));
 const diagnostics = buildDiagnosticReport(optimizerSummary.results, blockerMatrixByPool);
-const diagnosticByPool = new Map(diagnostics.matrix.map((row) => [row.poolAddress, row]));
-const top3ForPage = optimizerSummary.top3
-  .filter((row) => statusForTop3(diagnosticByPool.get(row.poolAddress)))
-  .slice(0, 3)
-  .map((row, index) => ({
-    rank: index + 1,
-    pair: `${row.symbol}/USDC`,
-    poolAddress: row.poolAddress,
-    net24h: row.best?.expectedNetFee24h ?? null,
-    coreCapital: row.best?.coreCapital ?? null,
-    coreLower: row.best?.core?.lowerPrice ?? null,
-    coreUpper: row.best?.core?.upperPrice ?? null,
-    bufferCapital: row.best?.bufferCapital ?? null,
-    bufferLower: row.best?.buffer?.lowerPrice ?? null,
-    bufferUpper: row.best?.buffer?.upperPrice ?? null,
-    action: displayAction(row.action),
-    status: diagnosticByPool.get(row.poolAddress)?.status ?? "UNAVAILABLE",
-    dataQuality: row.dataQuality ?? null,
-    evidence: row.evidence ?? null,
-  }));
+const opportunityRanking = buildOpportunityRanking(pools, optimizerSummary.results, diagnostics);
+const opportunityByPool = new Map(opportunityRanking.scored.map((row) => [row.pool.poolAddress, row]));
+const diagnosticsWithOpportunity = {
+  ...diagnostics,
+  matrix: diagnostics.matrix.map((row) => ({
+    ...row,
+    opportunity: opportunityByPool.get(row.poolAddress)?.featureScore ?? null,
+    opportunityScore: opportunityByPool.get(row.poolAddress)?.opportunityScore ?? null,
+    opportunityStatus: opportunityByPool.get(row.poolAddress)?.opportunityStatus ?? "WATCH",
+  })),
+  nearest: diagnostics.nearest.map((row) => ({
+    ...row,
+    opportunity: opportunityByPool.get(row.poolAddress)?.featureScore ?? null,
+    opportunityScore: opportunityByPool.get(row.poolAddress)?.opportunityScore ?? null,
+    opportunityStatus: opportunityByPool.get(row.poolAddress)?.opportunityStatus ?? "WATCH",
+  })),
+};
+const top3ForPage = opportunityRanking.top3;
 const slot = pools.reduce((highest, pool) => {
   const candidate = Number(pool.evidence?.poolState?.slot);
   return Number.isFinite(candidate) ? Math.max(highest ?? candidate, candidate) : highest;
@@ -150,7 +149,8 @@ const baseSnapshot = {
     capital: DASHBOARD_CONFIG.capital,
     tvlEnterThreshold: DASHBOARD_CONFIG.tvlEnterThreshold,
     tvlExitHysteresis: DASHBOARD_CONFIG.tvlExitHysteresis,
-    objective: "EXPECTED_NET_FEE_24H_USD_1000",
+    objective: "OPPORTUNITY_SCORE_WITH_VERIFICATION_OVERLAY",
+    verificationObjective: "EXPECTED_NET_FEE_24H_USD_1000",
     autoExecution: DASHBOARD_CONFIG.autoExecution,
     displayLimit: 3,
   },
@@ -159,12 +159,19 @@ const baseSnapshot = {
   activeIndexedPoolCount: evidenceRun.evidenceSummary.activeIndexedCount,
   executablePoolCount: diagnostics.readyCount,
   optimizerExecutablePoolCount: optimizerSummary.executablePoolCount,
+  opportunityCandidateCount: opportunityRanking.scored.length,
   nearReadyPoolCount: diagnostics.nearReadyCount,
   blockedPoolCount: diagnostics.blockedCount,
   shadowState: optimizerSummary.shadowState,
-  top3Change: { ...optimizerSummary.top3Change, readyOnly: true },
+  top3Change: { ...optimizerSummary.top3Change, opportunityLayer: true },
   top3: top3ForPage,
-  diagnostics,
+  opportunityRanking: {
+    version: 1,
+    featureWeights: FEATURE_WEIGHTS,
+    candidateCount: opportunityRanking.scored.length,
+    top3Count: opportunityRanking.top3.length,
+  },
+  diagnostics: diagnosticsWithOpportunity,
   blockersByPool,
   blockerMatrix,
   optimizerAudit: {
@@ -226,5 +233,5 @@ console.log(JSON.stringify({
   executablePoolCount: optimizerSummary.executablePoolCount,
   top3: top3ForPage.map((row) => ({ rank: row.rank, pair: row.pair, action: row.action })),
   rpc: evidenceRun.evidenceSummary.rpc,
-  status: top3ForPage.length > 0 ? "RWA_TOP3_PRODUCTION_EVIDENCE_READY_CANDIDATE" : "UNAVAILABLE_REAL_EVIDENCE_INCOMPLETE",
+  status: top3ForPage.length > 0 ? "RWA_TOP3_OPPORTUNITY_CANDIDATES_READY" : "UNAVAILABLE_PUBLIC_OPPORTUNITY_DATA",
 }, null, 2));
