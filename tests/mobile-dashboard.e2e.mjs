@@ -94,7 +94,7 @@ try {
   currentTop3 = [makeRow(1)];
   await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.querySelectorAll("#ranking-list .optimizer-row").length === 1);
-  await page.locator(".why-trigger").click();
+  await page.locator(".row-tools .why-trigger").click();
   await page.waitForSelector("#why-drawer:not([hidden])");
   assert.match(await page.locator("#why-drawer").innerText(), /Swap replay/);
   console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4], renderedRows: [0, 1, 3, 3] }, null, 2));
