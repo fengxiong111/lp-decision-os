@@ -14,6 +14,7 @@ import {
 import { renderPage } from "../scripts/mobile-dashboard/presentation.mjs";
 import { renderRuntime } from "../scripts/mobile-dashboard/runtime.mjs";
 import { decodeSwapEventLog, snapshotFreshness, snapshotHash } from "../scripts/mobile-dashboard/evidence.mjs";
+import { buildDiagnosticReport, buildPoolDiagnostic, deriveVolatilityRegime, statusForTop3 } from "../scripts/mobile-dashboard/diagnostics.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "../scripts/mobile-dashboard/verify.mjs";
 
 function rawPool({
@@ -159,6 +160,46 @@ test("影子仓位只影响动作，不读取钱包；排序跌出 Top 3 不自�
   assert.equal(result.exit.exitEvent, "NO_FORCED_EXIT");
 });
 
+test("READY / NEAR_READY / BLOCKED 诊断状态严格分层，NEAR_READY 不进入 Top 3", () => {
+  const [pool] = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
+  const optimizer = searchOptimizer(pool, DASHBOARD_CONFIG);
+  const baseEvidence = {
+    poolState: { poolStatePass: true },
+    tickArrays: { tickArrayPass: true },
+    replayEvidence: { ...pool.replayEvidence, candidates: { ...pool.replayEvidence.candidates } },
+    swapIndexPass: true,
+    swaps: {
+      windows: { "24": { windowComplete: true, feeCoverage: 1 } },
+      path: { pass: true, coverageRatio: 1, transactionOrderComplete: true },
+      parser: { amountReconciliationFailed: 0 },
+    },
+    shadowReplay: { candidateCount: 87 },
+    feeConfigVerified: true,
+    feeGrowthReconciliation: { status: "PASS" },
+    executionCosts: { quality: "PASS" },
+    markout: { quality: "COMPLETE" },
+  };
+  const readyPool = { ...pool, universeStatus: "ACTIVE_INDEXED", evidence: baseEvidence };
+  const ready = buildPoolDiagnostic(readyPool, optimizer);
+  assert.equal(ready.status, "READY");
+  assert.equal(statusForTop3(ready), true);
+
+  const near = buildPoolDiagnostic({ ...readyPool, evidence: { ...baseEvidence, markout: { quality: "INCOMPLETE" } } }, optimizer);
+  assert.equal(near.status, "NEAR_READY");
+  assert.equal(statusForTop3(near), false);
+
+  const blocked = buildPoolDiagnostic({ ...readyPool, currentTick: null }, optimizer);
+  assert.equal(blocked.status, "BLOCKED");
+  assert.equal(statusForTop3(blocked), false);
+  assert.deepEqual(buildDiagnosticReport([{ pool: readyPool, optimizer }, { pool: { ...readyPool, currentTick: null }, optimizer }]).statusCounts, { READY: 1, NEAR_READY: 0, BLOCKED: 1 });
+});
+
+test("波动 regime 缺证据时不虚构，并且只作为优化器同净收益候选偏好", () => {
+  assert.equal(deriveVolatilityRegime({ evidence: {} }).regime, null);
+  assert.equal(deriveVolatilityRegime({ evidence: { poolState: { dynamicFeeInfo: { volatilityAccumulator: 10, maxVolatilityAccumulator: 100 } } } }).regime, "LOW_VOL");
+  assert.equal(deriveVolatilityRegime({ evidence: { poolState: { dynamicFeeInfo: { volatilityAccumulator: 90, maxVolatilityAccumulator: 100 } } } }).regime, "HIGH_VOL");
+});
+
 test("外版页面只展示六列 Top 3，唯一运行时数据源为 top3.json", () => {
   const pools = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
   const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
@@ -173,6 +214,8 @@ test("外版页面只展示六列 Top 3，唯一运行时数据源为 top3.json"
   assert.match(page, /Core/);
   assert.match(page, /Buffer/);
   assert.match(page, /Action/);
+  assert.match(page, /WHY/);
+  assert.match(page, /正在验证/);
   assert.match(page, /top3\.json/);
   assert.doesNotMatch(page, /24h 成交量|24h LP Fee|预计手续费/);
   assert.doesNotMatch(page, /#01/);
@@ -197,6 +240,7 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
     sourceEvidence: { api: {}, rpc: {}, evidenceSummary: {} },
     scope: { capital: 1_000, autoExecution: false },
     top3: [],
+    diagnostics: { version: 1, statusCounts: { READY: 0, NEAR_READY: 0, BLOCKED: 0 }, nearest: [], matrix: [] },
     publicPoolCount: 0,
   };
   const snapshot = { ...base, snapshotHash: snapshotHash(base) };

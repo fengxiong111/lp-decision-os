@@ -12,7 +12,7 @@ const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
 ]);
 
 const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["Net 24H", "Core", "Buffer", "Action"];
+const requiredLabels = ["Net 24H", "Core", "Buffer", "Action", "WHY", "正在验证"];
 const actions = new Set(["OPEN", "HOLD", "MOVE CORE", "MOVE BOTH", "CLOSE", "UNAVAILABLE"]);
 const snapshot = JSON.parse(top3Json);
 const manifest = JSON.parse(manifestJson);
@@ -40,6 +40,7 @@ assert.equal(snapshot.snapshotHash, manifest.snapshotHash);
 assert.ok(Array.isArray(snapshot.top3) && snapshot.top3.length <= 3, "top3.json 超过三行");
 snapshot.top3.forEach((row, index) => {
   assert.equal(row.rank, index + 1, "Top 3 rank 不连续");
+  assert.equal(row.status, "READY", "主 Top 3 只能包含 READY");
   assert.equal(typeof row.pair, "string");
   assert.equal(typeof row.poolAddress, "string");
   assert.ok(actions.has(row.action), `Action 不允许：${row.action}`);
@@ -47,6 +48,12 @@ snapshot.top3.forEach((row, index) => {
     assert.equal(Number.isFinite(row[field]), true, `optimizer 字段缺失：${field}`);
   }
 });
+assert.equal(snapshot.diagnostics?.version, 1, "缺少诊断版本");
+assert.ok(Array.isArray(snapshot.diagnostics?.matrix), "缺少诊断矩阵");
+for (const row of snapshot.diagnostics.matrix) {
+  assert.ok(["READY", "NEAR_READY", "BLOCKED"].includes(row.status), `诊断状态不允许：${row.status}`);
+  assert.ok(Array.isArray(row.evidence), `诊断缺少 Evidence：${row.pair}`);
+}
 
 console.log(JSON.stringify({
   status: "PASS",

@@ -10,6 +10,7 @@ const makeRow = (rank) => ({
   rank,
   pair: `ASSET${rank}/USDC`,
   poolAddress: `Pool${rank}`,
+  status: "READY",
   net24h: 18 - rank,
   coreCapital: 700,
   coreLower: 140.12,
@@ -18,6 +19,16 @@ const makeRow = (rank) => ({
   bufferLower: 136.5,
   bufferUpper: 145,
   action,
+});
+
+const makeDiagnostic = (rank, status = "READY") => ({
+  poolAddress: `Pool${rank}`,
+  pair: `ASSET${rank}/USDC`,
+  status,
+  primaryBlocker: status === "READY" ? null : { label: status === "NEAR_READY" ? "Markout" : "Swap replay", display: status === "NEAR_READY" ? "WAITING" : "FAIL" },
+  evidence: [{ key: "swapReplay", label: "Swap replay", status: status === "BLOCKED" ? "FAIL" : "PASS", display: status === "BLOCKED" ? "FAIL" : "PASS", reason: "fixture" }],
+  netRange: { NET_LOW: 10, NET_BASE: 12, NET_HIGH: 14, reason: "fixture" },
+  volatilityRegime: { regime: "NORMAL_VOL", reason: "fixture" },
 });
 
 let currentTop3 = [];
@@ -30,6 +41,11 @@ const server = createServer(async (request, response) => {
       dataFreshness: { state: "FRESH", ageMs: 0, slaMs: 3_600_000 },
       scope: { capital: 1_000, autoExecution: false },
       top3: currentTop3,
+      diagnostics: {
+        version: 1,
+        nearest: [makeDiagnostic(1, "READY"), makeDiagnostic(2, "NEAR_READY"), makeDiagnostic(3, "BLOCKED")],
+        matrix: [makeDiagnostic(1, "READY"), makeDiagnostic(2, "NEAR_READY"), makeDiagnostic(3, "BLOCKED")],
+      },
     };
     response.writeHead(200, { "content-type": "application/json", "cache-control": "no-store" });
     response.end(JSON.stringify(snapshot));
@@ -71,10 +87,16 @@ try {
     }
     assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `top3=${fixture.length} 行数错误`);
     if (expectedRows === 0) {
-      assert.equal(await page.locator("#empty-state").innerText(), "RWA TOP 3\n0 / 3 READY\n当前没有满足完整证据门槛的可执行 Pool。", "空 Top 3 文案错误");
+      assert.equal(await page.locator("#empty-state").innerText(), "等待可验证机会\n当前没有满足全部链上证据要求的 RWA/USDC LP。", "空 Top 3 文案错误");
       assert.equal(await page.locator(".rank").count(), 0, "空 Top 3 不得出现排名编号");
     }
   }
+  currentTop3 = [makeRow(1)];
+  await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => document.querySelectorAll("#ranking-list .optimizer-row").length === 1);
+  await page.locator(".why-trigger").click();
+  await page.waitForSelector("#why-drawer:not([hidden])");
+  assert.match(await page.locator("#why-drawer").innerText(), /Swap replay/);
   console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4], renderedRows: [0, 1, 3, 3] }, null, 2));
 } finally {
   await browser.close();

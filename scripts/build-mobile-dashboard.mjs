@@ -5,6 +5,7 @@ import { formatTimestamp } from "./mobile-dashboard/format.mjs";
 import { normalizePools } from "./mobile-dashboard/market-data.mjs";
 import { collectProductionEvidence, snapshotFreshness, snapshotHash } from "./mobile-dashboard/evidence.mjs";
 import { buildOptimizerResults } from "./mobile-dashboard/optimizer.mjs";
+import { buildDiagnosticReport, deriveVolatilityRegime, statusForTop3 } from "./mobile-dashboard/diagnostics.mjs";
 import { renderRuntime } from "./mobile-dashboard/runtime.mjs";
 import { fetchRaydiumPools } from "./mobile-dashboard/source.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "./mobile-dashboard/verify.mjs";
@@ -13,23 +14,11 @@ const fetchedAt = new Date().toISOString();
 const rawPools = await fetchRaydiumPools(DASHBOARD_CONFIG);
 const apiPools = normalizePools(rawPools, DASHBOARD_CONFIG);
 const evidenceRun = await collectProductionEvidence(apiPools, DASHBOARD_CONFIG);
-const pools = evidenceRun.pools;
-const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
-const top3ForPage = optimizerSummary.top3.slice(0, 3).map((row) => ({
-  rank: row.rank,
-  pair: `${row.symbol}/USDC`,
-  poolAddress: row.poolAddress,
-  net24h: row.best?.expectedNetFee24h ?? null,
-  coreCapital: row.best?.coreCapital ?? null,
-  coreLower: row.best?.core?.lowerPrice ?? null,
-  coreUpper: row.best?.core?.upperPrice ?? null,
-  bufferCapital: row.best?.bufferCapital ?? null,
-  bufferLower: row.best?.buffer?.lowerPrice ?? null,
-  bufferUpper: row.best?.buffer?.upperPrice ?? null,
-  action: displayAction(row.action),
-  dataQuality: row.dataQuality ?? null,
-  evidence: row.evidence ?? null,
+const pools = evidenceRun.pools.map((pool) => ({
+  ...pool,
+  volatilityRegime: deriveVolatilityRegime(pool),
 }));
+const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
 const updatedAt = formatTimestamp(fetchedAt);
 if (!updatedAt) throw new Error("Could not produce a valid observation timestamp");
 
@@ -114,6 +103,28 @@ const blockerMatrix = optimizerSummary.results
       executable: optimizer.executable === true,
     };
   });
+const blockerMatrixByPool = new Map(blockerMatrix.map((row) => [row.pool, row]));
+const diagnostics = buildDiagnosticReport(optimizerSummary.results, blockerMatrixByPool);
+const diagnosticByPool = new Map(diagnostics.matrix.map((row) => [row.poolAddress, row]));
+const top3ForPage = optimizerSummary.top3
+  .filter((row) => statusForTop3(diagnosticByPool.get(row.poolAddress)))
+  .slice(0, 3)
+  .map((row, index) => ({
+    rank: index + 1,
+    pair: `${row.symbol}/USDC`,
+    poolAddress: row.poolAddress,
+    net24h: row.best?.expectedNetFee24h ?? null,
+    coreCapital: row.best?.coreCapital ?? null,
+    coreLower: row.best?.core?.lowerPrice ?? null,
+    coreUpper: row.best?.core?.upperPrice ?? null,
+    bufferCapital: row.best?.bufferCapital ?? null,
+    bufferLower: row.best?.buffer?.lowerPrice ?? null,
+    bufferUpper: row.best?.buffer?.upperPrice ?? null,
+    action: displayAction(row.action),
+    status: diagnosticByPool.get(row.poolAddress)?.status ?? "UNAVAILABLE",
+    dataQuality: row.dataQuality ?? null,
+    evidence: row.evidence ?? null,
+  }));
 const slot = pools.reduce((highest, pool) => {
   const candidate = Number(pool.evidence?.poolState?.slot);
   return Number.isFinite(candidate) ? Math.max(highest ?? candidate, candidate) : highest;
@@ -145,15 +156,21 @@ const baseSnapshot = {
   publicPoolCount: pools.length,
   stage1CandidateCount: evidenceRun.evidenceSummary.stage1CandidateCount,
   activeIndexedPoolCount: evidenceRun.evidenceSummary.activeIndexedCount,
-  executablePoolCount: optimizerSummary.executablePoolCount,
+  executablePoolCount: diagnostics.readyCount,
+  optimizerExecutablePoolCount: optimizerSummary.executablePoolCount,
+  nearReadyPoolCount: diagnostics.nearReadyCount,
+  blockedPoolCount: diagnostics.blockedCount,
   shadowState: optimizerSummary.shadowState,
-  top3Change: optimizerSummary.top3Change,
+  top3Change: { ...optimizerSummary.top3Change, readyOnly: true },
   top3: top3ForPage,
+  diagnostics,
   blockersByPool,
   blockerMatrix,
   optimizerAudit: {
-    blockedPoolCount: optimizerSummary.results.filter(({ optimizer }) => !optimizer.executable).length,
-    completeEvidencePoolCount: optimizerSummary.results.filter(({ optimizer }) => optimizer.executable).length,
+    blockedPoolCount: diagnostics.blockedCount,
+    nearReadyPoolCount: diagnostics.nearReadyCount,
+    completeEvidencePoolCount: diagnostics.readyCount,
+    optimizerExecutablePoolCount: optimizerSummary.executablePoolCount,
     noWallet: true,
     noRealPosition: true,
     autoExecution: false,
@@ -207,5 +224,5 @@ console.log(JSON.stringify({
   executablePoolCount: optimizerSummary.executablePoolCount,
   top3: top3ForPage.map((row) => ({ rank: row.rank, pair: row.pair, action: row.action })),
   rpc: evidenceRun.evidenceSummary.rpc,
-  status: optimizerSummary.top3.length > 0 ? "RWA_TOP3_PRODUCTION_EVIDENCE_READY_CANDIDATE" : "UNAVAILABLE_REAL_EVIDENCE_INCOMPLETE",
+  status: top3ForPage.length > 0 ? "RWA_TOP3_PRODUCTION_EVIDENCE_READY_CANDIDATE" : "UNAVAILABLE_REAL_EVIDENCE_INCOMPLETE",
 }, null, 2));

@@ -185,6 +185,14 @@ function replayCandidate(candidate, ranges, replayEvidence) {
   };
 }
 
+function volatilityPreference(replay, pool) {
+  const regime = pool.volatilityRegime?.regime;
+  const width = replay.coreWidth + replay.bufferWidth;
+  if (regime === "LOW_VOL") return -width;
+  if (regime === "HIGH_VOL") return width;
+  return 0;
+}
+
 function actionForResult(pool, best) {
   if (!best) return "UNAVAILABLE";
   const shadow = pool.shadowPosition;
@@ -291,6 +299,7 @@ export function searchOptimizer(pool, config) {
       selfDilution: "UNAVAILABLE",
       markoutModel: "UNAVAILABLE",
       rebalanceCost: "UNAVAILABLE",
+      volatilityRegime: pool.volatilityRegime ?? null,
       moveCoreIndependent: "PASS",
       moveBothGate: "PASS",
       closeLogic: "PASS",
@@ -309,7 +318,11 @@ export function searchOptimizer(pool, config) {
     .map((candidate) => ({ candidate, ranges: candidateRanges(candidate, pool) }))
     .map(({ candidate, ranges }) => ({ candidate, replay: replayCandidate(candidate, ranges, pool.replayEvidence) }))
     .filter((candidate) => candidate.replay !== null)
-    .sort((a, b) => b.replay.expectedNetFee24h - a.replay.expectedNetFee24h);
+    .sort((a, b) => {
+      const netDelta = b.replay.expectedNetFee24h - a.replay.expectedNetFee24h;
+      if (Math.abs(netDelta) > 1e-9) return netDelta;
+      return volatilityPreference(b.replay, pool) - volatilityPreference(a.replay, pool);
+    });
   const best = evaluated[0]?.replay ?? null;
   if (!best) return { ...base, blockers: ["NO_VALID_CANDIDATE"] };
 
@@ -327,6 +340,7 @@ export function searchOptimizer(pool, config) {
       selfDilution: "PASS",
       markoutModel: "PASS",
       rebalanceCost: "PASS",
+      volatilityRegime: pool.volatilityRegime ?? null,
     },
   };
   return { ...result, exit: evaluateShadowExit(pool, result, config) };

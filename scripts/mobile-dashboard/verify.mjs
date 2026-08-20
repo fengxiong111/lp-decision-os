@@ -54,6 +54,7 @@ export function verifyPageMarkup(markup) {
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少独立浏览器运行时");
   if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一 top3.json 数据源");
   if (!markup.includes("Net 24H") || !markup.includes("Core") || !markup.includes("Buffer") || !markup.includes("Action")) fail("页面缺少六列主表字段");
+  if (!markup.includes("WHY") || !markup.includes("正在验证")) fail("页面缺少可解释性诊断入口");
   if (LEGACY_PRESENTATION_TEXT.some((label) => markup.includes(label))) fail("页面仍包含旧版字段");
   if (markup.includes('class="optimizer-row"')) fail("页面在静态 HTML 中嵌入了旧排名行");
   if (/<(?:span|br|strong)\b/i.test(markup.match(/<script type="module"[^>]*>[\s\S]*?<\/script>/)?.[0] ?? "")) fail("运行时脚本不应包含展示 HTML");
@@ -72,7 +73,9 @@ export function verifySnapshot(snapshot, config) {
   if (snapshot.scope?.autoExecution !== false || config.autoExecution !== false) fail("快照自动执行边界不是 OFF");
   if (!snapshot.sourceEvidence?.api || !snapshot.sourceEvidence?.rpc || !snapshot.sourceEvidence?.evidenceSummary) fail("快照缺少来源证据摘要");
   if (!Array.isArray(snapshot.top3) || snapshot.top3.length > 3) fail("快照 Top 3 数量非法");
-  if (snapshot.top3.some((row, index) => row.rank !== index + 1 || !row.evidence || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("Top 3 缺少可展示的 optimizer 结果");
+  if (snapshot.top3.some((row, index) => row.rank !== index + 1 || row.status !== "READY" || !row.evidence || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("Top 3 缺少 READY optimizer 结果");
   if (snapshot.top3.some((row) => [row.net24h, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => !Number.isFinite(value)))) fail("Top 3 缺少完整的 Core / Buffer 可执行价格区间");
+  if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
+  if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");
   if (containsForbiddenPositionField(snapshot)) fail("证据快照包含真实钱包或真实仓位字段");
 }
