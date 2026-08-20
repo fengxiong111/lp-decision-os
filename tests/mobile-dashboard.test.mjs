@@ -255,10 +255,15 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
   const base = {
     schemaVersion: 1,
     generatedAt: new Date().toISOString(),
+    opportunityGeneratedAt: new Date().toISOString(),
+    verificationGeneratedAt: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
     dataFreshness: { state: "FRESH", ageMs: 0, slaMs: DASHBOARD_CONFIG.evidence.freshnessSlaMs },
+    opportunityFreshness: { state: "FRESH", ageMs: 0, slaMs: DASHBOARD_CONFIG.opportunityFreshnessSlaMs },
+    verificationFreshness: { state: "STALE", ageMs: 7 * 60 * 60_000, slaMs: DASHBOARD_CONFIG.verificationFreshnessSlaMs },
+    verificationReady: false,
     sourceEvidence: { api: {}, rpc: {}, evidenceSummary: {} },
     scope: { capital: 1_000, autoExecution: false },
-    top3: [],
+    candidates: [],
     opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0 },
     diagnostics: { version: 1, statusCounts: { READY: 0, NEAR_READY: 0, BLOCKED: 0 }, nearest: [], matrix: [] },
     publicPoolCount: 0,
@@ -272,6 +277,9 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
 test("浏览器运行时读取证据快照，而不是直接调用 Raydium API", () => {
   const runtime = renderRuntime(DASHBOARD_CONFIG);
   assert.match(runtime, /top3\.json/);
+  assert.match(runtime, /opportunityGeneratedAt/);
+  assert.match(runtime, /candidates/);
+  assert.doesNotMatch(runtime, /snapshot\.top3/);
   assert.doesNotMatch(runtime, /api-v3\.raydium\.io/);
   assert.doesNotMatch(runtime, /CONFIG\.apiUrl/);
 });

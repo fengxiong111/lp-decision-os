@@ -24,6 +24,16 @@ const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
 const updatedAt = formatTimestamp(fetchedAt);
 if (!updatedAt) throw new Error("Could not produce a valid observation timestamp");
 
+const verificationGeneratedAt = pools
+  .map((pool) => pool.evidence?.updatedAt)
+  .filter((value) => Number.isFinite(Date.parse(value ?? "")))
+  .sort((left, right) => Date.parse(left) - Date.parse(right))
+  .at(-1) ?? null;
+const opportunityFreshness = snapshotFreshness(fetchedAt, DASHBOARD_CONFIG.opportunityFreshnessSlaMs);
+const verificationFreshness = verificationGeneratedAt
+  ? snapshotFreshness(verificationGeneratedAt, DASHBOARD_CONFIG.verificationFreshnessSlaMs)
+  : { state: "UNAVAILABLE", ageMs: null, slaMs: DASHBOARD_CONFIG.verificationFreshnessSlaMs };
+
 verifyMarketData(pools, optimizerSummary, DASHBOARD_CONFIG);
 
 const blockersByPool = optimizerSummary.results.map(({ pool, optimizer }) => ({
@@ -132,8 +142,12 @@ const slot = pools.reduce((highest, pool) => {
 const baseSnapshot = {
   schemaVersion: 1,
   generatedAt: fetchedAt,
+  opportunityGeneratedAt: fetchedAt,
+  verificationGeneratedAt,
   slot,
-  dataFreshness: snapshotFreshness(fetchedAt, DASHBOARD_CONFIG.evidence.freshnessSlaMs),
+  dataFreshness: opportunityFreshness,
+  opportunityFreshness,
+  verificationFreshness,
   strategyVersion: "shadow-v1",
   snapshotType: "VERIFIED_RAYDIUM_RWA_USDC_EVIDENCE",
   sourceEvidence: {
@@ -164,7 +178,9 @@ const baseSnapshot = {
   blockedPoolCount: diagnostics.blockedCount,
   shadowState: optimizerSummary.shadowState,
   top3Change: { ...optimizerSummary.top3Change, opportunityLayer: true },
+  candidates: top3ForPage,
   top3: top3ForPage,
+  verificationReady: diagnostics.readyCount > 0,
   opportunityRanking: {
     version: 1,
     featureWeights: FEATURE_WEIGHTS,
@@ -217,8 +233,11 @@ const manifest = {
   runtimeJs: "mobile-dashboard/runtime.js",
   pageDataSource: "./top3.json",
   top3Count: top3ForPage.length,
+  candidateCount: top3ForPage.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: fetchedAt,
+  opportunityGeneratedAt: fetchedAt,
+  verificationGeneratedAt,
   legacyColumnsPresent: false,
   staleFallbackRemoved: true,
   serviceWorker: false,

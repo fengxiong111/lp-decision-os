@@ -34,16 +34,23 @@ const makeDiagnostic = (rank, status = "READY") => ({
   volatilityRegime: { regime: "NORMAL_VOL", reason: "fixture" },
 });
 
-let currentTop3 = [];
+let currentCandidates = [];
 const server = createServer(async (request, response) => {
   if (request.url?.startsWith("/top3.json")) {
+    const opportunityGeneratedAt = new Date().toISOString();
+    const verificationGeneratedAt = new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString();
     const snapshot = {
       schemaVersion: 1,
-      generatedAt: new Date().toISOString(),
+      generatedAt: opportunityGeneratedAt,
+      opportunityGeneratedAt,
+      verificationGeneratedAt,
       snapshotHash: "a".repeat(64),
-      dataFreshness: { state: "FRESH", ageMs: 0, slaMs: 3_600_000 },
+      dataFreshness: { state: "FRESH", ageMs: 0, slaMs: 1_800_000 },
+      opportunityFreshness: { state: "FRESH", ageMs: 0, slaMs: 1_800_000 },
+      verificationFreshness: { state: "STALE", ageMs: 25_200_000, slaMs: 21_600_000 },
+      verificationReady: false,
       scope: { capital: 1_000, autoExecution: false },
-      top3: currentTop3,
+      candidates: currentCandidates,
       diagnostics: {
         version: 1,
         nearest: [makeDiagnostic(1, "READY"), makeDiagnostic(2, "NEAR_READY"), makeDiagnostic(3, "BLOCKED")],
@@ -81,20 +88,21 @@ const browser = await chromium.launch({
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   for (const [fixture, expectedRows] of [[[], 0], [[makeRow(1)], 1], [[makeRow(1), makeRow(2), makeRow(3)], 3], [[makeRow(1), makeRow(2), makeRow(3), makeRow(4)], 3]]) {
-    currentTop3 = fixture;
+    currentCandidates = fixture;
     await page.goto(`${baseUrl}/?fixture=${fixture.length}`, { waitUntil: "domcontentloaded" });
     if (expectedRows === 0) {
       await page.waitForSelector("#empty-state:not([hidden])");
     } else {
       await page.waitForFunction((count) => document.querySelectorAll("#ranking-list .optimizer-row").length === count, expectedRows);
+      assert.equal(await page.locator("#empty-state").isHidden(), true, "Opportunity candidates 不应因 Verification 过期进入空状态");
     }
-    assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `top3=${fixture.length} 行数错误`);
+    assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `candidates=${fixture.length} 行数错误`);
     if (expectedRows === 0) {
       assert.equal(await page.locator("#empty-state").innerText(), "等待机会快照\n当前没有可展示的 RWA/USDC 机会候选。", "空机会层文案错误");
       assert.equal(await page.locator(".pair").count(), 0, "空机会层不得出现候选行");
     }
   }
-  currentTop3 = [makeRow(1)];
+  currentCandidates = [makeRow(1)];
   await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.querySelectorAll("#ranking-list .optimizer-row").length === 1);
   await page.locator(".row-tools .why-trigger").click();

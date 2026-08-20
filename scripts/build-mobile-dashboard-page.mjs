@@ -16,7 +16,7 @@ verifyDataJson(data);
 const runtime = renderRuntime(DASHBOARD_CONFIG);
 const runtimeVersion = createHash("sha256").update(runtime).digest("hex");
 const page = renderPage({
-  fetchedAt: snapshot.generatedAt,
+  fetchedAt: snapshot.opportunityGeneratedAt ?? snapshot.generatedAt,
   poolCount: snapshot.publicPoolCount ?? null,
   snapshotHash: snapshot.snapshotHash,
   runtimeVersion,
@@ -40,9 +40,12 @@ await writeFile(new URL("deployment-manifest.json", outputDir), JSON.stringify({
   indexHtml: "mobile-dashboard/index.html",
   runtimeJs: "mobile-dashboard/runtime.js",
   pageDataSource: "./top3.json",
-  top3Count: snapshot.top3.length,
+  top3Count: snapshot.candidates.length,
+  candidateCount: snapshot.candidates.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: snapshot.generatedAt,
+  opportunityGeneratedAt: snapshot.opportunityGeneratedAt ?? snapshot.generatedAt,
+  verificationGeneratedAt: snapshot.verificationGeneratedAt ?? null,
   legacyColumnsPresent: false,
   staleFallbackRemoved: true,
   serviceWorker: false,
@@ -51,6 +54,6 @@ await writeFile(new URL("deployment-manifest.json", outputDir), JSON.stringify({
 console.log(JSON.stringify({
   status: "PASS",
   source: "mobile-dashboard/top3.json",
-  top3Count: snapshot.top3.length,
+  top3Count: snapshot.candidates.length,
   buildHash: snapshot.snapshotHash,
 }, null, 2));

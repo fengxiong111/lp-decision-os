@@ -38,8 +38,14 @@ assert.equal(manifest.legacyColumnsPresent, false);
 assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
 assert.equal(snapshot.snapshotHash, manifest.snapshotHash);
-assert.ok(Array.isArray(snapshot.top3) && snapshot.top3.length <= 3, "top3.json 超过三行");
-snapshot.top3.forEach((row, index) => {
+assert.ok(Array.isArray(snapshot.candidates) && snapshot.candidates.length <= 3, "top3.json candidates 超过三行");
+assert.equal(manifest.candidateCount, snapshot.candidates.length, "manifest candidateCount 不一致");
+assert.ok(snapshot.opportunityGeneratedAt, "缺少 opportunityGeneratedAt");
+assert.ok(snapshot.opportunityFreshness, "缺少 opportunityFreshness");
+assert.ok(Object.hasOwn(snapshot, "verificationGeneratedAt"), "缺少 verificationGeneratedAt");
+assert.ok(snapshot.verificationFreshness, "缺少 verificationFreshness");
+assert.equal(typeof snapshot.verificationReady, "boolean", "verificationReady 类型错误");
+snapshot.candidates.forEach((row, index) => {
   assert.equal(row.rank, index + 1, "Top 3 rank 不连续");
   assert.ok(opportunityStatuses.has(row.opportunityStatus), `Opportunity 状态不允许：${row.opportunityStatus}`);
   assert.equal(typeof row.pair, "string");
@@ -51,7 +57,7 @@ snapshot.top3.forEach((row, index) => {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Opportunity 字段非法：${field}`);
   }
 });
-assert.ok(snapshot.publicPoolCount === 0 || snapshot.top3.length > 0, "存在公开 Pool 时机会层不得为空");
+assert.ok(snapshot.publicPoolCount === 0 || snapshot.candidates.length > 0, "存在公开 Pool 时机会层不得为空");
 assert.equal(snapshot.opportunityRanking?.version, 1, "缺少 Opportunity Ranking 摘要");
 assert.ok(Number.isInteger(snapshot.opportunityRanking?.candidateCount), "Opportunity candidateCount 缺失");
 assert.equal(snapshot.diagnostics?.version, 1, "缺少诊断版本");
@@ -65,7 +71,7 @@ console.log(JSON.stringify({
   status: "PASS",
   sourceDirectory: manifest.sourceDirectory,
   top3Json: manifest.top3Json,
-  top3Count: snapshot.top3.length,
+  top3Count: snapshot.candidates.length,
   buildHash: snapshot.snapshotHash,
   legacyColumnsPresent: false,
   staleFallbackRemoved: true,

@@ -40,5 +40,7 @@ export const DASHBOARD_CONFIG = Object.freeze({
     Object.freeze({ core: 0.7, buffer: 0.3 }),
     Object.freeze({ core: 0.6, buffer: 0.4 }),
   ]),
+  opportunityFreshnessSlaMs: 30 * 60_000,
+  verificationFreshnessSlaMs: 6 * 60 * 60_000,
   refreshIntervalMs: 60_000,
 });

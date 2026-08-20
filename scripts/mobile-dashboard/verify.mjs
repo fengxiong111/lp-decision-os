@@ -70,13 +70,14 @@ export function verifyDataJson(dataJson) {
 export function verifySnapshot(snapshot, config) {
   if (snapshot?.schemaVersion !== 1) fail("证据快照 schemaVersion 不正确");
   if (!snapshot?.generatedAt || !snapshot?.snapshotHash || !/^[a-f0-9]{64}$/.test(snapshot.snapshotHash)) fail("证据快照缺少有效 snapshotHash");
+  if (!snapshot?.opportunityGeneratedAt || !snapshot?.opportunityFreshness || !snapshot?.verificationFreshness || typeof snapshot.verificationReady !== "boolean" || !Object.hasOwn(snapshot, "verificationGeneratedAt")) fail("快照缺少 Opportunity / Verification 独立时间与新鲜度");
   if (snapshot.scope?.capital !== 1_000 || config.capital !== 1_000) fail("快照资金规模不是固定 $1,000");
   if (snapshot.scope?.autoExecution !== false || config.autoExecution !== false) fail("快照自动执行边界不是 OFF");
   if (!snapshot.sourceEvidence?.api || !snapshot.sourceEvidence?.rpc || !snapshot.sourceEvidence?.evidenceSummary) fail("快照缺少来源证据摘要");
-  if (!Array.isArray(snapshot.top3) || snapshot.top3.length > 3) fail("快照 Top 3 数量非法");
-  if (snapshot.publicPoolCount > 0 && snapshot.top3.length === 0) fail("存在公开 Pool 时机会层不得为空");
-  if (snapshot.top3.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("Top 3 缺少 Opportunity 结果");
-  if (snapshot.top3.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("Top 3 缺少有效 Opportunity / Confidence 或 Core / Buffer 字段");
+  if (!Array.isArray(snapshot.candidates) || snapshot.candidates.length > 3) fail("快照 candidates 数量非法");
+  if (snapshot.publicPoolCount > 0 && snapshot.candidates.length === 0) fail("存在公开 Pool 时机会层不得为空");
+  if (snapshot.candidates.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("candidates 缺少 Opportunity 结果");
+  if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效 Opportunity / Confidence 或 Core / Buffer 字段");
   if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount)) fail("快照缺少 Opportunity Ranking 摘要");
   if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");
