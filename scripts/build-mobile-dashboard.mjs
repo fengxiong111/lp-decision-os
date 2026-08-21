@@ -7,7 +7,7 @@ import { normalizePools } from "./mobile-dashboard/market-data.mjs";
 import { collectProductionEvidence, snapshotFreshness, snapshotHash } from "./mobile-dashboard/evidence.mjs";
 import { buildOptimizerResults } from "./mobile-dashboard/optimizer.mjs";
 import { buildDiagnosticReport, deriveVolatilityRegime } from "./mobile-dashboard/diagnostics.mjs";
-import { FEATURE_WEIGHTS, buildOpportunityRanking } from "./mobile-dashboard/opportunity.mjs";
+import { FEATURE_WEIGHTS, buildMarketHeatRanking, buildOpportunityRanking } from "./mobile-dashboard/opportunity.mjs";
 import { renderRuntime } from "./mobile-dashboard/runtime.mjs";
 import { fetchRaydiumPools } from "./mobile-dashboard/source.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "./mobile-dashboard/verify.mjs";
@@ -118,6 +118,7 @@ const blockerMatrix = optimizerSummary.results
 const blockerMatrixByPool = new Map(blockerMatrix.map((row) => [row.pool, row]));
 const diagnostics = buildDiagnosticReport(optimizerSummary.results, blockerMatrixByPool);
 const opportunityRanking = buildOpportunityRanking(pools, optimizerSummary.results, diagnostics);
+const marketHeat = buildMarketHeatRanking(opportunityRanking.scored);
 const opportunityByPool = new Map(opportunityRanking.scored.map((row) => [row.pool.poolAddress, row]));
 const diagnosticsWithOpportunity = {
   ...diagnostics,
@@ -187,12 +188,14 @@ const baseSnapshot = {
   top3Change: { ...optimizerSummary.top3Change, opportunityLayer: true },
   candidates: top3ForPage,
   top3: top3ForPage,
+  marketHeat,
   verificationReady: diagnostics.readyCount > 0,
   opportunityRanking: {
     version: 1,
     featureWeights: FEATURE_WEIGHTS,
     candidateCount: opportunityRanking.scored.length,
     top3Count: opportunityRanking.top3.length,
+    marketHeatCount: marketHeat.length,
   },
   diagnostics: diagnosticsWithOpportunity,
   blockersByPool,
@@ -241,6 +244,7 @@ const manifest = {
   pageDataSource: "./top3.json",
   top3Count: top3ForPage.length,
   candidateCount: top3ForPage.length,
+  marketHeatCount: marketHeat.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: fetchedAt,
   opportunityGeneratedAt: fetchedAt,

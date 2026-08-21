@@ -7,6 +7,11 @@ const LEGACY_PRESENTATION_TEXT = ["24h 成交量", "24h LP Fee", "预计手续�
 const DISPLAY_ACTIONS = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const OPPORTUNITY_STATUSES = new Set(["READY", "WATCH", "BLOCKED"]);
 
+function validMarketHeatRow(row, index) {
+  return row && row.rank === index + 1 && typeof row.pair === "string" && typeof row.poolAddress === "string"
+    && [row.volume24h, row.lpFee24h, row.tvl, row.feeTier].every((value) => value === null || Number.isFinite(value));
+}
+
 function containsForbiddenPositionField(value) {
   if (value === null || value === undefined) return false;
   if (Array.isArray(value)) return value.some(containsForbiddenPositionField);
@@ -49,12 +54,12 @@ export function verifyMarketData(pools, optimizerSummary, config) {
 
 export function verifyPageMarkup(markup) {
   const headerCells = markup.match(/role="columnheader"/g) ?? [];
-  if (headerCells.length !== 8) fail(`表头列数为 ${headerCells.length}，应为 8`);
+  if (headerCells.length !== 14) fail(`双榜表头列数为 ${headerCells.length}，应为 14`);
   if (!markup.includes("RWA / USDC LP 优化器")) fail("缺少中文 Optimizer 页面标题");
   if (!markup.includes("模拟资金 $1,000") || !markup.includes("Top 3")) fail("页面没有声明模拟资金与 Top 3 范围");
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少独立浏览器运行时");
   if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一 top3.json 数据源");
-  for (const label of ["排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议"]) {
+  for (const label of ["推荐机会", "手续费排行", "排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "Fee Tier"]) {
     if (!markup.includes(label)) fail(`页面缺少中文主表字段：${label}`);
   }
   if (!markup.includes("详情") || !markup.includes("更多详情")) fail("页面缺少详情入口");
@@ -78,9 +83,12 @@ export function verifySnapshot(snapshot, config) {
   if (!snapshot.sourceEvidence?.api || !snapshot.sourceEvidence?.rpc || !snapshot.sourceEvidence?.evidenceSummary) fail("快照缺少来源证据摘要");
   if (!Array.isArray(snapshot.candidates) || snapshot.candidates.length > 3) fail("快照 candidates 数量非法");
   if (snapshot.publicPoolCount > 0 && snapshot.candidates.length === 0) fail("存在公开 Pool 时机会层不得为空");
+  if (!Array.isArray(snapshot.marketHeat) || snapshot.marketHeat.some((row, index) => !validMarketHeatRow(row, index))) fail("快照缺少完整 Market Heat Layer");
+  if (snapshot.publicPoolCount > 0 && snapshot.marketHeat.length === 0) fail("存在公开 Pool 时手续费热度榜不得为空");
+  if (snapshot.marketHeat.some((row, index, rows) => index > 0 && (rows[index - 1].lpFee24h ?? -Infinity) < (row.lpFee24h ?? -Infinity))) fail("Market Heat 未按 24H LP Fee 降序");
   if (snapshot.candidates.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("candidates 缺少 Opportunity 结果");
   if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.grossFeeEstimate, row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效市场、毛收益、Opportunity / Confidence 或 Core / Buffer 字段");
-  if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount)) fail("快照缺少 Opportunity Ranking 摘要");
+  if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount) || snapshot.opportunityRanking.marketHeatCount !== snapshot.marketHeat.length) fail("快照缺少 Opportunity / Market Heat 摘要");
   if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");
   if (containsForbiddenPositionField(snapshot)) fail("证据快照包含真实钱包或真实仓位字段");

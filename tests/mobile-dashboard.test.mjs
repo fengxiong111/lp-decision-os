@@ -15,7 +15,7 @@ import { renderPage } from "../scripts/mobile-dashboard/presentation.mjs";
 import { renderRuntime } from "../scripts/mobile-dashboard/runtime.mjs";
 import { decodeSwapEventLog, snapshotFreshness, snapshotHash } from "../scripts/mobile-dashboard/evidence.mjs";
 import { buildDiagnosticReport, buildPoolDiagnostic, deriveVolatilityRegime, statusForTop3 } from "../scripts/mobile-dashboard/diagnostics.mjs";
-import { buildOpportunityRanking } from "../scripts/mobile-dashboard/opportunity.mjs";
+import { buildMarketHeatRanking, buildOpportunityRanking } from "../scripts/mobile-dashboard/opportunity.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "../scripts/mobile-dashboard/verify.mjs";
 
 function rawPool({
@@ -231,7 +231,23 @@ test("同一 Pair 只去重相同 Fee Tier，不吞掉不同 Fee Tier", () => {
   assert.equal(ranking.top3.filter((row) => row.pair === "CRCLx/USDC").length, 2);
 });
 
-test("外版页面只展示中文八列决策 Top 3，唯一运行时数据源为 top3.json", () => {
+test("Market Heat 独立保留全部 Pool，并按 24H LP Fee 降序", () => {
+  const pools = normalizePools([
+    rawPool({ id: "pool-low", symbol: "LOW", assetAddress: "asset-low", tvl: 20_000, volume: 50_000, fee: 10 }),
+    rawPool({ id: "pool-hot", symbol: "HOT", assetAddress: "asset-hot", tvl: 8_000, volume: 12_000, fee: 1_000 }),
+    rawPool({ id: "pool-other", symbol: "OTHER", assetAddress: "asset-other", tvl: 7_000, volume: 11_000, fee: 120 }),
+  ], DASHBOARD_CONFIG);
+  const optimizerResults = pools.map((pool) => ({ pool, optimizer: searchOptimizer(pool, DASHBOARD_CONFIG) }));
+  const ranking = buildOpportunityRanking(pools, optimizerResults, buildDiagnosticReport(optimizerResults));
+  const heat = buildMarketHeatRanking(ranking.scored);
+  assert.equal(heat.length, 3);
+  assert.equal(heat[0].pair, "HOT/USDC");
+  assert.equal(heat[0].lpFee24h, 1_000);
+  assert.ok(heat.some((row) => row.pair === "LOW/USDC"), "热度榜不能只保留推荐候选");
+  assert.deepEqual(heat.map((row) => row.rank), [1, 2, 3]);
+});
+
+test("外版页面展示推荐机会与独立手续费热度双榜，唯一运行时数据源为 top3.json", () => {
   const pools = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
   const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
   const fetchedAt = new Date().toISOString();
@@ -253,10 +269,13 @@ test("外版页面只展示中文八列决策 Top 3，唯一运行时数据源�
   assert.match(page, /建议/);
   assert.match(page, /详情/);
   assert.match(page, /更多详情/);
+  assert.match(page, /推荐机会/);
+  assert.match(page, /手续费排行/);
+  assert.match(page, /Fee Tier/);
   assert.match(page, /top3\.json/);
   assert.doesNotMatch(page, /24h 成交量|24h LP Fee|预计手续费/);
   assert.doesNotMatch(page, /#01/);
-  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 8);
+  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 14);
   assert.equal(formatTimestamp(fetchedAt) !== null, true);
 });
 
@@ -282,7 +301,8 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
     sourceEvidence: { api: {}, rpc: {}, evidenceSummary: {} },
     scope: { capital: 1_000, autoExecution: false },
     candidates: [],
-    opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0 },
+    marketHeat: [],
+    opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0, marketHeatCount: 0 },
     diagnostics: { version: 1, statusCounts: { READY: 0, NEAR_READY: 0, BLOCKED: 0 }, nearest: [], matrix: [] },
     publicPoolCount: 0,
   };
@@ -297,6 +317,7 @@ test("浏览器运行时读取证据快照，而不是直接调用 Raydium API",
   assert.match(runtime, /top3\.json/);
   assert.match(runtime, /opportunityGeneratedAt/);
   assert.match(runtime, /candidates/);
+  assert.match(runtime, /marketHeat/);
   assert.doesNotMatch(runtime, /snapshot\.top3/);
   assert.doesNotMatch(runtime, /api-v3\.raydium\.io/);
   assert.doesNotMatch(runtime, /CONFIG\.apiUrl/);

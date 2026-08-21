@@ -170,4 +170,23 @@ export function buildOpportunityRanking(pools, optimizerResults, diagnostics) {
   return { top3, scored, uniqueCandidateCount: uniqueCandidates.length };
 }
 
+export function buildMarketHeatRanking(scored) {
+  return scored
+    .filter((candidate) => candidate?.pool?.poolAddress)
+    .sort((left, right) => {
+      return (metricValue(right.pool.lpFee24h) ?? -Infinity) - (metricValue(left.pool.lpFee24h) ?? -Infinity)
+        || (metricValue(right.pool.volume24h) ?? -Infinity) - (metricValue(left.pool.volume24h) ?? -Infinity)
+        || left.pool.poolAddress.localeCompare(right.pool.poolAddress);
+    })
+    .map((candidate, index) => ({
+      rank: index + 1,
+      pair: `${candidate.pool.symbol}/USDC`,
+      poolAddress: candidate.pool.poolAddress,
+      volume24h: metricValue(candidate.pool.volume24h),
+      lpFee24h: metricValue(candidate.pool.lpFee24h),
+      tvl: metricValue(candidate.pool.tvl),
+      feeTier: metricValue(candidate.pool.feeTier),
+    }));
+}
+
 export { FEATURE_WEIGHTS };

@@ -42,6 +42,7 @@ await writeFile(new URL("deployment-manifest.json", outputDir), JSON.stringify({
   pageDataSource: "./top3.json",
   top3Count: snapshot.candidates.length,
   candidateCount: snapshot.candidates.length,
+  marketHeatCount: snapshot.marketHeat.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: snapshot.generatedAt,
   opportunityGeneratedAt: snapshot.opportunityGeneratedAt ?? snapshot.generatedAt,

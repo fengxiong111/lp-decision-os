@@ -12,7 +12,7 @@ const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
 ]);
 
 const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "详情", "更多详情"];
+const requiredLabels = ["推荐机会", "手续费排行", "排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "详情", "更多详情"];
 const actions = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const opportunityStatuses = new Set(["READY", "WATCH", "BLOCKED"]);
 const snapshot = JSON.parse(top3Json);
@@ -22,11 +22,12 @@ for (const label of legacyLabels) {
   assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧列仍出现在构建产物：${label}`);
 }
 for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少主表字段：${label}`);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 8, "主表不是八列");
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 14, "双榜列数不正确");
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
 assert.equal(indexHtml.includes('class="optimizer-row"'), false, "index.html 不应嵌入旧排名行");
 assert.equal(runtimeJs.includes("./top3.json"), true, "runtime.js 未读取 top3.json");
+assert.equal(runtimeJs.includes("marketHeat"), true, "runtime.js 未读取 Market Heat Layer");
 assert.equal(runtimeJs.includes("Core / Buffer"), true, "详情层缺少 Core / Buffer");
 assert.equal(runtimeJs.includes("Evidence"), true, "详情层缺少 Evidence");
 for (const forbiddenRuntimeToken of ["lastGoodTop3", "liveBackup", "api-v3.raydium.io", "navigator.serviceWorker", "serviceWorker", "fallback"]) {
@@ -39,6 +40,7 @@ assert.equal(manifest.pageDataSource, "./top3.json");
 assert.equal(manifest.legacyColumnsPresent, false);
 assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
+assert.equal(manifest.marketHeatCount, snapshot.marketHeat.length, "manifest marketHeatCount 不一致");
 assert.equal(snapshot.snapshotHash, manifest.snapshotHash);
 assert.ok(Array.isArray(snapshot.candidates) && snapshot.candidates.length <= 3, "top3.json candidates 超过三行");
 assert.equal(manifest.candidateCount, snapshot.candidates.length, "manifest candidateCount 不一致");
@@ -57,6 +59,15 @@ snapshot.candidates.forEach((row, index) => {
   assert.equal(Number.isFinite(row.confidence), true, "Confidence 缺失");
   for (const field of ["netEstimate", "coreCapital", "coreLower", "coreUpper", "bufferCapital", "bufferLower", "bufferUpper"]) {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Opportunity 字段非法：${field}`);
+  }
+});
+assert.ok(Array.isArray(snapshot.marketHeat) && snapshot.marketHeat.length > 0, "缺少 Market Heat 数据");
+snapshot.marketHeat.forEach((row, index) => {
+  assert.equal(row.rank, index + 1, "Market Heat rank 不连续");
+  assert.equal(typeof row.pair, "string");
+  assert.equal(typeof row.poolAddress, "string");
+  for (const field of ["volume24h", "lpFee24h", "tvl", "feeTier"]) {
+    assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Market Heat 字段非法：${field}`);
   }
 });
 assert.ok(snapshot.publicPoolCount === 0 || snapshot.candidates.length > 0, "存在公开 Pool 时机会层不得为空");

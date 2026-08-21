@@ -37,6 +37,15 @@ const makeDiagnostic = (rank, status = "READY") => ({
   netRange: { NET_LOW: 10, NET_BASE: 12, NET_HIGH: 14, reason: "fixture" },
   volatilityRegime: { regime: "NORMAL_VOL", reason: "fixture" },
 });
+const makeHeatRow = (rank, pair = `ASSET${rank}/USDC`) => ({
+  rank,
+  pair,
+  poolAddress: `HeatPool${rank}`,
+  volume24h: 30_000 - rank,
+  lpFee24h: 300 - rank,
+  tvl: 12_000 + rank,
+  feeTier: 0.0025,
+});
 
 let currentCandidates = [];
 const server = createServer(async (request, response) => {
@@ -55,6 +64,7 @@ const server = createServer(async (request, response) => {
       verificationReady: false,
       scope: { capital: 1_000, autoExecution: false },
       candidates: currentCandidates,
+      marketHeat: [makeHeatRow(1, "BOT/MRNA"), makeHeatRow(2), makeHeatRow(3)],
       diagnostics: {
         version: 1,
         nearest: [makeDiagnostic(1, "READY"), makeDiagnostic(2, "NEAR_READY"), makeDiagnostic(3, "BLOCKED")],
@@ -103,7 +113,7 @@ try {
     assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `candidates=${fixture.length} 行数错误`);
     if (expectedRows === 0) {
       assert.equal(await page.locator("#empty-state").innerText(), "等待计算\n当前没有可展示的 RWA / USDC 机会。", "空机会层文案错误");
-      assert.equal(await page.locator(".pool").count(), 0, "空机会层不得出现候选行");
+      assert.equal(await page.locator("#ranking-list .pool").count(), 0, "空机会层不得出现候选行");
     } else {
       const bodyText = await page.locator("body").innerText();
       assert.doesNotMatch(bodyText, /Opportunity Score|Candidates|Confidence|WHY|UNAVAILABLE|BLOCKED|WATCH/, "首页不应显示模型内部状态");
@@ -112,6 +122,12 @@ try {
       assert.match(bodyText, /净收益：等待风险校正/);
       assert.doesNotMatch(bodyText, /Core \/ Buffer|Evidence/);
     }
+    await page.getByRole("tab", { name: "手续费排行", exact: true }).click();
+    await page.waitForFunction(() => document.querySelectorAll("#heat-list .heat-row").length === 3);
+    assert.equal(await page.locator("#heat-list .heat-row").count(), 3, "手续费榜必须独立显示全部热度行");
+    assert.match(await page.locator("#heat-list").innerText(), /BOT \/ MRNA/);
+    assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, "切换手续费榜不应改变推荐榜");
+    await page.getByRole("tab", { name: "推荐机会", exact: true }).click();
   }
   currentCandidates = [makeRow(1)];
   await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
