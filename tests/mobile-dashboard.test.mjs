@@ -244,12 +244,12 @@ test("外版页面只展示中文八列决策 Top 3，唯一运行时数据源�
   assert.match(page, /RWA \/ USDC LP 优化器/);
   assert.match(page, /模拟资金 \$1,000/);
   assert.match(page, /排名/);
-  assert.match(page, /池/);
-  assert.match(page, /预计日收益/);
+  assert.match(page, /Pair \+ Fee Tier/);
+  assert.match(page, /24H Volume/);
+  assert.match(page, /24H LP Fee/);
   assert.match(page, /TVL/);
   assert.match(page, /手续费率/);
-  assert.match(page, /Core/);
-  assert.match(page, /Buffer/);
+  assert.match(page, /预计 \$1,000 日净收益/);
   assert.match(page, /建议/);
   assert.match(page, /详情/);
   assert.match(page, /更多详情/);

@@ -54,7 +54,7 @@ export function verifyPageMarkup(markup) {
   if (!markup.includes("模拟资金 $1,000") || !markup.includes("Top 3")) fail("页面没有声明模拟资金与 Top 3 范围");
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少独立浏览器运行时");
   if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一 top3.json 数据源");
-  for (const label of ["排名", "池", "预计日收益", "TVL", "手续费率", "Core", "Buffer", "建议"]) {
+  for (const label of ["排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议"]) {
     if (!markup.includes(label)) fail(`页面缺少中文主表字段：${label}`);
   }
   if (!markup.includes("详情") || !markup.includes("更多详情")) fail("页面缺少详情入口");
@@ -79,7 +79,7 @@ export function verifySnapshot(snapshot, config) {
   if (!Array.isArray(snapshot.candidates) || snapshot.candidates.length > 3) fail("快照 candidates 数量非法");
   if (snapshot.publicPoolCount > 0 && snapshot.candidates.length === 0) fail("存在公开 Pool 时机会层不得为空");
   if (snapshot.candidates.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("candidates 缺少 Opportunity 结果");
-  if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效市场、Opportunity / Confidence 或 Core / Buffer 字段");
+  if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.grossFeeEstimate, row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效市场、毛收益、Opportunity / Confidence 或 Core / Buffer 字段");
   if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount)) fail("快照缺少 Opportunity Ranking 摘要");
   if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");

@@ -136,7 +136,12 @@ const diagnosticsWithOpportunity = {
     opportunityStatus: opportunityByPool.get(row.poolAddress)?.opportunityStatus ?? "WATCH",
   })),
 };
-const top3ForPage = opportunityRanking.top3;
+const top3ForPage = opportunityRanking.top3.map((row) => ({
+  ...row,
+  grossFeeEstimate: Number.isFinite(row.lpFee24h) && Number.isFinite(row.tvl) && row.tvl >= 0
+    ? row.lpFee24h * DASHBOARD_CONFIG.capital / (row.tvl + DASHBOARD_CONFIG.capital)
+    : null,
+}));
 const slot = pools.reduce((highest, pool) => {
   const candidate = Number(pool.evidence?.poolState?.slot);
   return Number.isFinite(candidate) ? Math.max(highest ?? candidate, candidate) : highest;

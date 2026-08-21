@@ -12,7 +12,7 @@ const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
 ]);
 
 const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["排名", "池", "预计日收益", "TVL", "手续费率", "Core", "Buffer", "建议", "详情", "更多详情"];
+const requiredLabels = ["排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "详情", "更多详情"];
 const actions = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const opportunityStatuses = new Set(["READY", "WATCH", "BLOCKED"]);
 const snapshot = JSON.parse(top3Json);
@@ -27,6 +27,8 @@ assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
 assert.equal(indexHtml.includes('class="optimizer-row"'), false, "index.html 不应嵌入旧排名行");
 assert.equal(runtimeJs.includes("./top3.json"), true, "runtime.js 未读取 top3.json");
+assert.equal(runtimeJs.includes("Core / Buffer"), true, "详情层缺少 Core / Buffer");
+assert.equal(runtimeJs.includes("Evidence"), true, "详情层缺少 Evidence");
 for (const forbiddenRuntimeToken of ["lastGoodTop3", "liveBackup", "api-v3.raydium.io", "navigator.serviceWorker", "serviceWorker", "fallback"]) {
   assert.equal(runtimeJs.includes(forbiddenRuntimeToken), false, `runtime.js 仍含旧回退或缓存逻辑：${forbiddenRuntimeToken}`);
 }

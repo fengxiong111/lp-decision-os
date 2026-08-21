@@ -22,10 +22,8 @@ function dailyNet(value) {
   return `${value >= 0 ? "+" : "−"}${usd(Math.abs(value), 2)}/天`;
 }
 
-function rangeLabel(lower, upper) {
-  return Number.isFinite(lower) && Number.isFinite(upper)
-    ? `${numberValue(lower, 4)} – ${numberValue(upper, 4)}`
-    : "等待计算";
+function grossFeeLabel(value) {
+  return Number.isFinite(value) ? `${usd(value, 2)}/天` : "等待计算";
 }
 
 function feeTierLabel(value) {
@@ -48,15 +46,17 @@ function rowValues(row) {
     volume24h: row.volume24h,
     lpFee24h: row.lpFee24h,
     feeTier: row.feeTier,
+    grossFeeEstimate: row.grossFeeEstimate,
     netEstimate: row.netEstimate,
-    coreCapital: row.coreCapital,
-    coreLower: row.coreLower,
-    coreUpper: row.coreUpper,
-    bufferCapital: row.bufferCapital,
-    bufferLower: row.bufferLower,
-    bufferUpper: row.bufferUpper,
     action: row.action,
   };
+}
+
+function renderNet(value) {
+  if (Number.isFinite(value.netEstimate)) {
+    return `<strong>${escapeHtml(dailyNet(value.netEstimate))}</strong><small>毛收益估算：${escapeHtml(grossFeeLabel(value.grossFeeEstimate))} · 风险已校正</small>`;
+  }
+  return `<strong>估算中</strong><small>毛收益估算：${escapeHtml(grossFeeLabel(value.grossFeeEstimate))}</small><small>净收益：等待风险校正</small>`;
 }
 
 export function renderRow(row) {
@@ -65,12 +65,12 @@ export function renderRow(row) {
   return `<article class="optimizer-row" data-pool-address="${escapeHtml(row.poolAddress ?? "")}" role="row">
     <div class="row-grid">
       <div class="rank" role="cell"><strong>${escapeHtml(String(value.rank ?? "").padStart(2, "0"))}</strong></div>
-      <div class="pool" role="cell"><strong>${escapeHtml(value.pair)}</strong><small>24H 成交 ${escapeHtml(usd(value.volume24h, 0))} · LP Fee ${escapeHtml(usd(value.lpFee24h, 2))}</small></div>
-      <div class="net" role="cell"><strong>${escapeHtml(dailyNet(value.netEstimate))}</strong><small>预计 $1,000 日净收益</small></div>
+      <div class="pool" role="cell"><strong>${escapeHtml(value.pair)}</strong><small>Fee Tier ${escapeHtml(feeTierLabel(value.feeTier))}</small></div>
+      <div class="volume" role="cell"><strong>${escapeHtml(usd(value.volume24h, 0))}</strong></div>
+      <div class="lp-fee" role="cell"><strong>${escapeHtml(usd(value.lpFee24h, 2))}</strong></div>
       <div class="tvl" role="cell"><strong>${escapeHtml(usd(value.tvl, 0))}</strong></div>
       <div class="fee" role="cell"><strong>${escapeHtml(feeTierLabel(value.feeTier))}</strong></div>
-      <div class="strategy" role="cell"><strong>${escapeHtml(usd(value.coreCapital, 0))}</strong><em>${escapeHtml(rangeLabel(value.coreLower, value.coreUpper))}</em></div>
-      <div class="strategy" role="cell"><strong>${escapeHtml(usd(value.bufferCapital, 0))}</strong><em>${escapeHtml(rangeLabel(value.bufferLower, value.bufferUpper))}</em></div>
+      <div class="net" role="cell">${renderNet(value)}</div>
       <div class="action ${escapeHtml(actionClass)}" role="cell"><strong>${escapeHtml(displayAction(value.action))}</strong></div>
     </div>
     <div class="row-tools"><button class="details-trigger" type="button" data-pool-address="${escapeHtml(row.poolAddress ?? "")}">详情</button></div>
@@ -79,7 +79,8 @@ export function renderRow(row) {
 
 function renderStyles() {
   return `
-:root{--paper:#f5f4ed;--ink:#141413;--muted:#716f68;--soft:#96938b;--line:#dedbd0;--blue:#1b365d;--danger:#8a4e3d;--warn:#8a6b35;--pass:#3e6650;--content:1220px;--columns:minmax(42px,.35fr) minmax(250px,2.15fr) minmax(160px,1.2fr) minmax(120px,.85fr) minmax(105px,.75fr) minmax(150px,1fr) minmax(150px,1fr) minmax(92px,.7fr)}
+@media(max-width:1000px){.row-grid{grid-template-areas:"rank pool" "volume lpfee" "tvl fee" "net action" !important}.row-grid>.rank{grid-area:rank!important}.row-grid>.pool{grid-area:pool!important}.row-grid>.volume{grid-area:volume!important}.row-grid>.lp-fee{grid-area:lpfee!important}.row-grid>.tvl{grid-area:tvl!important}.row-grid>.fee{grid-area:fee!important}.row-grid>.net{grid-area:net!important}.row-grid>.action{grid-area:action!important}}.volume strong,.lp-fee strong{font-size:14px;font-weight:600;line-height:1.05;white-space:nowrap}.strategy-details{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}.strategy-details h3,.strategy-detail h3{margin:0 0 10px;color:var(--muted);font-size:11px;letter-spacing:.08em}.strategy-detail{display:grid;grid-template-columns:90px 100px minmax(0,1fr);gap:14px;align-items:baseline;padding:10px 0;border-top:1px solid rgba(222,219,208,.65)}.strategy-detail strong{font-size:15px}.strategy-detail span{color:var(--muted);font-size:13px}
+:root{--paper:#f5f4ed;--ink:#141413;--muted:#716f68;--soft:#96938b;--line:#dedbd0;--blue:#1b365d;--danger:#8a4e3d;--warn:#8a6b35;--pass:#3e6650;--content:1220px;--columns:minmax(42px,.35fr) minmax(190px,1.7fr) minmax(110px,1fr) minmax(110px,1fr) minmax(100px,.85fr) minmax(90px,.75fr) minmax(190px,1.5fr) minmax(80px,.7fr)}
 *{box-sizing:border-box}html{min-height:100%;background:var(--paper)}body{min-height:100%;margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}main{width:calc(100% - 40px);max-width:var(--content);margin:0 auto;padding:30px 0 44px}
 .masthead{display:flex;justify-content:space-between;align-items:end;gap:24px;padding:4px 10px 22px}.masthead h1{margin:0;color:var(--ink);font-size:27px;font-weight:750;letter-spacing:-.04em}.masthead p{margin:0;color:var(--muted);font-size:13px;text-align:right}.status-bar{display:flex;justify-content:flex-end;gap:20px;padding:0 10px 14px;color:var(--muted);font-size:13px}.status-bar [data-state="warning"]{color:var(--danger)}.status-bar [data-state="fresh"]{color:var(--pass)}
 .table-header,.row-grid{display:grid;grid-template-columns:var(--columns);column-gap:16px;align-items:center}.table-header{position:sticky;top:0;z-index:2;padding:11px 10px 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(245,244,237,.96);color:var(--soft);font-size:11px;letter-spacing:.06em}.table-header div:not(:first-child){text-align:right}.optimizer-row{padding:25px 10px 14px;border-bottom:1px solid var(--line)}.row-grid>div:not(:first-child){text-align:right}.rank{color:var(--soft);text-align:left!important}.rank strong{font-size:13px;font-weight:500}.pool{min-width:0;text-align:left!important}.pool strong{display:block;overflow:hidden;font-family:"Iowan Old Style","Songti SC",STSong,Georgia,serif;font-size:24px;font-weight:750;letter-spacing:-.035em;line-height:1.05;text-overflow:ellipsis;white-space:nowrap}.pool small{display:block;overflow:hidden;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}.net,.strategy{display:grid;gap:4px;min-width:0}.net strong{color:var(--blue);font-size:20px;font-weight:750;line-height:1.05;white-space:nowrap}.net small{color:var(--muted);font-size:10px;line-height:1.2;white-space:nowrap}.tvl strong{font-size:16px;font-weight:650;line-height:1.05;white-space:nowrap}.fee strong{font-size:14px;font-weight:600;line-height:1.05;white-space:nowrap}.strategy strong{font-size:14px;font-weight:650;line-height:1.15;white-space:nowrap}.strategy em{overflow:hidden;color:var(--muted);font-size:12px;font-style:normal;text-overflow:ellipsis;white-space:nowrap}.action strong{color:var(--blue);font-size:13px;font-weight:750;letter-spacing:.04em;white-space:nowrap}.action.blocked strong{color:var(--danger)}.action.review strong{color:var(--warn)}.action.watch strong{color:var(--muted)}.row-tools{display:flex;justify-content:flex-end;margin-top:10px}.details-trigger{border:0;padding:0;background:transparent;color:var(--muted);font:600 11px/1.2 inherit;cursor:pointer}.details-trigger:hover{color:var(--blue)}
@@ -101,7 +102,7 @@ export function renderPage({ fetchedAt, snapshotHash = null, runtimeVersion = nu
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><meta name="data-source" content="./top3.json"><title>RWA / USDC LP 优化器</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
 <header class="masthead"><div><h1>RWA / USDC LP 优化器</h1><p>Raydium · 模拟资金 ${escapeHtml(`$${config.capital.toLocaleString("en-US")}`)} · Top 3</p></div></header>
 <div class="status-bar" aria-live="polite"><span id="live-status" data-state="warning">等待计算</span></div>
-<section class="ranking" aria-label="RWA / USDC LP 决策排名" role="table"><div class="table-header" role="row"><div role="columnheader">排名</div><div role="columnheader">池</div><div role="columnheader">预计日收益</div><div role="columnheader">TVL</div><div role="columnheader">手续费率</div><div role="columnheader">Core</div><div role="columnheader">Buffer</div><div role="columnheader">建议</div></div><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
+<section class="ranking" aria-label="RWA / USDC LP 决策排名" role="table"><div class="table-header" role="row"><div role="columnheader">排名</div><div role="columnheader">Pair + Fee Tier</div><div role="columnheader">24H Volume</div><div role="columnheader">24H LP Fee</div><div role="columnheader">TVL</div><div role="columnheader">手续费率</div><div role="columnheader">预计 $1,000 日净收益</div><div role="columnheader">建议</div></div><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
 <section class="diagnostics-section" aria-label="更多详情"><details id="verification-panel" class="verification-panel"><summary>更多详情</summary><div id="verification-list" class="verification-list"></div></details></section>
 <aside id="why-drawer" class="why-drawer" aria-label="池详情" hidden></aside>
 <footer>数据源：Raydium 官方 RWA / USDC 市场数据 · <span id="observed-wrap"${initialTimestamp ? "" : " hidden"}>读取：<span id="observed-at">${escapeHtml(initialTimestamp ?? "")}</span></span><a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;

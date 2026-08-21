@@ -107,6 +107,10 @@ try {
     } else {
       const bodyText = await page.locator("body").innerText();
       assert.doesNotMatch(bodyText, /Opportunity Score|Candidates|Confidence|WHY|UNAVAILABLE|BLOCKED|WATCH/, "首页不应显示模型内部状态");
+      assert.match(bodyText, /24H Volume|24H LP Fee/);
+      assert.match(bodyText, /毛收益估算：\$[\d,]+\.\d{2}\/天/);
+      assert.match(bodyText, /净收益：等待风险校正/);
+      assert.doesNotMatch(bodyText, /Core \/ Buffer|Evidence/);
     }
   }
   currentCandidates = [makeRow(1)];
