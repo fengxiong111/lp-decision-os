@@ -217,28 +217,46 @@ test("Opportunity Ranking 保留验证不完整的公开 RWA/USDC Pool", () => {
   assert.equal(ranking.top3[0].netEstimate, null);
 });
 
-test("外版页面只展示七列机会 Top 3，唯一运行时数据源为 top3.json", () => {
+test("同一 Pair 只去重相同 Fee Tier，不吞掉不同 Fee Tier", () => {
+  const pools = normalizePools([
+    rawPool({ id: "pool-a", symbol: "CRCLx", assetAddress: "asset-a", tvl: 20_000, volume: 50_000, fee: 250, feeRate: 0.0025 }),
+    rawPool({ id: "pool-a-duplicate", symbol: "CRCLx", assetAddress: "asset-a-duplicate", tvl: 18_000, volume: 45_000, fee: 225, feeRate: 0.0025 }),
+    rawPool({ id: "pool-b", symbol: "CRCLx", assetAddress: "asset-b", tvl: 8_000, volume: 12_000, fee: 120, feeRate: 0.008 }),
+    rawPool({ id: "pool-c", symbol: "BOT", assetAddress: "asset-c", tvl: 7_000, volume: 11_000, fee: 110, feeRate: 0.0025 }),
+  ], DASHBOARD_CONFIG);
+  const optimizerResults = pools.map((pool) => ({ pool, optimizer: searchOptimizer(pool, DASHBOARD_CONFIG) }));
+  const ranking = buildOpportunityRanking(pools, optimizerResults, buildDiagnosticReport(optimizerResults));
+  assert.equal(ranking.top3.length, 3);
+  assert.equal(new Set(ranking.top3.map((row) => `${row.pair}::${row.feeTier}`)).size, 3);
+  assert.equal(ranking.top3.filter((row) => row.pair === "CRCLx/USDC").length, 2);
+});
+
+test("外版页面只展示中文八列决策 Top 3，唯一运行时数据源为 top3.json", () => {
   const pools = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
   const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
   const fetchedAt = new Date().toISOString();
   const page = renderPage({ optimizerSummary, fetchedAt, poolCount: pools.length, config: DASHBOARD_CONFIG });
-  const data = JSON.stringify({ scope: { capital: 1_000 }, top3: optimizerSummary.top3 });
+  const data = JSON.stringify({ scope: { capital: 1_000 }, candidates: [] });
 
   verifyMarketData(pools, optimizerSummary, DASHBOARD_CONFIG);
   verifyPageMarkup(page);
   verifyDataJson(data);
-  assert.match(page, /Opportunity Score/);
-  assert.match(page, /Net Estimate/);
+  assert.match(page, /RWA \/ USDC LP 优化器/);
+  assert.match(page, /模拟资金 \$1,000/);
+  assert.match(page, /排名/);
+  assert.match(page, /池/);
+  assert.match(page, /预计日收益/);
+  assert.match(page, /TVL/);
+  assert.match(page, /手续费率/);
   assert.match(page, /Core/);
   assert.match(page, /Buffer/);
-  assert.match(page, /Confidence/);
-  assert.match(page, /Action/);
-  assert.match(page, /WHY/);
-  assert.match(page, /正在验证/);
+  assert.match(page, /建议/);
+  assert.match(page, /详情/);
+  assert.match(page, /更多详情/);
   assert.match(page, /top3\.json/);
   assert.doesNotMatch(page, /24h 成交量|24h LP Fee|预计手续费/);
   assert.doesNotMatch(page, /#01/);
-  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 7);
+  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 8);
   assert.equal(formatTimestamp(fetchedAt) !== null, true);
 });
 

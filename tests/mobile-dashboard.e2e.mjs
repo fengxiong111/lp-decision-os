@@ -10,6 +10,10 @@ const makeRow = (rank) => ({
   rank,
   pair: `ASSET${rank}/USDC`,
   poolAddress: `Pool${rank}`,
+  tvl: 10000 + rank,
+  volume24h: 20000 + rank,
+  lpFee24h: 50 + rank,
+  feeTier: 0.0025,
   opportunityScore: 90 - rank,
   opportunityStatus: rank === 1 ? "READY" : "WATCH",
   netEstimate: null,
@@ -98,14 +102,17 @@ try {
     }
     assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, `candidates=${fixture.length} 行数错误`);
     if (expectedRows === 0) {
-      assert.equal(await page.locator("#empty-state").innerText(), "等待机会快照\n当前没有可展示的 RWA/USDC 机会候选。", "空机会层文案错误");
-      assert.equal(await page.locator(".pair").count(), 0, "空机会层不得出现候选行");
+      assert.equal(await page.locator("#empty-state").innerText(), "等待计算\n当前没有可展示的 RWA / USDC 机会。", "空机会层文案错误");
+      assert.equal(await page.locator(".pool").count(), 0, "空机会层不得出现候选行");
+    } else {
+      const bodyText = await page.locator("body").innerText();
+      assert.doesNotMatch(bodyText, /Opportunity Score|Candidates|Confidence|WHY|UNAVAILABLE|BLOCKED|WATCH/, "首页不应显示模型内部状态");
     }
   }
   currentCandidates = [makeRow(1)];
   await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.querySelectorAll("#ranking-list .optimizer-row").length === 1);
-  await page.locator(".row-tools .why-trigger").click();
+  await page.locator(".row-tools .details-trigger").click();
   await page.waitForSelector("#why-drawer:not([hidden])");
   assert.match(await page.locator("#why-drawer").innerText(), /Swap replay/);
   console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4], renderedRows: [0, 1, 3, 3] }, null, 2));

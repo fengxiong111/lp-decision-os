@@ -49,13 +49,15 @@ export function verifyMarketData(pools, optimizerSummary, config) {
 
 export function verifyPageMarkup(markup) {
   const headerCells = markup.match(/role="columnheader"/g) ?? [];
-  if (headerCells.length !== 7) fail(`表头列数为 ${headerCells.length}，应为 7`);
-  if (!markup.includes("RWA / USDC LP Optimizer")) fail("缺少 Optimizer 页面标题");
-  if (!markup.includes("只保留 Top 3")) fail("页面没有声明 Top 3 范围");
+  if (headerCells.length !== 8) fail(`表头列数为 ${headerCells.length}，应为 8`);
+  if (!markup.includes("RWA / USDC LP 优化器")) fail("缺少中文 Optimizer 页面标题");
+  if (!markup.includes("模拟资金 $1,000") || !markup.includes("Top 3")) fail("页面没有声明模拟资金与 Top 3 范围");
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少独立浏览器运行时");
   if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一 top3.json 数据源");
-  if (!markup.includes("Opportunity Score") || !markup.includes("Net Estimate") || !markup.includes("Core") || !markup.includes("Buffer") || !markup.includes("Confidence") || !markup.includes("Action")) fail("页面缺少机会层主表字段");
-  if (!markup.includes("WHY") || !markup.includes("正在验证")) fail("页面缺少可解释性诊断入口");
+  for (const label of ["排名", "池", "预计日收益", "TVL", "手续费率", "Core", "Buffer", "建议"]) {
+    if (!markup.includes(label)) fail(`页面缺少中文主表字段：${label}`);
+  }
+  if (!markup.includes("详情") || !markup.includes("更多详情")) fail("页面缺少详情入口");
   if (LEGACY_PRESENTATION_TEXT.some((label) => markup.includes(label))) fail("页面仍包含旧版字段");
   if (markup.includes('class="optimizer-row"')) fail("页面在静态 HTML 中嵌入了旧排名行");
   if (/<(?:span|br|strong)\b/i.test(markup.match(/<script type="module"[^>]*>[\s\S]*?<\/script>/)?.[0] ?? "")) fail("运行时脚本不应包含展示 HTML");
@@ -77,7 +79,7 @@ export function verifySnapshot(snapshot, config) {
   if (!Array.isArray(snapshot.candidates) || snapshot.candidates.length > 3) fail("快照 candidates 数量非法");
   if (snapshot.publicPoolCount > 0 && snapshot.candidates.length === 0) fail("存在公开 Pool 时机会层不得为空");
   if (snapshot.candidates.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("candidates 缺少 Opportunity 结果");
-  if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效 Opportunity / Confidence 或 Core / Buffer 字段");
+  if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效市场、Opportunity / Confidence 或 Core / Buffer 字段");
   if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount)) fail("快照缺少 Opportunity Ranking 摘要");
   if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");

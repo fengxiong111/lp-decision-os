@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-20T23:45:35.140Z",
-  "opportunityGeneratedAt": "2026-08-20T23:45:35.140Z",
-  "verificationGeneratedAt": "2026-08-20T23:45:44.129Z",
-  "slot": 440570665,
+  "generatedAt": "2026-08-21T00:10:12.539Z",
+  "opportunityGeneratedAt": "2026-08-21T00:10:12.539Z",
+  "verificationGeneratedAt": "2026-08-21T00:10:22.385Z",
+  "slot": 440574235,
   "dataFreshness": {
     "state": "FRESH",
-    "ageMs": 9009,
+    "ageMs": 9867,
     "slaMs": 1800000
   },
   "opportunityFreshness": {
     "state": "FRESH",
-    "ageMs": 9009,
+    "ageMs": 9867,
     "slaMs": 1800000
   },
   "verificationFreshness": {
     "state": "FRESH",
-    "ageMs": 20,
+    "ageMs": 21,
     "slaMs": 21600000
   },
   "strategyVersion": "shadow-v1",
@@ -25,7 +25,7 @@
     "api": {
       "provider": "Raydium API v3",
       "url": "https://api-v3.raydium.io/pools/info/list-v2?size=1000&hasReward=false&sortField=liquidity&sortType=desc&mintFilter=RWA",
-      "fetchedAt": "2026-08-20T23:45:35.140Z"
+      "fetchedAt": "2026-08-21T00:10:12.539Z"
     },
     "rpc": {
       "urls": [
@@ -42,7 +42,7 @@
     "evidenceSummary": {
       "stage1CandidateCount": 52,
       "stage1ProcessedThisBuild": 5,
-      "activeIndexedCount": 3,
+      "activeIndexedCount": 1,
       "freshCount": 6,
       "rpc": {
         "requests": 20,
@@ -50,12 +50,13 @@
         "failures": 0,
         "methods": {
           "getRecentPrioritizationFees": 1,
-          "getAccountInfo": 9,
+          "getAccountInfo": 5,
           "getMultipleAccounts": 5,
-          "getSignaturesForAddress": 5
+          "getSignaturesForAddress": 5,
+          "getTransaction": 4
         },
-        "averageLatencyMs": 354.15,
-        "p95LatencyMs": 953,
+        "averageLatencyMs": 446.5,
+        "p95LatencyMs": 1558,
         "endpoints": {
           "https://api.mainnet.solana.com": 20
         }
@@ -78,7 +79,7 @@
   },
   "publicPoolCount": 52,
   "stage1CandidateCount": 52,
-  "activeIndexedPoolCount": 3,
+  "activeIndexedPoolCount": 1,
   "executablePoolCount": 0,
   "optimizerExecutablePoolCount": 0,
   "opportunityCandidateCount": 52,
@@ -97,6 +98,10 @@
       "rank": 1,
       "pair": "CRCLx/USDC",
       "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
+      "tvl": 1858812.91,
+      "volume24h": 4994249.51732432,
+      "lpFee24h": 4994.255793312831,
+      "feeTier": 0.001,
       "opportunityScore": 85.1,
       "opportunityStatus": "WATCH",
       "netEstimate": null,
@@ -205,22 +210,22 @@
         "score": 85.1,
         "breakdown": {
           "raw": {
-            "volume24h": 5034167.112035183,
-            "lpFee24h": 5034.173441185978,
-            "tvl": 1856894.89,
+            "volume24h": 4994249.51732432,
+            "lpFee24h": 4994.255793312831,
+            "tvl": 1858812.91,
             "feeTier": 0.001,
             "liquidity": 5703067531108,
-            "priceActivity": 2.711067351817196
+            "priceActivity": 2.6867951532165333
           },
           "scores": {
             "volume24h": 100,
-            "lpFee24h": 96.26955058995017,
-            "tvl": 95.06180362351297,
+            "lpFee24h": 96.35894528042762,
+            "tvl": 95.04985854140088,
             "feeTier": 9.131722473109994,
             "liquidity": 77.30022839985075,
-            "priceActivity": 66.75153627505341
+            "priceActivity": 66.37000071667248
           },
-          "value": 85.12090762156076,
+          "value": 85.1268574884681,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -237,150 +242,12 @@
     },
     {
       "rank": 2,
-      "pair": "CRCLx/USDC",
-      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
-      "opportunityScore": 82.7,
-      "opportunityStatus": "WATCH",
-      "netEstimate": null,
-      "coreCapital": null,
-      "coreLower": null,
-      "coreUpper": null,
-      "bufferCapital": null,
-      "bufferLower": null,
-      "bufferUpper": null,
-      "confidence": 81.5,
-      "action": "WATCH",
-      "evidence": [
-        {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        {
-          "key": "poolState",
-          "label": "PoolState",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "PoolState identity、decimals、price、config 通过"
-        },
-        {
-          "key": "tickArray",
-          "label": "TickArray",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "TickArray 已解码"
-        },
-        {
-          "key": "currentPrice",
-          "label": "Current price",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "当前价格为正且可用于区间计算"
-        },
-        {
-          "key": "tick",
-          "label": "Tick",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Current Tick / TickSpacing 可用于合法 snap"
-        },
-        {
-          "key": "activeLiquidity",
-          "label": "Active liquidity",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Active liquidity 可用于 replay"
-        },
-        {
-          "key": "swapReplay",
-          "label": "Swap replay",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
-        },
-        {
-          "key": "tickPath",
-          "label": "Tick path",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "Tick path 尚未完成"
-        },
-        {
-          "key": "shadowReplay",
-          "label": "Shadow replay",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "Shadow replay 尚未产生候选"
-        },
-        {
-          "key": "feeReplay",
-          "label": "Fee replay",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Pool fee 配置与 Swap fee 证据通过"
-        },
-        {
-          "key": "markout",
-          "label": "Markout",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "外部参考价格 Markout 尚未完成"
-        },
-        {
-          "key": "feeGrowth",
-          "label": "Fee-growth",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "Fee-growth reconciliation 尚未完成"
-        },
-        {
-          "key": "executionCost",
-          "label": "Execution cost",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Open / rebalance cost 已有可复用估计"
-        }
-      ],
-      "opportunity": {
-        "score": 82.7,
-        "breakdown": {
-          "raw": {
-            "volume24h": 2801890.8044251953,
-            "lpFee24h": 7004.728994620332,
-            "tvl": 2516699.34,
-            "feeTier": 0.0025,
-            "liquidity": 4415974562004,
-            "priceActivity": 1.1133196404880035
-          },
-          "scores": {
-            "volume24h": 96.1294090800035,
-            "lpFee24h": 100,
-            "tvl": 100,
-            "feeTier": 24.333030203879364,
-            "liquidity": 44.97094824997523,
-            "priceActivity": 38.08893097267937
-          },
-          "value": 82.67366711802048,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "source": "Raydium API v3 public RWA/USDC market data"
-      }
-    },
-    {
-      "rank": 3,
       "pair": "COINx/USDC",
       "poolAddress": "w7SGmPeXoMCsjvXqgsAmUn56uypyDsjAtsxeVkaiqxa",
+      "tvl": 1024131.43,
+      "volume24h": 424927.85791693244,
+      "lpFee24h": 3399.4233547967006,
+      "feeTier": 0.008,
       "opportunityScore": 82.6,
       "opportunityStatus": "WATCH",
       "netEstimate": null,
@@ -489,22 +356,22 @@
         "score": 82.6,
         "breakdown": {
           "raw": {
-            "volume24h": 427239.5080930422,
-            "lpFee24h": 3417.9165537407857,
-            "tvl": 1023397.1,
+            "volume24h": 424927.85791693244,
+            "lpFee24h": 3399.4233547967006,
+            "tvl": 1024131.43,
             "feeTier": 0.008,
             "liquidity": null,
-            "priceActivity": 0.41747187684335063
+            "priceActivity": 0.41491535702300675
           },
           "scores": {
-            "volume24h": 83.70618351033954,
-            "lpFee24h": 91.897059604759,
-            "tvl": 85.38530224593899,
+            "volume24h": 83.51684190869294,
+            "lpFee24h": 92.00665549304287,
+            "tvl": 85.37116312244828,
             "feeTier": 79.87722212110391,
             "liquidity": null,
-            "priceActivity": 17.758190785679336
+            "priceActivity": 17.65273897942205
           },
-          "value": 82.62711113646084,
+          "value": 82.59231427774385,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -513,6 +380,152 @@
             "tvl": "Raydium API v3 tvl",
             "feeTier": "Raydium API v3 feeRate",
             "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "source": "Raydium API v3 public RWA/USDC market data"
+      }
+    },
+    {
+      "rank": 3,
+      "pair": "CRCLx/USDC",
+      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
+      "tvl": 2521384.52,
+      "volume24h": 2756035.1383256232,
+      "lpFee24h": 6890.089804239213,
+      "feeTier": 0.0025,
+      "opportunityScore": 82.2,
+      "opportunityStatus": "WATCH",
+      "netEstimate": null,
+      "coreCapital": null,
+      "coreLower": null,
+      "coreUpper": null,
+      "bufferCapital": null,
+      "bufferLower": null,
+      "bufferUpper": null,
+      "confidence": 81.5,
+      "action": "WATCH",
+      "evidence": [
+        {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        {
+          "key": "poolState",
+          "label": "PoolState",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "PoolState identity、decimals、price、config 通过"
+        },
+        {
+          "key": "tickArray",
+          "label": "TickArray",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "TickArray 已解码"
+        },
+        {
+          "key": "currentPrice",
+          "label": "Current price",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "当前价格为正且可用于区间计算"
+        },
+        {
+          "key": "tick",
+          "label": "Tick",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Current Tick / TickSpacing 可用于合法 snap"
+        },
+        {
+          "key": "activeLiquidity",
+          "label": "Active liquidity",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Active liquidity 可用于 replay"
+        },
+        {
+          "key": "swapReplay",
+          "label": "Swap replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Swap window / replay 尚未完成"
+        },
+        {
+          "key": "tickPath",
+          "label": "Tick path",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Tick path 尚未完成"
+        },
+        {
+          "key": "shadowReplay",
+          "label": "Shadow replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Shadow replay 尚未产生候选"
+        },
+        {
+          "key": "feeReplay",
+          "label": "Fee replay",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Pool fee 配置与 Swap fee 证据通过"
+        },
+        {
+          "key": "markout",
+          "label": "Markout",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "外部参考价格 Markout 尚未完成"
+        },
+        {
+          "key": "feeGrowth",
+          "label": "Fee-growth",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee-growth reconciliation 尚未完成"
+        },
+        {
+          "key": "executionCost",
+          "label": "Execution cost",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Open / rebalance cost 已有可复用估计"
+        }
+      ],
+      "opportunity": {
+        "score": 82.2,
+        "breakdown": {
+          "raw": {
+            "volume24h": 2756035.1383256232,
+            "lpFee24h": 6890.089804239213,
+            "tvl": 2521384.52,
+            "feeTier": 0.0025,
+            "liquidity": 4259823151767,
+            "priceActivity": 1.0930641940823937
+          },
+          "scores": {
+            "volume24h": 96.02327269595426,
+            "lpFee24h": 100,
+            "tvl": 100,
+            "feeTier": 24.333030203879364,
+            "liquidity": 40.420541300478554,
+            "priceActivity": 37.57123535071567
+          },
+          "value": 82.16090072675786,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
@@ -525,6 +538,10 @@
       "rank": 1,
       "pair": "CRCLx/USDC",
       "poolAddress": "GYqHjuDzTiw7i52Xv1qohDE6eJr6eSZpsrBVikGZyaFV",
+      "tvl": 1858812.91,
+      "volume24h": 4994249.51732432,
+      "lpFee24h": 4994.255793312831,
+      "feeTier": 0.001,
       "opportunityScore": 85.1,
       "opportunityStatus": "WATCH",
       "netEstimate": null,
@@ -633,22 +650,22 @@
         "score": 85.1,
         "breakdown": {
           "raw": {
-            "volume24h": 5034167.112035183,
-            "lpFee24h": 5034.173441185978,
-            "tvl": 1856894.89,
+            "volume24h": 4994249.51732432,
+            "lpFee24h": 4994.255793312831,
+            "tvl": 1858812.91,
             "feeTier": 0.001,
             "liquidity": 5703067531108,
-            "priceActivity": 2.711067351817196
+            "priceActivity": 2.6867951532165333
           },
           "scores": {
             "volume24h": 100,
-            "lpFee24h": 96.26955058995017,
-            "tvl": 95.06180362351297,
+            "lpFee24h": 96.35894528042762,
+            "tvl": 95.04985854140088,
             "feeTier": 9.131722473109994,
             "liquidity": 77.30022839985075,
-            "priceActivity": 66.75153627505341
+            "priceActivity": 66.37000071667248
           },
-          "value": 85.12090762156076,
+          "value": 85.1268574884681,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -665,150 +682,12 @@
     },
     {
       "rank": 2,
-      "pair": "CRCLx/USDC",
-      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
-      "opportunityScore": 82.7,
-      "opportunityStatus": "WATCH",
-      "netEstimate": null,
-      "coreCapital": null,
-      "coreLower": null,
-      "coreUpper": null,
-      "bufferCapital": null,
-      "bufferLower": null,
-      "bufferUpper": null,
-      "confidence": 81.5,
-      "action": "WATCH",
-      "evidence": [
-        {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        {
-          "key": "poolState",
-          "label": "PoolState",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "PoolState identity、decimals、price、config 通过"
-        },
-        {
-          "key": "tickArray",
-          "label": "TickArray",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "TickArray 已解码"
-        },
-        {
-          "key": "currentPrice",
-          "label": "Current price",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "当前价格为正且可用于区间计算"
-        },
-        {
-          "key": "tick",
-          "label": "Tick",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Current Tick / TickSpacing 可用于合法 snap"
-        },
-        {
-          "key": "activeLiquidity",
-          "label": "Active liquidity",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Active liquidity 可用于 replay"
-        },
-        {
-          "key": "swapReplay",
-          "label": "Swap replay",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
-        },
-        {
-          "key": "tickPath",
-          "label": "Tick path",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "Tick path 尚未完成"
-        },
-        {
-          "key": "shadowReplay",
-          "label": "Shadow replay",
-          "status": "FAIL",
-          "display": "FAIL",
-          "reason": "Shadow replay 尚未产生候选"
-        },
-        {
-          "key": "feeReplay",
-          "label": "Fee replay",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Pool fee 配置与 Swap fee 证据通过"
-        },
-        {
-          "key": "markout",
-          "label": "Markout",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "外部参考价格 Markout 尚未完成"
-        },
-        {
-          "key": "feeGrowth",
-          "label": "Fee-growth",
-          "status": "WARN",
-          "display": "WAITING",
-          "reason": "Fee-growth reconciliation 尚未完成"
-        },
-        {
-          "key": "executionCost",
-          "label": "Execution cost",
-          "status": "PASS",
-          "display": "PASS",
-          "reason": "Open / rebalance cost 已有可复用估计"
-        }
-      ],
-      "opportunity": {
-        "score": 82.7,
-        "breakdown": {
-          "raw": {
-            "volume24h": 2801890.8044251953,
-            "lpFee24h": 7004.728994620332,
-            "tvl": 2516699.34,
-            "feeTier": 0.0025,
-            "liquidity": 4415974562004,
-            "priceActivity": 1.1133196404880035
-          },
-          "scores": {
-            "volume24h": 96.1294090800035,
-            "lpFee24h": 100,
-            "tvl": 100,
-            "feeTier": 24.333030203879364,
-            "liquidity": 44.97094824997523,
-            "priceActivity": 38.08893097267937
-          },
-          "value": 82.67366711802048,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "source": "Raydium API v3 public RWA/USDC market data"
-      }
-    },
-    {
-      "rank": 3,
       "pair": "COINx/USDC",
       "poolAddress": "w7SGmPeXoMCsjvXqgsAmUn56uypyDsjAtsxeVkaiqxa",
+      "tvl": 1024131.43,
+      "volume24h": 424927.85791693244,
+      "lpFee24h": 3399.4233547967006,
+      "feeTier": 0.008,
       "opportunityScore": 82.6,
       "opportunityStatus": "WATCH",
       "netEstimate": null,
@@ -917,22 +796,22 @@
         "score": 82.6,
         "breakdown": {
           "raw": {
-            "volume24h": 427239.5080930422,
-            "lpFee24h": 3417.9165537407857,
-            "tvl": 1023397.1,
+            "volume24h": 424927.85791693244,
+            "lpFee24h": 3399.4233547967006,
+            "tvl": 1024131.43,
             "feeTier": 0.008,
             "liquidity": null,
-            "priceActivity": 0.41747187684335063
+            "priceActivity": 0.41491535702300675
           },
           "scores": {
-            "volume24h": 83.70618351033954,
-            "lpFee24h": 91.897059604759,
-            "tvl": 85.38530224593899,
+            "volume24h": 83.51684190869294,
+            "lpFee24h": 92.00665549304287,
+            "tvl": 85.37116312244828,
             "feeTier": 79.87722212110391,
             "liquidity": null,
-            "priceActivity": 17.758190785679336
+            "priceActivity": 17.65273897942205
           },
-          "value": 82.62711113646084,
+          "value": 82.59231427774385,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -941,6 +820,152 @@
             "tvl": "Raydium API v3 tvl",
             "feeTier": "Raydium API v3 feeRate",
             "liquidity": "等待 PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "source": "Raydium API v3 public RWA/USDC market data"
+      }
+    },
+    {
+      "rank": 3,
+      "pair": "CRCLx/USDC",
+      "poolAddress": "G39wywquKbHK8F2wZZZFX3fcsyG91VCCbbr6WEVp5axy",
+      "tvl": 2521384.52,
+      "volume24h": 2756035.1383256232,
+      "lpFee24h": 6890.089804239213,
+      "feeTier": 0.0025,
+      "opportunityScore": 82.2,
+      "opportunityStatus": "WATCH",
+      "netEstimate": null,
+      "coreCapital": null,
+      "coreLower": null,
+      "coreUpper": null,
+      "bufferCapital": null,
+      "bufferLower": null,
+      "bufferUpper": null,
+      "confidence": 81.5,
+      "action": "WATCH",
+      "evidence": [
+        {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        {
+          "key": "poolState",
+          "label": "PoolState",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "PoolState identity、decimals、price、config 通过"
+        },
+        {
+          "key": "tickArray",
+          "label": "TickArray",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "TickArray 已解码"
+        },
+        {
+          "key": "currentPrice",
+          "label": "Current price",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "当前价格为正且可用于区间计算"
+        },
+        {
+          "key": "tick",
+          "label": "Tick",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Current Tick / TickSpacing 可用于合法 snap"
+        },
+        {
+          "key": "activeLiquidity",
+          "label": "Active liquidity",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Active liquidity 可用于 replay"
+        },
+        {
+          "key": "swapReplay",
+          "label": "Swap replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Swap window / replay 尚未完成"
+        },
+        {
+          "key": "tickPath",
+          "label": "Tick path",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Tick path 尚未完成"
+        },
+        {
+          "key": "shadowReplay",
+          "label": "Shadow replay",
+          "status": "FAIL",
+          "display": "FAIL",
+          "reason": "Shadow replay 尚未产生候选"
+        },
+        {
+          "key": "feeReplay",
+          "label": "Fee replay",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Pool fee 配置与 Swap fee 证据通过"
+        },
+        {
+          "key": "markout",
+          "label": "Markout",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "外部参考价格 Markout 尚未完成"
+        },
+        {
+          "key": "feeGrowth",
+          "label": "Fee-growth",
+          "status": "WARN",
+          "display": "WAITING",
+          "reason": "Fee-growth reconciliation 尚未完成"
+        },
+        {
+          "key": "executionCost",
+          "label": "Execution cost",
+          "status": "PASS",
+          "display": "PASS",
+          "reason": "Open / rebalance cost 已有可复用估计"
+        }
+      ],
+      "opportunity": {
+        "score": 82.2,
+        "breakdown": {
+          "raw": {
+            "volume24h": 2756035.1383256232,
+            "lpFee24h": 6890.089804239213,
+            "tvl": 2521384.52,
+            "feeTier": 0.0025,
+            "liquidity": 4259823151767,
+            "priceActivity": 1.0930641940823937
+          },
+          "scores": {
+            "volume24h": 96.02327269595426,
+            "lpFee24h": 100,
+            "tvl": 100,
+            "feeTier": 24.333030203879364,
+            "liquidity": 40.420541300478554,
+            "priceActivity": 37.57123535071567
+          },
+          "value": 82.16090072675786,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
@@ -974,26 +999,26 @@
     "blockedCount": 52,
     "matrix": [
       {
-        "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
-        "pair": "QQQx/USDC",
+        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+        "pair": "NVDAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
         "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
-          "key": "swapReplay",
-          "label": "Swap replay",
+          "key": "poolIdentity",
+          "label": "Pool identity",
           "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
         },
-        "passCount": 8,
+        "passCount": 9,
         "totalChecks": 13,
         "evidence": [
           {
             "key": "poolIdentity",
             "label": "Pool identity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "RWA / USDC CLMM identity 已核验"
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
           },
           {
             "key": "poolState",
@@ -1040,16 +1065,16 @@
           {
             "key": "tickPath",
             "label": "Tick path",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Tick path 尚未完成"
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "逐笔 Tick path 与当前状态连续"
           },
           {
             "key": "shadowReplay",
             "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "已评估 87 个 Core + Buffer 候选"
           },
           {
             "key": "feeReplay",
@@ -1100,26 +1125,26 @@
         "action": "UNAVAILABLE",
         "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
+          "SWAP_BACKFILL_INCOMPLETE"
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 693390.5546569403,
-            "lpFee24h": 693.3952505217908,
-            "tvl": 2481794.79,
+            "volume24h": 699937.407671689,
+            "lpFee24h": 699.938708514051,
+            "tvl": 2437352.58,
             "feeTier": 0.001,
-            "liquidity": 4377805492998,
-            "priceActivity": 0.2793907689108092
+            "liquidity": 6825019671879,
+            "priceActivity": 0.2871711763883127
           },
           "scores": {
-            "volume24h": 86.904944284302,
-            "lpFee24h": 73.8927239085592,
-            "tvl": 99.77316300308213,
+            "volume24h": 86.85525739389864,
+            "lpFee24h": 74.13486750955731,
+            "tvl": 99.44963895952016,
             "feeTier": 9.131722473109994,
-            "liquidity": 43.87369838199039,
-            "priceActivity": 12.540879925768705
+            "liquidity": 100,
+            "priceActivity": 12.839309330168625
           },
-          "value": 69.13286099011916,
+          "value": 74.76962102878424,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -1131,168 +1156,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 69.1,
-        "opportunityStatus": "WATCH"
-      },
-      {
-        "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
-        "pair": "SPYx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "blockerClass": "EVIDENCE_MISSING",
-        "primaryBlocker": {
-          "key": "swapReplay",
-          "label": "Swap replay",
-          "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
-        },
-        "passCount": 8,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "RWA / USDC CLMM identity 已核验"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Tick path 尚未完成"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
-        ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
-        },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "机会层保留为 WATCH，等待验证",
-        "sourceBlockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
-        ],
-        "opportunity": {
-          "raw": {
-            "volume24h": 131164.8720450731,
-            "lpFee24h": 131.16614710812541,
-            "tvl": 2447068,
-            "feeTier": 0.001,
-            "liquidity": 3316118500125,
-            "priceActivity": 0.05360082843838958
-          },
-          "scores": {
-            "volume24h": 75.90569984833606,
-            "lpFee24h": 55.15486052652382,
-            "tvl": 99.5442928979041,
-            "feeTier": 9.131722473109994,
-            "liquidity": 8.766596861671198,
-            "priceActivity": 2.65661785407012
-          },
-          "value": 56.1724748733252,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "opportunityScore": 56.2,
+        "opportunityScore": 74.8,
+        "opportunityConfidence": 87.7,
         "opportunityStatus": "WATCH"
       },
       {
@@ -1427,22 +1292,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 2801890.8044251953,
-            "lpFee24h": 7004.728994620332,
-            "tvl": 2516699.34,
+            "volume24h": 2756035.1383256232,
+            "lpFee24h": 6890.089804239213,
+            "tvl": 2521384.52,
             "feeTier": 0.0025,
-            "liquidity": 4415974562004,
-            "priceActivity": 1.1133196404880035
+            "liquidity": 4259823151767,
+            "priceActivity": 1.0930641940823937
           },
           "scores": {
-            "volume24h": 96.1294090800035,
+            "volume24h": 96.02327269595426,
             "lpFee24h": 100,
             "tvl": 100,
             "feeTier": 24.333030203879364,
-            "liquidity": 44.97094824997523,
-            "priceActivity": 38.08893097267937
+            "liquidity": 40.420541300478554,
+            "priceActivity": 37.57123535071567
           },
-          "value": 82.67366711802048,
+          "value": 82.16090072675786,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -1454,7 +1319,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 82.7,
+        "opportunityScore": 82.2,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "WATCH"
       },
       {
@@ -1589,22 +1455,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 5034167.112035183,
-            "lpFee24h": 5034.173441185978,
-            "tvl": 1856894.89,
+            "volume24h": 4994249.51732432,
+            "lpFee24h": 4994.255793312831,
+            "tvl": 1858812.91,
             "feeTier": 0.001,
             "liquidity": 5703067531108,
-            "priceActivity": 2.711067351817196
+            "priceActivity": 2.6867951532165333
           },
           "scores": {
             "volume24h": 100,
-            "lpFee24h": 96.26955058995017,
-            "tvl": 95.06180362351297,
+            "lpFee24h": 96.35894528042762,
+            "tvl": 95.04985854140088,
             "feeTier": 9.131722473109994,
             "liquidity": 77.30022839985075,
-            "priceActivity": 66.75153627505341
+            "priceActivity": 66.37000071667248
           },
-          "value": 85.12090762156076,
+          "value": 85.1268574884681,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -1617,11 +1483,338 @@
           }
         },
         "opportunityScore": 85.1,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "WATCH"
       },
       {
-        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
-        "pair": "NVDAx/USDC",
+        "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
+        "pair": "QQQx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 7,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Tick path 尚未完成"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Shadow replay 尚未产生候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 682567.0697446667,
+            "lpFee24h": 682.571712098092,
+            "tvl": 2482463.77,
+            "feeTier": 0.001,
+            "liquidity": 4414878472168,
+            "priceActivity": 0.27495550106041095
+          },
+          "scores": {
+            "volume24h": 86.68715559548775,
+            "lpFee24h": 73.8509432070061,
+            "tvl": 99.74740856202102,
+            "feeTier": 9.131722473109994,
+            "liquidity": 44.939571328011226,
+            "priceActivity": 12.35423413993847
+          },
+          "value": 69.14838201216035,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 69.1,
+        "opportunityConfidence": 81.5,
+        "opportunityStatus": "WATCH"
+      },
+      {
+        "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
+        "pair": "SPYx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 7,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Tick path 尚未完成"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Shadow replay 尚未产生候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 129027.52327659962,
+            "lpFee24h": 129.0287767611318,
+            "tvl": 2447064.39,
+            "feeTier": 0.001,
+            "liquidity": 3316118500125,
+            "priceActivity": 0.05272747370435954
+          },
+          "scores": {
+            "volume24h": 75.54398512695083,
+            "lpFee24h": 55.06995692528943,
+            "tvl": 99.5142074769082,
+            "feeTier": 9.131722473109994,
+            "liquidity": 8.766596861671198,
+            "priceActivity": 2.6113252278768218
+          },
+          "value": 56.031711932080256,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 56,
+        "opportunityConfidence": 81.5,
+        "opportunityStatus": "WATCH"
+      },
+      {
+        "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
+        "pair": "TSLAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
         "blockerClass": "HARD_INVALID",
@@ -1751,185 +1944,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 706951.3293488517,
-            "lpFee24h": 706.9526403372053,
-            "tvl": 2438189.53,
-            "feeTier": 0.001,
-            "liquidity": 6825019671879,
-            "priceActivity": 0.2899492925592424
-          },
-          "scores": {
-            "volume24h": 87.03288463157793,
-            "lpFee24h": 74.11111874636967,
-            "tvl": 99.48525714371237,
-            "feeTier": 9.131722473109994,
-            "liquidity": 100,
-            "priceActivity": 12.959264244078675
-          },
-          "value": 74.82712504445607,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "opportunityScore": 74.8,
-        "opportunityStatus": "BLOCKED"
-      },
-      {
-        "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
-        "pair": "TSLAx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "blockerClass": "HARD_INVALID",
-        "primaryBlocker": {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        "passCount": 6,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "回放状态发生 divergence 或连续性失败"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "WARN",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
-        ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
-        },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "机会层保留，但禁止执行",
-        "sourceBlockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
-        ],
-        "opportunity": {
-          "raw": {
-            "volume24h": 1085745.9224623274,
-            "lpFee24h": 1085.7493190294074,
-            "tvl": 1947169.43,
+            "volume24h": 1069518.0802030198,
+            "lpFee24h": 1069.521429774873,
+            "tvl": 1947538.57,
             "feeTier": 0.001,
             "liquidity": 3093915222972,
-            "priceActivity": 0.5576021817794907
+            "priceActivity": 0.5491640045942812
           },
           "scores": {
-            "volume24h": 89.86709695930018,
-            "lpFee24h": 78.95172015428768,
-            "tvl": 95.83281874758237,
+            "volume24h": 89.69131873348954,
+            "lpFee24h": 78.9272878802902,
+            "tvl": 95.80695597181986,
             "feeTier": 9.131722473109994,
             "liquidity": 0,
-            "priceActivity": 22.557150538115067
+            "priceActivity": 22.26385668842732
           },
-          "value": 67.06159772043047,
+          "value": 66.98299046163926,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -1941,7 +1971,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 67.1,
+        "opportunityScore": 67,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "BLOCKED"
       },
       {
@@ -2073,22 +2104,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 23210.747113533725,
-            "lpFee24h": 58.02711045999333,
-            "tvl": 232423.27,
+            "volume24h": 22966.43435916124,
+            "lpFee24h": 57.416327121229635,
+            "tvl": 232412.12,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.09986412769054374
+            "priceActivity": 0.09881771380580859
           },
           "scores": {
-            "volume24h": 64.46604430205426,
-            "lpFee24h": 46.05054077172973,
-            "tvl": 61.30976760990524,
+            "volume24h": 63.9986064778979,
+            "lpFee24h": 46.01475082579343,
+            "tvl": 61.290473674771384,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 4.844162692652543
+            "priceActivity": 4.791111099662628
           },
-          "value": 50.02994646515727,
+          "value": 49.85604090854908,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2100,7 +2131,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 50,
+        "opportunityScore": 49.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -2232,22 +2264,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 0.3406494671354063,
-            "lpFee24h": 0.0008517031396109889,
-            "tvl": 13097.63,
+            "volume24h": 0.6071668743900813,
+            "lpFee24h": 0.0015179881011969964,
+            "tvl": 11963.81,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.000026008481468434083
+            "priceActivity": 0.000050750293960709954
           },
           "scores": {
             "volume24h": 0,
             "lpFee24h": 0,
-            "tvl": 14.597428947425833,
+            "tvl": 13.122967869699472,
             "feeTier": 24.333030203879364,
             "liquidity": null,
             "priceActivity": 0
           },
-          "value": 5.136574847224234,
+          "value": 4.8908313342698415,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2259,7 +2291,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 5.1,
+        "opportunityScore": 4.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -2391,22 +2424,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 55483.68466404862,
-            "lpFee24h": 138.70943573581275,
+            "volume24h": 54361.659521031936,
+            "lpFee24h": 135.90436862544928,
             "tvl": 457722.8,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.12121678156309587
+            "priceActivity": 0.11876546136882833
           },
           "scores": {
-            "volume24h": 70.22250969434897,
-            "lpFee24h": 55.781778207146345,
-            "tvl": 72.3168595485448,
+            "volume24h": 69.76207872694827,
+            "lpFee24h": 55.65307292847474,
+            "tvl": 72.29502051711302,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 5.82295873771313
+            "priceActivity": 5.706308017062908
           },
-          "value": 57.0814069555599,
+          "value": 56.87490777270549,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2418,7 +2451,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 57.1,
+        "opportunityScore": 56.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -2550,22 +2584,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 10412.195411710862,
-            "lpFee24h": 104.1221686848563,
-            "tvl": 121409.6,
+            "volume24h": 10045.046702341137,
+            "lpFee24h": 100.45068096255598,
+            "tvl": 121406.93,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.08576089050380581
+            "priceActivity": 0.08273865999528311
           },
           "scores": {
-            "volume24h": 59.17107348219718,
-            "lpFee24h": 52.56906713055518,
-            "tvl": 50.76256599590854,
+            "volume24h": 58.46726562049256,
+            "lpFee24h": 52.26133456706336,
+            "tvl": 50.74687908693137,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 4.187200269791908
+            "priceActivity": 4.041232772672348
           },
-          "value": 57.05087455189065,
+          "value": 56.70297061993344,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2577,7 +2611,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 57.1,
+        "opportunityScore": 56.7,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -2709,22 +2744,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 86552.86438242685,
-            "lpFee24h": 216.38769202091737,
-            "tvl": 44626.51,
+            "volume24h": 82941.48433176834,
+            "lpFee24h": 207.35901994137,
+            "tvl": 44602.64,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 1.9394943584525621
+            "priceActivity": 1.859564463712649
           },
           "scores": {
-            "volume24h": 73.15976784069359,
-            "lpFee24h": 60.77540729410062,
-            "tvl": 34.50732285868383,
+            "volume24h": 72.58809191307257,
+            "lpFee24h": 60.405877117243456,
+            "tvl": 34.48821498035413,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 54.886474739673886
+            "priceActivity": 53.44461707501025
           },
-          "value": 56.149197474013846,
+          "value": 55.752174255873754,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2736,7 +2771,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 56.1,
+        "opportunityScore": 55.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -2868,22 +2904,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 21860.84759374439,
-            "lpFee24h": 54.65243829021478,
-            "tvl": 75846.05,
+            "volume24h": 21365.966667641213,
+            "lpFee24h": 53.415237112754,
+            "tvl": 75844.05,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.2882265799437728
+            "priceActivity": 0.2817092002291704
           },
           "scores": {
-            "volume24h": 64.07026480753164,
-            "lpFee24h": 45.385605240304265,
-            "tvl": 43.121459015089854,
+            "volume24h": 63.51543282651926,
+            "lpFee24h": 45.2118144190059,
+            "tvl": 43.10800857410575,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 12.891235617383835
+            "priceActivity": 12.622989933825075
           },
-          "value": 47.09204963096819,
+          "value": 46.83203108539177,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -2895,7 +2931,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 47.1,
+        "opportunityScore": 46.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3027,22 +3064,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 427239.5080930422,
-            "lpFee24h": 3417.9165537407857,
-            "tvl": 1023397.1,
+            "volume24h": 424927.85791693244,
+            "lpFee24h": 3399.4233547967006,
+            "tvl": 1024131.43,
             "feeTier": 0.008,
             "liquidity": null,
-            "priceActivity": 0.41747187684335063
+            "priceActivity": 0.41491535702300675
           },
           "scores": {
-            "volume24h": 83.70618351033954,
-            "lpFee24h": 91.897059604759,
-            "tvl": 85.38530224593899,
+            "volume24h": 83.51684190869294,
+            "lpFee24h": 92.00665549304287,
+            "tvl": 85.37116312244828,
             "feeTier": 79.87722212110391,
             "liquidity": null,
-            "priceActivity": 17.758190785679336
+            "priceActivity": 17.65273897942205
           },
-          "value": 82.62711113646084,
+          "value": 82.59231427774385,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3055,6 +3092,7 @@
           }
         },
         "opportunityScore": 82.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3186,22 +3224,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 41626.02901240051,
-            "lpFee24h": 416.2603579838698,
-            "tvl": 105218.7,
+            "volume24h": 40797.535838227726,
+            "lpFee24h": 407.97542451318725,
+            "tvl": 105321.87,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.3956143633441633
+            "priceActivity": 0.3873605343147414
           },
           "scores": {
-            "volume24h": 68.32433384084253,
-            "lpFee24h": 68.13993311475059,
-            "tvl": 48.437915461014505,
+            "volume24h": 67.84205010971421,
+            "lpFee24h": 68.03780021401501,
+            "tvl": 48.439200449600044,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 16.967115541851733
+            "priceActivity": 16.65230227444111
           },
-          "value": 65.61480353658078,
+          "value": 65.40272253142315,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3213,7 +3251,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 65.6,
+        "opportunityScore": 65.4,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3345,22 +3384,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 519.1044453840701,
-            "lpFee24h": 5.191105184629391,
+            "volume24h": 504.01668449895277,
+            "lpFee24h": 5.040227126455588,
             "tvl": 5331.13,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.09737231044526584
+            "priceActivity": 0.09454218608417966
           },
           "scores": {
-            "volume24h": 39.375329510265466,
-            "lpFee24h": 20.582086950628593,
+            "volume24h": 38.46406809771307,
+            "lpFee24h": 20.335329021013028,
             "tvl": 0,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 4.728702859462846
+            "priceActivity": 4.592789842642256
           },
-          "value": 31.3596223124904,
+          "value": 30.966065141944377,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3372,7 +3411,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 31.4,
+        "opportunityScore": 31,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3504,22 +3544,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 252906.2445556763,
-            "lpFee24h": 632.281084485851,
-            "tvl": 377425.37,
+            "volume24h": 255820.67281434327,
+            "lpFee24h": 639.5674351601525,
+            "tvl": 377833.45,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.6700827889648125
+            "priceActivity": 0.6770725906198704
           },
           "scores": {
-            "volume24h": 80.24269187756033,
-            "lpFee24h": 72.85216849745188,
-            "tvl": 69.1839716182455,
+            "volume24h": 80.12243345893549,
+            "lpFee24h": 73.11561353758528,
+            "tvl": 69.18062482150883,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 26.106540825620762
+            "priceActivity": 26.299567845346118
           },
-          "value": 66.71631546323273,
+          "value": 66.77421026093089,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3531,7 +3571,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 66.7,
+        "opportunityScore": 66.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3663,22 +3704,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 110648.48366932572,
-            "lpFee24h": 110.64991799872612,
-            "tvl": 339309.2,
+            "volume24h": 109729.6249768292,
+            "lpFee24h": 109.73104205577411,
+            "tvl": 339246.23,
             "feeTier": 0.001,
             "liquidity": null,
-            "priceActivity": 0.32609927366934266
+            "priceActivity": 0.323451273067439
           },
           "scores": {
-            "volume24h": 74.78211333186856,
-            "lpFee24h": 53.24952298778229,
-            "tvl": 67.45485711185559,
+            "volume24h": 74.46029076523062,
+            "lpFee24h": 53.251905019058334,
+            "tvl": 67.43147279928091,
             "feeTier": 9.131722473109994,
             "liquidity": null,
-            "priceActivity": 14.366222663893685
+            "priceActivity": 14.253282657075465
           },
-          "value": 55.73244760353251,
+          "value": 55.61579559482621,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3690,7 +3731,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 55.7,
+        "opportunityScore": 55.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3822,22 +3864,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 632.5384396166668,
-            "lpFee24h": 1.5814621200130496,
-            "tvl": 7397.33,
+            "volume24h": 618.2200337464062,
+            "lpFee24h": 1.5456648630950498,
+            "tvl": 7395.39,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.08550902009463776
+            "priceActivity": 0.08359532543197941
           },
           "scores": {
-            "volume24h": 40.67856076831782,
-            "lpFee24h": 10.701874571206536,
-            "tvl": 5.319246516023311,
+            "volume24h": 39.827803308545526,
+            "lpFee24h": 10.55710329909333,
+            "tvl": 5.313381933498932,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 4.175390139723908
+            "priceActivity": 4.081465061800958
           },
-          "value": 20.948989007372145,
+          "value": 20.610950606438312,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -3849,7 +3891,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 20.9,
+        "opportunityScore": 20.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -3981,22 +4024,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 40609.727212675025,
-            "lpFee24h": 101.52450511050282,
-            "tvl": 316690.36,
+            "volume24h": 39810.98245140808,
+            "lpFee24h": 99.52764250611376,
+            "tvl": 316690.35,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.1282316494025111
+            "priceActivity": 0.12570949020520544
           },
           "scores": {
-            "volume24h": 68.16105958991307,
-            "lpFee24h": 52.28645610353705,
-            "tvl": 66.33438307688293,
+            "volume24h": 67.67830853028133,
+            "lpFee24h": 52.15789912906793,
+            "tvl": 66.31435018602987,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 6.140453236558055
+            "priceActivity": 6.021073446017354
           },
-          "value": 54.24970872420368,
+          "value": 54.03596835377562,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4008,7 +4051,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 54.2,
+        "opportunityScore": 54,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4140,22 +4184,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 272337.2528615914,
-            "lpFee24h": 680.8860227008656,
-            "tvl": 440028.89,
+            "volume24h": 268917.77288821596,
+            "lpFee24h": 672.3367977577049,
+            "tvl": 440204.54,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.6189076650435188
+            "priceActivity": 0.6108927747274391
           },
           "scores": {
-            "volume24h": 80.731654188031,
-            "lpFee24h": 73.68739798662864,
-            "tvl": 71.67655438384979,
+            "volume24h": 80.45642019973273,
+            "lpFee24h": 73.68021975459021,
+            "tvl": 71.66138882739766,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 24.5222945820771
+            "priceActivity": 24.25149278743339
           },
-          "value": 67.48512951051906,
+          "value": 67.37341996685127,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4167,7 +4211,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 67.5,
+        "opportunityScore": 67.4,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4299,22 +4344,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 157580.08534450436,
-            "lpFee24h": 1575.801052440432,
+            "volume24h": 154453.9383740328,
+            "lpFee24h": 1544.5395788696615,
             "tvl": 694862.98,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.22677864540215448
+            "priceActivity": 0.2222797052363227
           },
           "scores": {
-            "volume24h": 77.11768362249808,
-            "lpFee24h": 83.15572561157553,
-            "tvl": 79.0970015853988,
+            "volume24h": 76.74717592206417,
+            "lpFee24h": 83.08310281771304,
+            "tvl": 79.07311501296512,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 10.403259642889772
+            "priceActivity": 10.207862260062438
           },
-          "value": 78.2963733224182,
+          "value": 78.13382665209005,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4326,7 +4371,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 78.3,
+        "opportunityScore": 78.1,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4458,22 +4504,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 48139.72378028592,
-            "lpFee24h": 120.37458438513661,
-            "tvl": 110803.66,
+            "volume24h": 46644.16193546539,
+            "lpFee24h": 116.63527279501062,
+            "tvl": 110776.93,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.43445969005253005
+            "priceActivity": 0.4210638617216183
           },
           "scores": {
-            "volume24h": 69.28465203464525,
-            "lpFee24h": 54.19278849560472,
-            "tvl": 49.27791350544771,
+            "volume24h": 68.73789669621645,
+            "lpFee24h": 53.93639473741464,
+            "tvl": 49.259114640007404,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 18.364640587160892
+            "priceActivity": 17.873313850730035
           },
-          "value": 53.09606026070903,
+          "value": 52.797914821127634,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4485,7 +4531,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 53.1,
+        "opportunityScore": 52.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4617,22 +4664,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 8836.42350869695,
-            "lpFee24h": 88.3642629375048,
+            "volume24h": 8588.165368095075,
+            "lpFee24h": 85.88168085064922,
             "tvl": 41643.18,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.21219377359502684
+            "priceActivity": 0.2062322178108174
           },
           "scores": {
-            "volume24h": 58.08723240741581,
-            "lpFee24h": 50.734765423137006,
-            "tvl": 33.383571217720835,
+            "volume24h": 57.41920742246967,
+            "lpFee24h": 50.50695056154568,
+            "tvl": 33.37348968395845,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 9.794434963281743
+            "priceActivity": 9.535563958265572
           },
-          "value": 53.49317419998672,
+          "value": 53.178498939679606,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4644,7 +4691,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 53.5,
+        "opportunityScore": 53.2,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4776,22 +4824,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 4200.312218212255,
-            "lpFee24h": 42.00314442907695,
+            "volume24h": 4075.1335524925166,
+            "lpFee24h": 40.751357343342185,
             "tvl": 20064.9,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.20933631456983362
+            "priceActivity": 0.20309762582881133
           },
           "scores": {
-            "volume24h": 53.17529711091144,
-            "lpFee24h": 42.47321124237084,
-            "tvl": 21.52478736522233,
+            "volume24h": 52.43334559768993,
+            "lpFee24h": 42.21387162051386,
+            "tvl": 21.51828707592927,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 9.674296606248506
+            "priceActivity": 9.403198736311722
           },
-          "value": 47.118872712311614,
+          "value": 46.76896462629568,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4803,7 +4851,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 47.1,
+        "opportunityScore": 46.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -4935,22 +4984,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 422283.4809929693,
-            "lpFee24h": 1543.0839588265662,
-            "tvl": 144460.39,
+            "volume24h": 421661.0123155373,
+            "lpFee24h": 1538.4727729069,
+            "tvl": 144414.03,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 2.9231783258578306
+            "priceActivity": 2.9198064226553146
           },
           "scores": {
-            "volume24h": 83.62910974281345,
-            "lpFee24h": 82.91890397408727,
-            "tvl": 53.58594439252556,
+            "volume24h": 83.46521625110563,
+            "lpFee24h": 83.03859307748579,
+            "tvl": 53.564550407649605,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 69.58097401019641
+            "priceActivity": 69.48753360340388
           },
-          "value": 71.01627499427423,
+          "value": 70.99278340031444,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -4963,6 +5012,7 @@
           }
         },
         "opportunityScore": 71,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5094,22 +5144,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 374.7455542149976,
-            "lpFee24h": 3.7475100323808475,
+            "volume24h": 367.41759395419655,
+            "lpFee24h": 3.6742299327699404,
             "tvl": 5660.44,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.06620431525022748
+            "priceActivity": 0.06490972326430394
           },
           "scores": {
-            "volume24h": 37.22772437706992,
-            "lpFee24h": 17.58339294558829,
-            "tvl": 0.9733303508780659,
+            "volume24h": 36.35444504388333,
+            "lpFee24h": 17.43397527706583,
+            "tvl": 0.9730364139972469,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 3.2619465078608405
+            "priceActivity": 3.1966132211878375
           },
-          "value": 29.72492452758024,
+          "value": 29.380346910493028,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5121,7 +5171,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 29.7,
+        "opportunityScore": 29.4,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5253,22 +5304,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 1388.1911429574081,
-            "lpFee24h": 13.88195391364766,
+            "volume24h": 1220.6499698811137,
+            "lpFee24h": 12.206539158145366,
             "tvl": 17198.48,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.08071592041607213
+            "priceActivity": 0.07097429365159676
           },
           "scores": {
-            "volume24h": 45.86501147451543,
-            "lpFee24h": 30.48802950607159,
-            "tvl": 19.021232402815723,
+            "volume24h": 44.37313885286914,
+            "lpFee24h": 29.188080035477903,
+            "tvl": 19.015488164267346,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 3.9501193078585413
+            "priceActivity": 3.4854898659058864
           },
-          "value": 39.951781244434876,
+          "value": 38.99440376048833,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5280,7 +5331,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 40,
+        "opportunityScore": 39,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5412,22 +5464,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 23505.814743314004,
-            "lpFee24h": 58.764742596544515,
+            "volume24h": 22925.411770126804,
+            "lpFee24h": 57.313730593366834,
             "tvl": 125376.06,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.18748248065311673
+            "priceActivity": 0.18285318401397208
           },
           "scores": {
-            "volume24h": 64.54948578714192,
-            "lpFee24h": 46.19081157190517,
-            "tvl": 51.28469904765015,
+            "volume24h": 63.98664796602377,
+            "lpFee24h": 45.99485777566738,
+            "tvl": 51.2692115366954,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 8.74598064639287
+            "priceActivity": 8.539934732226737
           },
-          "value": 48.65044013063248,
+          "value": 48.383481344456584,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5439,7 +5491,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 48.7,
+        "opportunityScore": 48.4,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5571,22 +5624,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 436047.057538823,
-            "lpFee24h": 1733.5876940897863,
-            "tvl": 141961.36,
+            "volume24h": 431214.2092472886,
+            "lpFee24h": 1630.54415026201,
+            "tvl": 141525.5,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 3.071589744834954
+            "priceActivity": 3.046901153836507
           },
           "scores": {
-            "volume24h": 83.84097371035307,
-            "lpFee24h": 84.23292871432882,
-            "tvl": 53.30251974807565,
+            "volume24h": 83.61507730806498,
+            "lpFee24h": 83.69594732062431,
+            "tvl": 53.236494854884455,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 71.47115193755792
+            "priceActivity": 71.1107424724522
           },
-          "value": 71.58267700764638,
+          "value": 71.29735751205556,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5598,7 +5651,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 71.6,
+        "opportunityScore": 71.3,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5730,22 +5784,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 43421.16340585196,
-            "lpFee24h": 108.5535955808161,
-            "tvl": 243452.73,
+            "volume24h": 42768.78588766782,
+            "lpFee24h": 106.9226446284778,
+            "tvl": 243456.98,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.17835562331074276
+            "priceActivity": 0.17567286790326497
           },
           "scores": {
-            "volume24h": 68.60322543658532,
-            "lpFee24h": 53.03543732689491,
-            "tvl": 62.06277727654371,
+            "volume24h": 68.15768791730909,
+            "lpFee24h": 52.96118365497205,
+            "tvl": 62.04431833123514,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 8.353218396168675
+            "priceActivity": 8.230197711095483
           },
-          "value": 54.05775484524666,
+          "value": 53.87458014145813,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5757,7 +5811,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 54.1,
+        "opportunityScore": 53.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -5889,22 +5944,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 420846.9105841365,
-            "lpFee24h": 1052.1947692678846,
+            "volume24h": 415288.489819251,
+            "lpFee24h": 1038.297891899004,
             "tvl": 303144.48,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 1.388271726353508
+            "priceActivity": 1.3699358464955425
           },
           "scores": {
-            "volume24h": 83.60659973168073,
-            "lpFee24h": 78.59748381917456,
-            "tvl": 65.62437524559068,
+            "volume24h": 83.36335057099635,
+            "lpFee24h": 78.59230712614679,
+            "tvl": 65.60455728332538,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 44.315133353017224
+            "priceActivity": 43.890965939534496
           },
-          "value": 70.17104560014887,
+          "value": 70.06136913222934,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -5916,7 +5971,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 70.2,
+        "opportunityScore": 70.1,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6048,22 +6104,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 467379.36797430826,
-            "lpFee24h": 1168.449692869409,
-            "tvl": 387497.5,
+            "volume24h": 461254.43718410213,
+            "lpFee24h": 1153.1373529346283,
+            "tvl": 388207.6,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 1.206148086050383
+            "priceActivity": 1.1881643666535693
           },
           "scores": {
-            "volume24h": 84.29934460448746,
-            "lpFee24h": 79.78010701763351,
-            "tvl": 69.6117233627681,
+            "volume24h": 84.06556381757119,
+            "lpFee24h": 79.77838969714637,
+            "tvl": 69.6204285150173,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 40.27724207010833
+            "priceActivity": 39.831572519441764
           },
-          "value": 71.2363990166054,
+          "value": 71.13459108669764,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6075,7 +6131,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 71.2,
+        "opportunityScore": 71.1,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6207,22 +6264,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 88065.9610241265,
-            "lpFee24h": 220.23209829160484,
-            "tvl": 266503.16,
+            "volume24h": 85849.61945766737,
+            "lpFee24h": 214.6896601691647,
+            "tvl": 266698.8,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.3304499692391134
+            "priceActivity": 0.3218972843434893
           },
           "scores": {
-            "volume24h": 73.2742467934533,
-            "lpFee24h": 60.9734052449482,
-            "tvl": 63.53205838192609,
+            "volume24h": 72.818613325874,
+            "lpFee24h": 60.79718694965687,
+            "tvl": 63.524787368999014,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 14.532959884650795
+            "priceActivity": 14.193516697293324
           },
-          "value": 58.84895042603315,
+          "value": 58.61826338140191,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6234,7 +6291,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 58.8,
+        "opportunityScore": 58.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6366,22 +6424,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 343.22898619524454,
-            "lpFee24h": 3.432309541700807,
+            "volume24h": 337.76211581442845,
+            "lpFee24h": 3.3776405391239317,
             "tvl": 6409.38,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.05355104334510429
+            "priceActivity": 0.05269809495059248
           },
           "scores": {
-            "volume24h": 36.649037601047226,
-            "lpFee24h": 16.807446011646203,
-            "tvl": 2.991216011074629,
+            "volume24h": 35.79308910804188,
+            "lpFee24h": 16.692111653590732,
+            "tvl": 2.990312691144907,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 2.6542124123894433
+            "priceActivity": 2.6099055743507056
           },
-          "value": 29.57593122898744,
+          "value": 29.24955823431006,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6393,7 +6451,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 29.6,
+        "opportunityScore": 29.2,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6525,22 +6584,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 39240.89347561381,
-            "lpFee24h": 98.10238971965258,
-            "tvl": 154142.39,
+            "volume24h": 39061.335648022985,
+            "lpFee24h": 97.65349385843535,
+            "tvl": 154087.2,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.2545756133378612
+            "priceActivity": 0.25350149556889207
           },
           "scores": {
-            "volume24h": 67.93457001402666,
-            "lpFee24h": 51.903016987343165,
-            "tvl": 54.639566158008236,
+            "volume24h": 67.55115085905224,
+            "lpFee24h": 51.94492838545497,
+            "tvl": 54.617250956250004,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 11.543819722108156
+            "priceActivity": 11.490953249504065
           },
-          "value": 52.39745003400615,
+          "value": 52.27695788850312,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6552,7 +6611,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 52.4,
+        "opportunityScore": 52.3,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6684,22 +6744,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 2182.44461893963,
-            "lpFee24h": 21.824465032203584,
+            "volume24h": 2134.9591140639236,
+            "lpFee24h": 21.34960956463547,
             "tvl": 20837.83,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.10473473576373499
+            "priceActivity": 0.10245592338856414
           },
           "scores": {
-            "volume24h": 48.85195824828852,
-            "lpFee24h": 35.318630636804436,
-            "tvl": 22.13866594142643,
+            "volume24h": 48.11052097964567,
+            "lpFee24h": 35.141779780071865,
+            "tvl": 22.131980266407208,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 5.069091798417592
+            "priceActivity": 4.9592634590464
           },
-          "value": 43.13936794073636,
+          "value": 42.82605604536517,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6711,7 +6771,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 43.1,
+        "opportunityScore": 42.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -6843,22 +6904,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 42373.52563007726,
-            "lpFee24h": 43.509408910987496,
+            "volume24h": 40820.91482823516,
+            "lpFee24h": 41.86877129170771,
             "tvl": 333373.56,
             "feeTier": 0.001,
             "liquidity": null,
-            "priceActivity": 0.12710523783013045
+            "priceActivity": 0.12244796746399192
           },
           "scores": {
-            "volume24h": 68.44189869766547,
-            "lpFee24h": 42.86206141194383,
-            "tvl": 67.16822068418136,
+            "volume24h": 67.84588219513374,
+            "lpFee24h": 42.512765453309584,
+            "tvl": 67.14793649468675,
             "feeTier": 9.131722473109994,
             "liquidity": null,
-            "priceActivity": 6.089604863524088
+            "priceActivity": 5.873474628102957
           },
-          "value": 49.648970695552435,
+          "value": 49.31847860828017,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -6870,7 +6931,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 49.6,
+        "opportunityScore": 49.3,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7002,22 +7064,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 666.0159125755633,
-            "lpFee24h": 1.797796844768058,
+            "volume24h": 617.0089874369359,
+            "lpFee24h": 1.6632725970848505,
             "tvl": 15804.66,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.042140477085591425
+            "priceActivity": 0.039039687499568855
           },
           "scores": {
-            "volume24h": 41.01870589783444,
-            "lpFee24h": 11.610838407392063,
-            "tvl": 17.648620901547456,
+            "volume24h": 39.814707895441146,
+            "lpFee24h": 11.06821032855067,
+            "tvl": 17.643291179142437,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 2.0998733566722363
+            "priceActivity": 1.945569425431087
           },
-          "value": 23.30494790557957,
+          "value": 22.713278484142666,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7029,7 +7091,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 23.3,
+        "opportunityScore": 22.7,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7161,22 +7224,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 904.3762225459404,
-            "lpFee24h": 9.043775445277152,
+            "volume24h": 779.7428199051955,
+            "lpFee24h": 7.797441063044005,
             "tvl": 44681.8,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.020240371304332868
+            "priceActivity": 0.017451016295341626
           },
           "scores": {
-            "volume24h": 43.03696766507955,
-            "lpFee24h": 26.04695673247461,
-            "tvl": 34.527432725543264,
+            "volume24h": 41.37827547966813,
+            "lpFee24h": 24.590641090267955,
+            "tvl": 34.51700575604736,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 1.0187256911617326
+            "priceActivity": 0.8774888796492729
           },
-          "value": 39.95025390295091,
+          "value": 38.902333642633764,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7188,7 +7251,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 40,
+        "opportunityScore": 38.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7320,22 +7384,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 7766.881077914777,
-            "lpFee24h": 19.41751393797414,
-            "tvl": 123516.08,
+            "volume24h": 7775.319629476042,
+            "lpFee24h": 19.438606118449865,
+            "tvl": 123539.94,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.06288153799824911
+            "priceActivity": 0.06293769957696306
           },
           "scores": {
-            "volume24h": 57.23511983169942,
-            "lpFee24h": 34.05993898081638,
-            "tvl": 51.0419453610624,
+            "volume24h": 56.75417139427579,
+            "lpFee24h": 34.13025248500127,
+            "tvl": 51.02966736461483,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 3.103055341930902
+            "priceActivity": 3.1023243021519393
           },
-          "value": 41.81473915044287,
+          "value": 41.67577389330098,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7347,7 +7411,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 41.8,
+        "opportunityScore": 41.7,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7479,22 +7544,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 537586.8608223839,
-            "lpFee24h": 1344.017925598149,
-            "tvl": 743200.58,
+            "volume24h": 552539.7048946052,
+            "lpFee24h": 1381.4011290924916,
+            "tvl": 746442.67,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.7233402062500865
+            "priceActivity": 0.7402305992161531
           },
           "scores": {
-            "volume24h": 85.22379433439403,
-            "lpFee24h": 81.35995636657522,
-            "tvl": 80.1892820951718,
+            "volume24h": 85.2734787007783,
+            "lpFee24h": 81.82070748626819,
+            "tvl": 80.23574229999011,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 27.704512618792233
+            "priceActivity": 28.180110812725356
           },
-          "value": 73.13560686210454,
+          "value": 73.33991751348519,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7506,7 +7571,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 73.1,
+        "opportunityScore": 73.3,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7638,22 +7704,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 1244898.849432072,
-            "lpFee24h": 1245.5293603489038,
-            "tvl": 203046.58,
+            "volume24h": 1245659.5818693396,
+            "lpFee24h": 1246.2910675228093,
+            "tvl": 202841.71,
             "feeTier": 0.001,
             "liquidity": null,
-            "priceActivity": 6.131099816761612
+            "priceActivity": 6.141042598533308
           },
           "scores": {
-            "volume24h": 90.77066059305737,
-            "lpFee24h": 80.50105279951718,
-            "tvl": 59.11510878400064,
+            "volume24h": 90.71114329067746,
+            "lpFee24h": 80.65680482959465,
+            "tvl": 59.08086566397122,
             "feeTier": 9.131722473109994,
             "liquidity": null,
             "priceActivity": 100
           },
-          "value": 73.51328064742606,
+          "value": 73.53965170332035,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7666,6 +7732,7 @@
           }
         },
         "opportunityScore": 73.5,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7797,22 +7864,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 127476.80176987707,
-            "lpFee24h": 319.1608257187357,
-            "tvl": 339618.52,
+            "volume24h": 124347.25965641491,
+            "lpFee24h": 311.3264203772157,
+            "tvl": 339557.04,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.3753529158830239
+            "priceActivity": 0.3662043339063591
           },
           "scores": {
-            "volume24h": 75.71730418043687,
-            "lpFee24h": 65.1480882839725,
-            "tvl": 67.46965662258907,
+            "volume24h": 75.2968347305714,
+            "lpFee24h": 64.98673708580766,
+            "tvl": 67.44634183422993,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 16.22266104869863
+            "priceActivity": 15.87060284456618
           },
-          "value": 61.805002561704484,
+          "value": 61.58761775851605,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7824,7 +7891,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 61.8,
+        "opportunityScore": 61.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -7956,22 +8024,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 399630.6426367756,
-            "lpFee24h": 3197.045986772066,
-            "tvl": 1059704.11,
+            "volume24h": 393460.97898388543,
+            "lpFee24h": 3147.688667415302,
+            "tvl": 1059701.29,
             "feeTier": 0.008,
             "liquidity": null,
-            "priceActivity": 0.3771153087598911
+            "priceActivity": 0.37129423423074764
           },
           "scores": {
-            "volume24h": 83.26490191617157,
-            "lpFee24h": 91.14275099775381,
-            "tvl": 85.9515256623554,
+            "volume24h": 83.00218776007038,
+            "lpFee24h": 91.13624128892275,
+            "tvl": 85.92552587787732,
             "feeTier": 79.87722212110391,
             "liquidity": null,
-            "priceActivity": 16.287849673457526
+            "priceActivity": 16.05976957883336
           },
-          "value": 82.24126602146019,
+          "value": 82.13452031936842,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -7983,7 +8051,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 82.2,
+        "opportunityScore": 82.1,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8115,22 +8184,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 1473808.9389112669,
-            "lpFee24h": 147.39397595622913,
-            "tvl": 244358.45,
+            "volume24h": 1453722.9593538973,
+            "lpFee24h": 145.38518627673895,
+            "tvl": 244357.27,
             "feeTier": 0.0001,
             "liquidity": null,
-            "priceActivity": 6.031340184516913
+            "priceActivity": 5.94917007934283
           },
           "scores": {
-            "volume24h": 91.88566268350765,
-            "lpFee24h": 56.46292159060342,
-            "tvl": 62.12308946307732,
+            "volume24h": 91.74438415617142,
+            "lpFee24h": 56.41082782891237,
+            "tvl": 62.104250449784914,
             "feeTier": 0,
             "liquidity": null,
-            "priceActivity": 99.282841278287
+            "priceActivity": 98.61448585244196
           },
-          "value": 65.31908973956585,
+          "value": 65.21436161734997,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8142,7 +8211,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 65.3,
+        "opportunityScore": 65.2,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8274,22 +8344,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 917.9506148178446,
-            "lpFee24h": 2.2950909928823737,
-            "tvl": 82304.84,
+            "volume24h": 904.7994827057988,
+            "lpFee24h": 2.2622109491795395,
+            "tvl": 82304.78,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.011153057521499884
+            "priceActivity": 0.01099327988855324
           },
           "scores": {
-            "volume24h": 43.13527137562049,
-            "lpFee24h": 13.458684730526421,
-            "tvl": 44.44879171656547,
+            "volume24h": 42.37211406722754,
+            "lpFee24h": 13.363805262208867,
+            "tvl": 44.43535675071064,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 0.563280917177131
+            "priceActivity": 0.5535913883880687
           },
-          "value": 29.00774739508409,
+          "value": 28.71895766804984,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8301,7 +8371,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 29,
+        "opportunityScore": 28.7,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8433,22 +8504,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 24113.50001613322,
-            "lpFee24h": 24.113578086223153,
+            "volume24h": 23274.481381151872,
+            "lpFee24h": 23.2745578752504,
             "tvl": 182825.89,
             "feeTier": 0.001,
             "liquidity": null,
-            "priceActivity": 0.1318932456236544
+            "priceActivity": 0.12730407811033695
           },
           "scores": {
-            "volume24h": 64.71808092751174,
-            "lpFee24h": 36.39813867518152,
-            "tvl": 57.41133445939486,
+            "volume24h": 64.08772883034212,
+            "lpFee24h": 36.07676819410632,
+            "tvl": 57.39399676047338,
             "feeTier": 9.131722473109994,
             "liquidity": null,
-            "priceActivity": 6.305394659589882
+            "priceActivity": 6.0930802640483845
           },
-          "value": 44.63889781111966,
+          "value": 44.30697209102105,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8460,7 +8531,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 44.6,
+        "opportunityScore": 44.3,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8592,22 +8664,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 29928.999332243813,
-            "lpFee24h": 59.85802645466054,
+            "volume24h": 29459.458640565095,
+            "lpFee24h": 58.918944682479776,
             "tvl": 94406.23,
             "feeTier": 0.002,
             "liquidity": null,
-            "priceActivity": 0.31702356223994765
+            "priceActivity": 0.31204994247270645
           },
           "scores": {
-            "volume24h": 66.14521364011604,
-            "lpFee24h": 46.39556164004564,
-            "tvl": 46.67677024393531,
+            "volume24h": 65.6640439754287,
+            "lpFee24h": 46.302165470345464,
+            "tvl": 46.66267428541533,
             "feeTier": 19.26845633180659,
             "liquidity": null,
-            "priceActivity": 14.016634770985249
+            "priceActivity": 13.813149673240318
           },
-          "value": 48.212694991520806,
+          "value": 48.007518992652464,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8619,7 +8691,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 48.2,
+        "opportunityScore": 48,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8751,22 +8824,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 215695.42906135344,
-            "lpFee24h": 539.2391584105183,
-            "tvl": 683452.62,
+            "volume24h": 213002.27172727566,
+            "lpFee24h": 532.5062563582076,
+            "tvl": 683006.44,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.315596754989912
+            "priceActivity": 0.31185982920933464
           },
           "scores": {
-            "volume24h": 79.19140079452455,
-            "lpFee24h": 71.05739721934357,
-            "tvl": 78.82808095965417,
+            "volume24h": 78.8971401061989,
+            "lpFee24h": 71.04596750037022,
+            "tvl": 78.79367218210815,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 13.961456451899046
+            "priceActivity": 13.805778231973582
           },
-          "value": 66.70025265676827,
+          "value": 66.58397226808175,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8778,7 +8851,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 66.7,
+        "opportunityScore": 66.6,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -8910,22 +8984,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 41235.76670872472,
-            "lpFee24h": 103.11544209448128,
-            "tvl": 161434.69,
+            "volume24h": 41810.12295472608,
+            "lpFee24h": 104.55097166958477,
+            "tvl": 161360.42,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.2554331210269907
+            "priceActivity": 0.2591101520107972
           },
           "scores": {
-            "volume24h": 68.2621125324259,
-            "lpFee24h": 52.46037861461882,
-            "tvl": 55.390320383233735,
+            "volume24h": 68.00604553491392,
+            "lpFee24h": 52.70971736986989,
+            "tvl": 55.36612135784862,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 11.578601690179834
+            "priceActivity": 11.718056358528498
           },
-          "value": 52.819476118328225,
+          "value": 52.820947681585324,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -8938,6 +9012,7 @@
           }
         },
         "opportunityScore": 52.8,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -9069,22 +9144,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 625.5631615611277,
-            "lpFee24h": 6.255647425202834,
+            "volume24h": 616.384843304033,
+            "lpFee24h": 6.163863856593603,
             "tvl": 11028.91,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.05672030704404404
+            "priceActivity": 0.055888101662270616
           },
           "scores": {
-            "volume24h": 40.60542925766411,
-            "lpFee24h": 22.37419332331658,
-            "tvl": 11.805512772065681,
+            "volume24h": 39.807948810355946,
+            "lpFee24h": 22.26605373242848,
+            "tvl": 11.801947614976353,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 2.8071139119839787
+            "priceActivity": 2.7638235907810347
           },
-          "value": 34.227854873003615,
+          "value": 33.92298231624537,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -9096,7 +9171,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 34.2,
+        "opportunityScore": 33.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -9228,22 +9304,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 1115.3096102375714,
-            "lpFee24h": 11.15311596702592,
+            "volume24h": 1096.8970701634312,
+            "lpFee24h": 10.968991356790768,
             "tvl": 11619.02,
             "feeTier": 0.01,
             "liquidity": null,
-            "priceActivity": 0.09598998970976652
+            "priceActivity": 0.09440530011682836
           },
           "scores": {
-            "volume24h": 44.42040401632965,
-            "lpFee24h": 28.20011271713887,
-            "tvl": 12.652015866231975,
+            "volume24h": 43.65868663668787,
+            "lpFee24h": 28.074593861693458,
+            "tvl": 12.6481950729356,
             "feeTier": 100,
             "liquidity": null,
-            "priceActivity": 4.66453909281678
+            "priceActivity": 4.586427567067773
           },
-          "value": 37.685760394018,
+          "value": 37.38503865423125,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -9255,32 +9331,33 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 37.7,
+        "opportunityScore": 37.4,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       }
     ],
     "nearest": [
       {
-        "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
-        "pair": "QQQx/USDC",
+        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+        "pair": "NVDAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
         "blockerClass": "EVIDENCE_MISSING",
         "primaryBlocker": {
-          "key": "swapReplay",
-          "label": "Swap replay",
+          "key": "poolIdentity",
+          "label": "Pool identity",
           "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
         },
-        "passCount": 8,
+        "passCount": 9,
         "totalChecks": 13,
         "evidence": [
           {
             "key": "poolIdentity",
             "label": "Pool identity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "RWA / USDC CLMM identity 已核验"
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
           },
           {
             "key": "poolState",
@@ -9327,16 +9404,16 @@
           {
             "key": "tickPath",
             "label": "Tick path",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Tick path 尚未完成"
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "逐笔 Tick path 与当前状态连续"
           },
           {
             "key": "shadowReplay",
             "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "已评估 87 个 Core + Buffer 候选"
           },
           {
             "key": "feeReplay",
@@ -9387,26 +9464,26 @@
         "action": "UNAVAILABLE",
         "rankingImpact": "机会层保留为 WATCH，等待验证",
         "sourceBlockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
+          "SWAP_BACKFILL_INCOMPLETE"
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 693390.5546569403,
-            "lpFee24h": 693.3952505217908,
-            "tvl": 2481794.79,
+            "volume24h": 699937.407671689,
+            "lpFee24h": 699.938708514051,
+            "tvl": 2437352.58,
             "feeTier": 0.001,
-            "liquidity": 4377805492998,
-            "priceActivity": 0.2793907689108092
+            "liquidity": 6825019671879,
+            "priceActivity": 0.2871711763883127
           },
           "scores": {
-            "volume24h": 86.904944284302,
-            "lpFee24h": 73.8927239085592,
-            "tvl": 99.77316300308213,
+            "volume24h": 86.85525739389864,
+            "lpFee24h": 74.13486750955731,
+            "tvl": 99.44963895952016,
             "feeTier": 9.131722473109994,
-            "liquidity": 43.87369838199039,
-            "priceActivity": 12.540879925768705
+            "liquidity": 100,
+            "priceActivity": 12.839309330168625
           },
-          "value": 69.13286099011916,
+          "value": 74.76962102878424,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -9418,168 +9495,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 69.1,
-        "opportunityStatus": "WATCH"
-      },
-      {
-        "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
-        "pair": "SPYx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "blockerClass": "EVIDENCE_MISSING",
-        "primaryBlocker": {
-          "key": "swapReplay",
-          "label": "Swap replay",
-          "display": "FAIL",
-          "reason": "Swap window / replay 尚未完成"
-        },
-        "passCount": 8,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "RWA / USDC CLMM identity 已核验"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Tick path 尚未完成"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
-        ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
-        },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "机会层保留为 WATCH，等待验证",
-        "sourceBlockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
-        ],
-        "opportunity": {
-          "raw": {
-            "volume24h": 131164.8720450731,
-            "lpFee24h": 131.16614710812541,
-            "tvl": 2447068,
-            "feeTier": 0.001,
-            "liquidity": 3316118500125,
-            "priceActivity": 0.05360082843838958
-          },
-          "scores": {
-            "volume24h": 75.90569984833606,
-            "lpFee24h": 55.15486052652382,
-            "tvl": 99.5442928979041,
-            "feeTier": 9.131722473109994,
-            "liquidity": 8.766596861671198,
-            "priceActivity": 2.65661785407012
-          },
-          "value": 56.1724748733252,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "opportunityScore": 56.2,
+        "opportunityScore": 74.8,
+        "opportunityConfidence": 87.7,
         "opportunityStatus": "WATCH"
       },
       {
@@ -9714,22 +9631,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 2801890.8044251953,
-            "lpFee24h": 7004.728994620332,
-            "tvl": 2516699.34,
+            "volume24h": 2756035.1383256232,
+            "lpFee24h": 6890.089804239213,
+            "tvl": 2521384.52,
             "feeTier": 0.0025,
-            "liquidity": 4415974562004,
-            "priceActivity": 1.1133196404880035
+            "liquidity": 4259823151767,
+            "priceActivity": 1.0930641940823937
           },
           "scores": {
-            "volume24h": 96.1294090800035,
+            "volume24h": 96.02327269595426,
             "lpFee24h": 100,
             "tvl": 100,
             "feeTier": 24.333030203879364,
-            "liquidity": 44.97094824997523,
-            "priceActivity": 38.08893097267937
+            "liquidity": 40.420541300478554,
+            "priceActivity": 37.57123535071567
           },
-          "value": 82.67366711802048,
+          "value": 82.16090072675786,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -9741,7 +9658,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 82.7,
+        "opportunityScore": 82.2,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "WATCH"
       },
       {
@@ -9876,22 +9794,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 5034167.112035183,
-            "lpFee24h": 5034.173441185978,
-            "tvl": 1856894.89,
+            "volume24h": 4994249.51732432,
+            "lpFee24h": 4994.255793312831,
+            "tvl": 1858812.91,
             "feeTier": 0.001,
             "liquidity": 5703067531108,
-            "priceActivity": 2.711067351817196
+            "priceActivity": 2.6867951532165333
           },
           "scores": {
             "volume24h": 100,
-            "lpFee24h": 96.26955058995017,
-            "tvl": 95.06180362351297,
+            "lpFee24h": 96.35894528042762,
+            "tvl": 95.04985854140088,
             "feeTier": 9.131722473109994,
             "liquidity": 77.30022839985075,
-            "priceActivity": 66.75153627505341
+            "priceActivity": 66.37000071667248
           },
-          "value": 85.12090762156076,
+          "value": 85.1268574884681,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -9904,11 +9822,338 @@
           }
         },
         "opportunityScore": 85.1,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "WATCH"
       },
       {
-        "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
-        "pair": "NVDAx/USDC",
+        "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
+        "pair": "QQQx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 7,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Tick path 尚未完成"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Shadow replay 尚未产生候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 682567.0697446667,
+            "lpFee24h": 682.571712098092,
+            "tvl": 2482463.77,
+            "feeTier": 0.001,
+            "liquidity": 4414878472168,
+            "priceActivity": 0.27495550106041095
+          },
+          "scores": {
+            "volume24h": 86.68715559548775,
+            "lpFee24h": 73.8509432070061,
+            "tvl": 99.74740856202102,
+            "feeTier": 9.131722473109994,
+            "liquidity": 44.939571328011226,
+            "priceActivity": 12.35423413993847
+          },
+          "value": 69.14838201216035,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 69.1,
+        "opportunityConfidence": 81.5,
+        "opportunityStatus": "WATCH"
+      },
+      {
+        "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
+        "pair": "SPYx/USDC",
+        "status": "BLOCKED",
+        "readyForTop3": false,
+        "blockerClass": "EVIDENCE_MISSING",
+        "primaryBlocker": {
+          "key": "poolIdentity",
+          "label": "Pool identity",
+          "display": "FAIL",
+          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+        },
+        "passCount": 7,
+        "totalChecks": 13,
+        "evidence": [
+          {
+            "key": "poolIdentity",
+            "label": "Pool identity",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
+          },
+          {
+            "key": "poolState",
+            "label": "PoolState",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "PoolState identity、decimals、price、config 通过"
+          },
+          {
+            "key": "tickArray",
+            "label": "TickArray",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "TickArray 已解码"
+          },
+          {
+            "key": "currentPrice",
+            "label": "Current price",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "当前价格为正且可用于区间计算"
+          },
+          {
+            "key": "tick",
+            "label": "Tick",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Current Tick / TickSpacing 可用于合法 snap"
+          },
+          {
+            "key": "activeLiquidity",
+            "label": "Active liquidity",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Active liquidity 可用于 replay"
+          },
+          {
+            "key": "swapReplay",
+            "label": "Swap replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Swap window / replay 尚未完成"
+          },
+          {
+            "key": "tickPath",
+            "label": "Tick path",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Tick path 尚未完成"
+          },
+          {
+            "key": "shadowReplay",
+            "label": "Shadow replay",
+            "status": "FAIL",
+            "display": "FAIL",
+            "reason": "Shadow replay 尚未产生候选"
+          },
+          {
+            "key": "feeReplay",
+            "label": "Fee replay",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Pool fee 配置与 Swap fee 证据通过"
+          },
+          {
+            "key": "markout",
+            "label": "Markout",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "外部参考价格 Markout 尚未完成"
+          },
+          {
+            "key": "feeGrowth",
+            "label": "Fee-growth",
+            "status": "WARN",
+            "display": "WAITING",
+            "reason": "Fee-growth reconciliation 尚未完成"
+          },
+          {
+            "key": "executionCost",
+            "label": "Execution cost",
+            "status": "PASS",
+            "display": "PASS",
+            "reason": "Open / rebalance cost 已有可复用估计"
+          }
+        ],
+        "netRange": {
+          "NET_LOW": null,
+          "NET_BASE": null,
+          "NET_HIGH": null,
+          "uncertaintyUsd": null,
+          "status": "WAITING",
+          "reason": "净收益模型尚未完成",
+          "formula": "等待完整 replay / cost / markout 后计算"
+        },
+        "volatilityRegime": {
+          "regime": null,
+          "ratio": null,
+          "source": "Raydium PoolState.dynamicFeeInfo",
+          "confidence": null,
+          "reason": "PoolState 未提供可比较的 volatility accumulator",
+          "optimizerImpact": "未参与策略偏好"
+        },
+        "action": "UNAVAILABLE",
+        "rankingImpact": "机会层保留为 WATCH，等待验证",
+        "sourceBlockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
+          "SWAP_TICK_PATH_UNAVAILABLE"
+        ],
+        "opportunity": {
+          "raw": {
+            "volume24h": 129027.52327659962,
+            "lpFee24h": 129.0287767611318,
+            "tvl": 2447064.39,
+            "feeTier": 0.001,
+            "liquidity": 3316118500125,
+            "priceActivity": 0.05272747370435954
+          },
+          "scores": {
+            "volume24h": 75.54398512695083,
+            "lpFee24h": 55.06995692528943,
+            "tvl": 99.5142074769082,
+            "feeTier": 9.131722473109994,
+            "liquidity": 8.766596861671198,
+            "priceActivity": 2.6113252278768218
+          },
+          "value": 56.031711932080256,
+          "knownWeight": 1,
+          "coverage": 1,
+          "sources": {
+            "volume24h": "Raydium API v3 day.volume",
+            "lpFee24h": "Raydium API v3 day.volumeFee",
+            "tvl": "Raydium API v3 tvl",
+            "feeTier": "Raydium API v3 feeRate",
+            "liquidity": "PoolState liquidity",
+            "priceActivity": "24h volume / TVL turnover proxy"
+          }
+        },
+        "opportunityScore": 56,
+        "opportunityConfidence": 81.5,
+        "opportunityStatus": "WATCH"
+      },
+      {
+        "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
+        "pair": "TSLAx/USDC",
         "status": "BLOCKED",
         "readyForTop3": false,
         "blockerClass": "HARD_INVALID",
@@ -10038,185 +10283,22 @@
         ],
         "opportunity": {
           "raw": {
-            "volume24h": 706951.3293488517,
-            "lpFee24h": 706.9526403372053,
-            "tvl": 2438189.53,
-            "feeTier": 0.001,
-            "liquidity": 6825019671879,
-            "priceActivity": 0.2899492925592424
-          },
-          "scores": {
-            "volume24h": 87.03288463157793,
-            "lpFee24h": 74.11111874636967,
-            "tvl": 99.48525714371237,
-            "feeTier": 9.131722473109994,
-            "liquidity": 100,
-            "priceActivity": 12.959264244078675
-          },
-          "value": 74.82712504445607,
-          "knownWeight": 1,
-          "coverage": 1,
-          "sources": {
-            "volume24h": "Raydium API v3 day.volume",
-            "lpFee24h": "Raydium API v3 day.volumeFee",
-            "tvl": "Raydium API v3 tvl",
-            "feeTier": "Raydium API v3 feeRate",
-            "liquidity": "PoolState liquidity",
-            "priceActivity": "24h volume / TVL turnover proxy"
-          }
-        },
-        "opportunityScore": 74.8,
-        "opportunityStatus": "BLOCKED"
-      },
-      {
-        "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
-        "pair": "TSLAx/USDC",
-        "status": "BLOCKED",
-        "readyForTop3": false,
-        "blockerClass": "HARD_INVALID",
-        "primaryBlocker": {
-          "key": "poolIdentity",
-          "label": "Pool identity",
-          "display": "FAIL",
-          "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-        },
-        "passCount": 6,
-        "totalChecks": 13,
-        "evidence": [
-          {
-            "key": "poolIdentity",
-            "label": "Pool identity",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "RWA / USDC / ACTIVE_INDEXED 身份尚未同时通过"
-          },
-          {
-            "key": "poolState",
-            "label": "PoolState",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "PoolState identity、decimals、price、config 通过"
-          },
-          {
-            "key": "tickArray",
-            "label": "TickArray",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "TickArray 已解码"
-          },
-          {
-            "key": "currentPrice",
-            "label": "Current price",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "当前价格为正且可用于区间计算"
-          },
-          {
-            "key": "tick",
-            "label": "Tick",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Current Tick / TickSpacing 可用于合法 snap"
-          },
-          {
-            "key": "activeLiquidity",
-            "label": "Active liquidity",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Active liquidity 可用于 replay"
-          },
-          {
-            "key": "swapReplay",
-            "label": "Swap replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Swap window / replay 尚未完成"
-          },
-          {
-            "key": "tickPath",
-            "label": "Tick path",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "回放状态发生 divergence 或连续性失败"
-          },
-          {
-            "key": "shadowReplay",
-            "label": "Shadow replay",
-            "status": "FAIL",
-            "display": "FAIL",
-            "reason": "Shadow replay 尚未产生候选"
-          },
-          {
-            "key": "feeReplay",
-            "label": "Fee replay",
-            "status": "WARN",
-            "display": "PASS",
-            "reason": "Pool fee 配置与 Swap fee 证据通过"
-          },
-          {
-            "key": "markout",
-            "label": "Markout",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "外部参考价格 Markout 尚未完成"
-          },
-          {
-            "key": "feeGrowth",
-            "label": "Fee-growth",
-            "status": "WARN",
-            "display": "WAITING",
-            "reason": "Fee-growth reconciliation 尚未完成"
-          },
-          {
-            "key": "executionCost",
-            "label": "Execution cost",
-            "status": "PASS",
-            "display": "PASS",
-            "reason": "Open / rebalance cost 已有可复用估计"
-          }
-        ],
-        "netRange": {
-          "NET_LOW": null,
-          "NET_BASE": null,
-          "NET_HIGH": null,
-          "uncertaintyUsd": null,
-          "status": "WAITING",
-          "reason": "净收益模型尚未完成",
-          "formula": "等待完整 replay / cost / markout 后计算"
-        },
-        "volatilityRegime": {
-          "regime": null,
-          "ratio": null,
-          "source": "Raydium PoolState.dynamicFeeInfo",
-          "confidence": null,
-          "reason": "PoolState 未提供可比较的 volatility accumulator",
-          "optimizerImpact": "未参与策略偏好"
-        },
-        "action": "UNAVAILABLE",
-        "rankingImpact": "机会层保留，但禁止执行",
-        "sourceBlockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
-        ],
-        "opportunity": {
-          "raw": {
-            "volume24h": 1085745.9224623274,
-            "lpFee24h": 1085.7493190294074,
-            "tvl": 1947169.43,
+            "volume24h": 1069518.0802030198,
+            "lpFee24h": 1069.521429774873,
+            "tvl": 1947538.57,
             "feeTier": 0.001,
             "liquidity": 3093915222972,
-            "priceActivity": 0.5576021817794907
+            "priceActivity": 0.5491640045942812
           },
           "scores": {
-            "volume24h": 89.86709695930018,
-            "lpFee24h": 78.95172015428768,
-            "tvl": 95.83281874758237,
+            "volume24h": 89.69131873348954,
+            "lpFee24h": 78.9272878802902,
+            "tvl": 95.80695597181986,
             "feeTier": 9.131722473109994,
             "liquidity": 0,
-            "priceActivity": 22.557150538115067
+            "priceActivity": 22.26385668842732
           },
-          "value": 67.06159772043047,
+          "value": 66.98299046163926,
           "knownWeight": 1,
           "coverage": 1,
           "sources": {
@@ -10228,7 +10310,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 67.1,
+        "opportunityScore": 67,
+        "opportunityConfidence": 81.5,
         "opportunityStatus": "BLOCKED"
       },
       {
@@ -10360,22 +10443,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 23210.747113533725,
-            "lpFee24h": 58.02711045999333,
-            "tvl": 232423.27,
+            "volume24h": 22966.43435916124,
+            "lpFee24h": 57.416327121229635,
+            "tvl": 232412.12,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.09986412769054374
+            "priceActivity": 0.09881771380580859
           },
           "scores": {
-            "volume24h": 64.46604430205426,
-            "lpFee24h": 46.05054077172973,
-            "tvl": 61.30976760990524,
+            "volume24h": 63.9986064778979,
+            "lpFee24h": 46.01475082579343,
+            "tvl": 61.290473674771384,
             "feeTier": 24.333030203879364,
             "liquidity": null,
-            "priceActivity": 4.844162692652543
+            "priceActivity": 4.791111099662628
           },
-          "value": 50.02994646515727,
+          "value": 49.85604090854908,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -10387,7 +10470,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 50,
+        "opportunityScore": 49.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       },
       {
@@ -10519,22 +10603,22 @@
         "sourceBlockers": [],
         "opportunity": {
           "raw": {
-            "volume24h": 0.3406494671354063,
-            "lpFee24h": 0.0008517031396109889,
-            "tvl": 13097.63,
+            "volume24h": 0.6071668743900813,
+            "lpFee24h": 0.0015179881011969964,
+            "tvl": 11963.81,
             "feeTier": 0.0025,
             "liquidity": null,
-            "priceActivity": 0.000026008481468434083
+            "priceActivity": 0.000050750293960709954
           },
           "scores": {
             "volume24h": 0,
             "lpFee24h": 0,
-            "tvl": 14.597428947425833,
+            "tvl": 13.122967869699472,
             "feeTier": 24.333030203879364,
             "liquidity": null,
             "priceActivity": 0
           },
-          "value": 5.136574847224234,
+          "value": 4.8908313342698415,
           "knownWeight": 0.9,
           "coverage": 0.9,
           "sources": {
@@ -10546,7 +10630,8 @@
             "priceActivity": "24h volume / TVL turnover proxy"
           }
         },
-        "opportunityScore": 5.1,
+        "opportunityScore": 4.9,
+        "opportunityConfidence": 54,
         "opportunityStatus": "WATCH"
       }
     ]
@@ -10570,70 +10655,13 @@
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T23:45:39.445Z",
+        "observedAt": "2026-08-21T00:10:19.275Z",
         "maxAgeMs": 1800000
       }
     },
     {
       "poolAddress": "GMjGLWzvK75LPetrgAmdeXnvxc4fUuQPwJxeQqTDU1aG",
       "pair": "QQQx/USDC",
-      "universeStatus": "ACTIVE_INDEXED",
-      "executable": false,
-      "blockers": [
-        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
-        "REPLAY_INPUT_UNAVAILABLE",
-        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
-        "MARKOUT_UNAVAILABLE",
-        "SWAP_TICK_PATH_UNAVAILABLE",
-        "WINDOW_24H_COVERAGE_UNAVAILABLE"
-      ],
-      "dataFreshness": {
-        "state": "FRESH",
-        "observedAt": "2026-08-20T23:45:40.559Z",
-        "maxAgeMs": 1800000
-      }
-    },
-    {
-      "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
-      "pair": "SPYx/USDC",
-      "universeStatus": "ACTIVE_INDEXED",
-      "executable": false,
-      "blockers": [
-        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
-        "REPLAY_INPUT_UNAVAILABLE",
-        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
-        "MARKOUT_UNAVAILABLE",
-        "SWAP_TICK_PATH_UNAVAILABLE",
-        "WINDOW_24H_COVERAGE_UNAVAILABLE"
-      ],
-      "dataFreshness": {
-        "state": "FRESH",
-        "observedAt": "2026-08-20T23:45:43.263Z",
-        "maxAgeMs": 1800000
-      }
-    },
-    {
-      "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
-      "pair": "NVDAx/USDC",
-      "universeStatus": "ACTIVE_INDEXED",
-      "executable": false,
-      "blockers": [
-        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
-        "REPLAY_INPUT_UNAVAILABLE",
-        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
-        "MARKOUT_UNAVAILABLE",
-        "SWAP_TICK_PATH_UNAVAILABLE",
-        "REPLAY_STATE_INCOMPLETE"
-      ],
-      "dataFreshness": {
-        "state": "FRESH",
-        "observedAt": "2026-08-20T23:45:41.802Z",
-        "maxAgeMs": 1800000
-      }
-    },
-    {
-      "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
-      "pair": "TSLAx/USDC",
       "universeStatus": "NOT_ACTIVE",
       "executable": false,
       "blockers": [
@@ -10645,12 +10673,73 @@
         "MARKOUT_UNAVAILABLE",
         "SWAP_TICK_PATH_UNAVAILABLE",
         "WINDOW_24H_COVERAGE_UNAVAILABLE",
-        "SWAP_BACKFILL_INCOMPLETE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-21T00:10:21.910Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "6truu3rZuiB9rKQg4VYC3Dt3QwV7DgwGqXrYUcrvnDDE",
+      "pair": "SPYx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-21T00:10:22.385Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
+      "pair": "NVDAx/USDC",
+      "universeStatus": "NOT_ACTIVE",
+      "executable": false,
+      "blockers": [
+        "ACTIVE_INDEXED_STATUS_UNAVAILABLE",
+        "SWAP_HISTORY_UNAVAILABLE",
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "WINDOW_24H_COVERAGE_UNAVAILABLE",
+        "SWAP_BACKFILL_INCOMPLETE"
+      ],
+      "dataFreshness": {
+        "state": "FRESH",
+        "observedAt": "2026-08-21T00:10:19.556Z",
+        "maxAgeMs": 1800000
+      }
+    },
+    {
+      "poolAddress": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
+      "pair": "TSLAx/USDC",
+      "universeStatus": "ACTIVE_INDEXED",
+      "executable": false,
+      "blockers": [
+        "FEE_GROWTH_ACCOUNTING_UNAVAILABLE",
+        "REPLAY_INPUT_UNAVAILABLE",
+        "EXACT_REPLAY_ACCOUNTING_UNAVAILABLE",
+        "MARKOUT_UNAVAILABLE",
+        "SWAP_TICK_PATH_UNAVAILABLE",
         "REPLAY_STATE_INCOMPLETE"
       ],
       "dataFreshness": {
         "state": "FRESH",
-        "observedAt": "2026-08-20T23:45:44.129Z",
+        "observedAt": "2026-08-21T00:10:20.541Z",
         "maxAgeMs": 1800000
       }
     },
@@ -11609,20 +11698,20 @@
         "gapCount": null,
         "unknownInstructions": 0,
         "unresolvedRetryableTransactions": 0,
-        "firstEventTime": "2026-08-20T10:15:35.000Z",
+        "firstEventTime": "2026-08-20T08:20:30.000Z",
         "lastEventTime": "2026-08-20T10:42:27.000Z",
         "replayCoverageSeconds": 86400,
-        "totalSwaps": 79,
+        "totalSwaps": 80,
         "validSwaps": 67,
-        "invalidSwaps": 12,
-        "pathCoverage": 0.8481012658227848,
+        "invalidSwaps": 13,
+        "pathCoverage": 0.8375,
         "feeCoverage": 1
       },
       "swapPath": {
         "status": "INCOMPLETE",
         "valid": 67,
-        "total": 79,
-        "coverageRatio": 0.8481012658227848,
+        "total": 80,
+        "coverageRatio": 0.8375,
         "divergence": false,
         "currentMatchesLast": null,
         "currentStateAfterReplay": true,
@@ -11631,10 +11720,10 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 0,
+        "parsedSwap": 1,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 72.77930459941557,
+        "replayFeeUsd": 73.66912736188414,
         "feeGrowthExpected": null,
         "diffBps": null,
         "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
@@ -11674,7 +11763,7 @@
         "coverageRatio": 1,
         "expectedBucketCount": 1440,
         "metricsBucketCount": 1440,
-        "gapCount": 0,
+        "gapCount": null,
         "unknownInstructions": 0,
         "unresolvedRetryableTransactions": 0,
         "firstEventTime": "2026-08-20T08:17:47.000Z",
@@ -11689,8 +11778,8 @@
       "swapPath": {
         "status": "INCOMPLETE",
         "valid": 81,
-        "total": 82,
-        "coverageRatio": 0.9878048780487805,
+        "total": 83,
+        "coverageRatio": 0.9759036144578314,
         "divergence": false,
         "currentMatchesLast": null,
         "currentStateAfterReplay": true,
@@ -11699,10 +11788,10 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 0,
+        "parsedSwap": 1,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 9.212746078437368,
+        "replayFeeUsd": 9.212959889930433,
         "feeGrowthExpected": null,
         "diffBps": null,
         "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
@@ -11718,6 +11807,7 @@
       "replay": {
         "status": "UNAVAILABLE",
         "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
         ],
         "executionCostQuality": null,
@@ -11741,23 +11831,23 @@
         "coverageRatio": 1,
         "expectedBucketCount": 1440,
         "metricsBucketCount": 1440,
-        "gapCount": 0,
+        "gapCount": null,
         "unknownInstructions": 0,
         "unresolvedRetryableTransactions": 0,
         "firstEventTime": "2026-08-20T00:19:06.000Z",
-        "lastEventTime": "2026-08-20T10:43:12.000Z",
+        "lastEventTime": "2026-08-20T23:44:11.000Z",
         "replayCoverageSeconds": 86400,
-        "totalSwaps": 78,
+        "totalSwaps": 79,
         "validSwaps": 72,
-        "invalidSwaps": 6,
-        "pathCoverage": 0.9230769230769231,
+        "invalidSwaps": 7,
+        "pathCoverage": 0.9113924050632911,
         "feeCoverage": 1
       },
       "swapPath": {
         "status": "INCOMPLETE",
         "valid": 72,
-        "total": 78,
-        "coverageRatio": 0.9230769230769231,
+        "total": 79,
+        "coverageRatio": 0.9113924050632911,
         "divergence": false,
         "currentMatchesLast": null,
         "currentStateAfterReplay": true,
@@ -11766,10 +11856,10 @@
       },
       "fee": {
         "status": "PASS",
-        "parsedSwap": 0,
+        "parsedSwap": 1,
         "reconciliationFailed": 0,
         "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 21.766999714265847,
+        "replayFeeUsd": 21.778514486022456,
         "feeGrowthExpected": null,
         "diffBps": null,
         "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
@@ -11785,6 +11875,7 @@
       "replay": {
         "status": "UNAVAILABLE",
         "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE"
         ],
         "executionCostQuality": null,
@@ -11803,6 +11894,74 @@
     {
       "pool": "49iMatQtoyabsYAQc8GafVq6aeBFVDxSRH44oiatyyw6",
       "pair": "NVDAx/USDC",
+      "coverage24h": {
+        "status": "INCOMPLETE",
+        "coverageRatio": 1,
+        "expectedBucketCount": 1440,
+        "metricsBucketCount": 1440,
+        "gapCount": null,
+        "unknownInstructions": 0,
+        "unresolvedRetryableTransactions": 0,
+        "firstEventTime": "2026-08-21T00:07:12.000Z",
+        "lastEventTime": "2026-08-21T00:07:12.000Z",
+        "replayCoverageSeconds": 86400,
+        "totalSwaps": 1,
+        "validSwaps": 1,
+        "invalidSwaps": 0,
+        "pathCoverage": 1,
+        "feeCoverage": 1
+      },
+      "swapPath": {
+        "status": "PASS",
+        "valid": 1,
+        "total": 1,
+        "coverageRatio": 1,
+        "divergence": false,
+        "currentMatchesLast": null,
+        "currentStateAfterReplay": true,
+        "transactionOrderComplete": true,
+        "orderIncompleteSlots": []
+      },
+      "fee": {
+        "status": "PASS",
+        "parsedSwap": 1,
+        "reconciliationFailed": 0,
+        "feeGrowthReconciliation": "UNAVAILABLE",
+        "replayFeeUsd": 0.624832,
+        "feeGrowthExpected": null,
+        "diffBps": null,
+        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
+      },
+      "activeLiquidityReplay": {
+        "status": "PASS",
+        "candidateCount": 87,
+        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
+        "blockers": [
+          "EXECUTION_COST_UNAVAILABLE",
+          "MARKOUT_UNAVAILABLE"
+        ]
+      },
+      "replay": {
+        "status": "UNAVAILABLE",
+        "blockers": [
+          "SWAP_BACKFILL_INCOMPLETE"
+        ],
+        "executionCostQuality": null,
+        "markoutQuality": null
+      },
+      "cost": {
+        "status": "ESTIMATED",
+        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
+      },
+      "markout": {
+        "status": "INCOMPLETE",
+        "source": null
+      },
+      "executable": false
+    },
+    {
+      "pool": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
+      "pair": "TSLAx/USDC",
       "coverage24h": {
         "status": "PASS",
         "coverageRatio": 1,
@@ -11852,75 +12011,6 @@
       "replay": {
         "status": "UNAVAILABLE",
         "blockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE",
-          "REPLAY_STATE_INCOMPLETE"
-        ],
-        "executionCostQuality": null,
-        "markoutQuality": null
-      },
-      "cost": {
-        "status": "ESTIMATED",
-        "simulation": "NOT_BUILT_AUTO_EXECUTION_OFF"
-      },
-      "markout": {
-        "status": "INCOMPLETE",
-        "source": null
-      },
-      "executable": false
-    },
-    {
-      "pool": "8aDaBQkTrS6HVMjyc6EZebgdiaXhLYGriDWKWWp1NpFF",
-      "pair": "TSLAx/USDC",
-      "coverage24h": {
-        "status": "INCOMPLETE",
-        "coverageRatio": 0.8400347222222222,
-        "expectedBucketCount": 1440,
-        "metricsBucketCount": 1440,
-        "gapCount": null,
-        "unknownInstructions": 0,
-        "unresolvedRetryableTransactions": 0,
-        "firstEventTime": null,
-        "lastEventTime": null,
-        "replayCoverageSeconds": 72579,
-        "totalSwaps": 0,
-        "validSwaps": 0,
-        "invalidSwaps": 0,
-        "pathCoverage": null,
-        "feeCoverage": null
-      },
-      "swapPath": {
-        "status": "INCOMPLETE",
-        "valid": 0,
-        "total": 0,
-        "coverageRatio": null,
-        "divergence": false,
-        "currentMatchesLast": false,
-        "currentStateAfterReplay": false,
-        "transactionOrderComplete": true,
-        "orderIncompleteSlots": []
-      },
-      "fee": {
-        "status": "PASS",
-        "parsedSwap": 0,
-        "reconciliationFailed": 0,
-        "feeGrowthReconciliation": "UNAVAILABLE",
-        "replayFeeUsd": 0,
-        "feeGrowthExpected": null,
-        "diffBps": null,
-        "evidence": "OFFICIAL_SWAP_EVENT_PLUS_CONFIG_SPLIT"
-      },
-      "activeLiquidityReplay": {
-        "status": "INCOMPLETE",
-        "candidateCount": 0,
-        "method": "OFFICIAL_SWAP_EVENT_LP_FEE × L_SHADOW / (L_HISTORICAL + L_SHADOW)",
-        "blockers": [
-          "SWAP_TICK_PATH_UNAVAILABLE"
-        ]
-      },
-      "replay": {
-        "status": "UNAVAILABLE",
-        "blockers": [
-          "SWAP_BACKFILL_INCOMPLETE",
           "SWAP_TICK_PATH_UNAVAILABLE",
           "REPLAY_STATE_INCOMPLETE"
         ],
@@ -12015,5 +12105,5 @@
     "noRealPosition": true,
     "autoExecution": false
   },
-  "snapshotHash": "f0bab663fe9e507f1d1fda45d306d044e5910345a582b4620ffe9ab788a2a17b"
+  "snapshotHash": "3ad10fc64db95806649075dc7dd0ed51fabface5be872a4750cc5534462cf2f5"
 }

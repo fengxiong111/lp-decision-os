@@ -132,10 +132,22 @@ export function buildOpportunityRanking(pools, optimizerResults, diagnostics) {
       || left.pool.poolAddress.localeCompare(right.pool.poolAddress);
   });
 
-  const top3 = scored.slice(0, 3).map((candidate, index) => ({
+  const seenPoolVariants = new Set();
+  const uniqueCandidates = scored.filter((candidate) => {
+    const feeTier = metricValue(candidate.pool.feeTier);
+    const key = `${candidate.pool.symbol}/USDC::${feeTier === null ? "unknown" : feeTier}`;
+    if (seenPoolVariants.has(key)) return false;
+    seenPoolVariants.add(key);
+    return true;
+  });
+  const top3 = uniqueCandidates.slice(0, 3).map((candidate, index) => ({
     rank: index + 1,
     pair: `${candidate.pool.symbol}/USDC`,
     poolAddress: candidate.pool.poolAddress,
+    tvl: metricValue(candidate.pool.tvl),
+    volume24h: metricValue(candidate.pool.volume24h),
+    lpFee24h: metricValue(candidate.pool.lpFee24h),
+    feeTier: metricValue(candidate.pool.feeTier),
     opportunityScore: candidate.opportunityScore,
     opportunityStatus: candidate.opportunityStatus,
     netEstimate: candidate.netEstimate,
@@ -155,7 +167,7 @@ export function buildOpportunityRanking(pools, optimizerResults, diagnostics) {
     },
   }));
 
-  return { top3, scored };
+  return { top3, scored, uniqueCandidateCount: uniqueCandidates.length };
 }
 
 export { FEATURE_WEIGHTS };

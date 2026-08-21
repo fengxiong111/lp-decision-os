@@ -125,12 +125,14 @@ const diagnosticsWithOpportunity = {
     ...row,
     opportunity: opportunityByPool.get(row.poolAddress)?.featureScore ?? null,
     opportunityScore: opportunityByPool.get(row.poolAddress)?.opportunityScore ?? null,
+    opportunityConfidence: opportunityByPool.get(row.poolAddress)?.confidence ?? null,
     opportunityStatus: opportunityByPool.get(row.poolAddress)?.opportunityStatus ?? "WATCH",
   })),
   nearest: diagnostics.nearest.map((row) => ({
     ...row,
     opportunity: opportunityByPool.get(row.poolAddress)?.featureScore ?? null,
     opportunityScore: opportunityByPool.get(row.poolAddress)?.opportunityScore ?? null,
+    opportunityConfidence: opportunityByPool.get(row.poolAddress)?.confidence ?? null,
     opportunityStatus: opportunityByPool.get(row.poolAddress)?.opportunityStatus ?? "WATCH",
   })),
 };

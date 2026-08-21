@@ -12,7 +12,7 @@ const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
 ]);
 
 const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["Opportunity Score", "Net Estimate", "Core", "Buffer", "Confidence", "Action", "WHY", "正在验证"];
+const requiredLabels = ["排名", "池", "预计日收益", "TVL", "手续费率", "Core", "Buffer", "建议", "详情", "更多详情"];
 const actions = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const opportunityStatuses = new Set(["READY", "WATCH", "BLOCKED"]);
 const snapshot = JSON.parse(top3Json);
@@ -22,7 +22,7 @@ for (const label of legacyLabels) {
   assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧列仍出现在构建产物：${label}`);
 }
 for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少主表字段：${label}`);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 7, "主表不是七列");
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 8, "主表不是八列");
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
 assert.equal(indexHtml.includes('class="optimizer-row"'), false, "index.html 不应嵌入旧排名行");
