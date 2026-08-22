@@ -182,6 +182,7 @@ export function buildMarketHeatRanking(scored) {
       rank: index + 1,
       pair: `${candidate.pool.symbol}/USDC`,
       poolAddress: candidate.pool.poolAddress,
+      assetMint: candidate.pool.assetMint,
       volume24h: metricValue(candidate.pool.volume24h),
       lpFee24h: metricValue(candidate.pool.lpFee24h),
       tvl: metricValue(candidate.pool.tvl),

@@ -8,6 +8,7 @@ import { collectProductionEvidence, snapshotFreshness, snapshotHash } from "./mo
 import { buildOptimizerResults } from "./mobile-dashboard/optimizer.mjs";
 import { buildDiagnosticReport, deriveVolatilityRegime } from "./mobile-dashboard/diagnostics.mjs";
 import { FEATURE_WEIGHTS, buildMarketHeatRanking, buildOpportunityRanking } from "./mobile-dashboard/opportunity.mjs";
+import { fetchFeeLeaderboards } from "./mobile-dashboard/fee-leaderboards.mjs";
 import { renderRuntime } from "./mobile-dashboard/runtime.mjs";
 import { fetchRaydiumPools } from "./mobile-dashboard/source.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "./mobile-dashboard/verify.mjs";
@@ -119,6 +120,7 @@ const blockerMatrixByPool = new Map(blockerMatrix.map((row) => [row.pool, row]))
 const diagnostics = buildDiagnosticReport(optimizerSummary.results, blockerMatrixByPool);
 const opportunityRanking = buildOpportunityRanking(pools, optimizerSummary.results, diagnostics);
 const marketHeat = buildMarketHeatRanking(opportunityRanking.scored);
+const feeLeaderboards = await fetchFeeLeaderboards({ rwaPools: pools });
 const opportunityByPool = new Map(opportunityRanking.scored.map((row) => [row.pool.poolAddress, row]));
 const diagnosticsWithOpportunity = {
   ...diagnostics,
@@ -189,6 +191,8 @@ const baseSnapshot = {
   candidates: top3ForPage,
   top3: top3ForPage,
   marketHeat,
+  feeLeaderboards,
+  rwaMints: [...new Set(pools.map((pool) => pool.assetMint).filter(Boolean))],
   verificationReady: diagnostics.readyCount > 0,
   opportunityRanking: {
     version: 1,
@@ -196,6 +200,8 @@ const baseSnapshot = {
     candidateCount: opportunityRanking.scored.length,
     top3Count: opportunityRanking.top3.length,
     marketHeatCount: marketHeat.length,
+    feeLeaderboardCount: feeLeaderboards.overall.length,
+    rwaFeeLeaderboardCount: feeLeaderboards.rwa.length,
   },
   diagnostics: diagnosticsWithOpportunity,
   blockersByPool,
@@ -245,6 +251,8 @@ const manifest = {
   top3Count: top3ForPage.length,
   candidateCount: top3ForPage.length,
   marketHeatCount: marketHeat.length,
+  feeLeaderboardCount: feeLeaderboards.overall.length,
+  rwaFeeLeaderboardCount: feeLeaderboards.rwa.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: fetchedAt,
   opportunityGeneratedAt: fetchedAt,

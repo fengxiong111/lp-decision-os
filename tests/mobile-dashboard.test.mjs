@@ -16,6 +16,7 @@ import { renderRuntime } from "../scripts/mobile-dashboard/runtime.mjs";
 import { decodeSwapEventLog, snapshotFreshness, snapshotHash } from "../scripts/mobile-dashboard/evidence.mjs";
 import { buildDiagnosticReport, buildPoolDiagnostic, deriveVolatilityRegime, statusForTop3 } from "../scripts/mobile-dashboard/diagnostics.mjs";
 import { buildMarketHeatRanking, buildOpportunityRanking } from "../scripts/mobile-dashboard/opportunity.mjs";
+import { rankFeeRows } from "../scripts/mobile-dashboard/fee-leaderboards.mjs";
 import { verifyDataJson, verifyMarketData, verifyPageMarkup, verifySnapshot } from "../scripts/mobile-dashboard/verify.mjs";
 
 function rawPool({
@@ -247,7 +248,18 @@ test("Market Heat 独立保留全部 Pool，并按 24H LP Fee 降序", () => {
   assert.deepEqual(heat.map((row) => row.rank), [1, 2, 3]);
 });
 
-test("外版页面展示推荐机会与独立手续费热度双榜，唯一运行时数据源为 top3.json", () => {
+test("Fee 总榜跨 DEX 排序并限制 Top 10，RWA 榜不吞掉独立 Pool", () => {
+  const rows = rankFeeRows([
+    { dex: "Raydium", pair: "AAA/USDC", poolAddress: "ray-a", tvl: 1, volume24h: 2, lpFee24h: 20, feeTier: 0.0025 },
+    { dex: "Meteora", pair: "BBB/USDC", poolAddress: "met-b", tvl: 3, volume24h: 4, lpFee24h: 80, feeTier: 0.001 },
+    { dex: "Meteora", pair: "BOT/USDC", poolAddress: "met-bot", tvl: 5, volume24h: 6, lpFee24h: 10, feeTier: 0.0025 },
+  ]);
+  assert.deepEqual(rows.map((row) => row.pair), ["BBB/USDC", "AAA/USDC", "BOT/USDC"]);
+  assert.deepEqual(rows.map((row) => row.rank), [1, 2, 3]);
+  assert.equal(rows[0].dex, "Meteora");
+});
+
+test("外版页面展示跨 DEX Fee 总榜、RWA Fee 榜与推荐机会，且移除本金文案", () => {
   const pools = normalizePools([rawPool({ replayEvidence: replayEvidence() })], DASHBOARD_CONFIG);
   const optimizerSummary = buildOptimizerResults(pools, DASHBOARD_CONFIG);
   const fetchedAt = new Date().toISOString();
@@ -257,25 +269,26 @@ test("外版页面展示推荐机会与独立手续费热度双榜，唯一运�
   verifyMarketData(pools, optimizerSummary, DASHBOARD_CONFIG);
   verifyPageMarkup(page);
   verifyDataJson(data);
-  assert.match(page, /RWA \/ USDC LP 优化器/);
-  assert.match(page, /模拟资金 \$1,000/);
+  assert.match(page, /Raydium · Meteora 24H Fee Terminal/);
+  assert.doesNotMatch(page, /\$1,000|模拟资金|毛收益估算|Core \/ Buffer|NET LOW/);
   assert.match(page, /排名/);
   assert.match(page, /Pair \+ Fee Tier/);
   assert.match(page, /24H Volume/);
   assert.match(page, /24H LP Fee/);
   assert.match(page, /TVL/);
-  assert.match(page, /手续费率/);
-  assert.match(page, /预计 \$1,000 日净收益/);
+  assert.match(page, /Pool Address/);
+  assert.match(page, /24H Fee/);
+  assert.match(page, /24H Fee 总榜/);
+  assert.match(page, /RWA Fee Top 10/);
   assert.match(page, /建议/);
   assert.match(page, /详情/);
   assert.match(page, /更多详情/);
   assert.match(page, /推荐机会/);
-  assert.match(page, /手续费排行/);
   assert.match(page, /Fee Tier/);
   assert.match(page, /top3\.json/);
   assert.doesNotMatch(page, /24h 成交量|24h LP Fee|预计手续费/);
   assert.doesNotMatch(page, /#01/);
-  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 14);
+  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 23);
   assert.equal(formatTimestamp(fetchedAt) !== null, true);
 });
 
@@ -302,7 +315,8 @@ test("外版快照只接受固定资金、无钱包和可验证哈希", () => {
     scope: { capital: 1_000, autoExecution: false },
     candidates: [],
     marketHeat: [],
-    opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0, marketHeatCount: 0 },
+    feeLeaderboards: { generatedAt: new Date().toISOString(), overall: [], rwa: [] },
+    opportunityRanking: { version: 1, featureWeights: {}, candidateCount: 0, top3Count: 0, marketHeatCount: 0, feeLeaderboardCount: 0, rwaFeeLeaderboardCount: 0 },
     diagnostics: { version: 1, statusCounts: { READY: 0, NEAR_READY: 0, BLOCKED: 0 }, nearest: [], matrix: [] },
     publicPoolCount: 0,
   };
@@ -317,7 +331,8 @@ test("浏览器运行时读取证据快照，而不是直接调用 Raydium API",
   assert.match(runtime, /top3\.json/);
   assert.match(runtime, /opportunityGeneratedAt/);
   assert.match(runtime, /candidates/);
-  assert.match(runtime, /marketHeat/);
+  assert.match(runtime, /feeLeaderboards/);
+  assert.doesNotMatch(runtime, /\$1,000|模拟资金|毛收益估算|Core \/ Buffer|NET LOW/);
   assert.doesNotMatch(runtime, /snapshot\.top3/);
   assert.doesNotMatch(runtime, /api-v3\.raydium\.io/);
   assert.doesNotMatch(runtime, /CONFIG\.apiUrl/);

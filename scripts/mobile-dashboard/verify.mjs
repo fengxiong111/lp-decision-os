@@ -4,12 +4,19 @@ function fail(message) {
 
 const FORBIDDEN_POSITION_FIELDS = /^(walletAddress|walletBalance|positionNft|tokenFeesOwed|personalPosition|positionState)$/i;
 const LEGACY_PRESENTATION_TEXT = ["24h 成交量", "24h LP Fee", "预计手续费"];
+const FORBIDDEN_PRINCIPAL_TEXT = ["$1,000", "模拟资金", "预计 $1,000", "毛收益估算", "Core / Buffer", "NET LOW"];
 const DISPLAY_ACTIONS = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const OPPORTUNITY_STATUSES = new Set(["READY", "WATCH", "BLOCKED"]);
+const FEE_DEXES = new Set(["Raydium", "Meteora"]);
 
 function validMarketHeatRow(row, index) {
   return row && row.rank === index + 1 && typeof row.pair === "string" && typeof row.poolAddress === "string"
     && [row.volume24h, row.lpFee24h, row.tvl, row.feeTier].every((value) => value === null || Number.isFinite(value));
+}
+
+function validFeeLeaderboardRow(row, index) {
+  return row && row.rank === index + 1 && FEE_DEXES.has(row.dex) && typeof row.pair === "string" && typeof row.poolAddress === "string"
+    && [row.tvl, row.volume24h, row.lpFee24h, row.feeTier].every((value) => value === null || Number.isFinite(value));
 }
 
 function containsForbiddenPositionField(value) {
@@ -54,16 +61,16 @@ export function verifyMarketData(pools, optimizerSummary, config) {
 
 export function verifyPageMarkup(markup) {
   const headerCells = markup.match(/role="columnheader"/g) ?? [];
-  if (headerCells.length !== 14) fail(`双榜表头列数为 ${headerCells.length}，应为 14`);
-  if (!markup.includes("RWA / USDC LP 优化器")) fail("缺少中文 Optimizer 页面标题");
-  if (!markup.includes("模拟资金 $1,000") || !markup.includes("Top 3")) fail("页面没有声明模拟资金与 Top 3 范围");
+  if (headerCells.length !== 23) fail(`Fee 总榜与推荐榜表头列数为 ${headerCells.length}，应为 23`);
+  if (!markup.includes("Raydium · Meteora 24H Fee Terminal")) fail("缺少 Fee Terminal 页面标题");
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少独立浏览器运行时");
   if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一 top3.json 数据源");
-  for (const label of ["推荐机会", "手续费排行", "排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "Fee Tier"]) {
+  for (const label of ["24H Fee 总榜", "RWA Fee Top 10", "推荐机会", "DEX / Pair", "Pool Address", "TVL", "24H Volume", "24H Fee", "Fee Tier", "操作", "Pair + Fee Tier", "建议"]) {
     if (!markup.includes(label)) fail(`页面缺少中文主表字段：${label}`);
   }
   if (!markup.includes("详情") || !markup.includes("更多详情")) fail("页面缺少详情入口");
   if (LEGACY_PRESENTATION_TEXT.some((label) => markup.includes(label))) fail("页面仍包含旧版字段");
+  if (FORBIDDEN_PRINCIPAL_TEXT.some((label) => markup.includes(label))) fail("页面仍包含 $1,000 本金元素");
   if (markup.includes('class="optimizer-row"')) fail("页面在静态 HTML 中嵌入了旧排名行");
   if (/<(?:span|br|strong)\b/i.test(markup.match(/<script type="module"[^>]*>[\s\S]*?<\/script>/)?.[0] ?? "")) fail("运行时脚本不应包含展示 HTML");
   if (markup.includes("资金档") || markup.includes("MIGRATE") || markup.includes("连接钱包") || markup.includes("serviceWorker")) fail("页面仍包含已删除的资金档、动作语义或缓存脚本");
@@ -86,9 +93,15 @@ export function verifySnapshot(snapshot, config) {
   if (!Array.isArray(snapshot.marketHeat) || snapshot.marketHeat.some((row, index) => !validMarketHeatRow(row, index))) fail("快照缺少完整 Market Heat Layer");
   if (snapshot.publicPoolCount > 0 && snapshot.marketHeat.length === 0) fail("存在公开 Pool 时手续费热度榜不得为空");
   if (snapshot.marketHeat.some((row, index, rows) => index > 0 && (rows[index - 1].lpFee24h ?? -Infinity) < (row.lpFee24h ?? -Infinity))) fail("Market Heat 未按 24H LP Fee 降序");
+  if (!snapshot.feeLeaderboards || !Array.isArray(snapshot.feeLeaderboards.overall) || !Array.isArray(snapshot.feeLeaderboards.rwa)) fail("快照缺少 Raydium / Meteora Fee 总榜");
+  if (snapshot.feeLeaderboards.overall.length > 10 || snapshot.feeLeaderboards.rwa.length > 10) fail("Fee 榜超过 Top 10");
+  if (snapshot.feeLeaderboards.overall.some((row, index) => !validFeeLeaderboardRow(row, index)) || snapshot.feeLeaderboards.rwa.some((row, index) => !validFeeLeaderboardRow(row, index))) fail("Fee 榜包含非法 Pool 数据");
+  for (const rows of [snapshot.feeLeaderboards.overall, snapshot.feeLeaderboards.rwa]) {
+    if (rows.some((row, index) => index > 0 && rows[index - 1].lpFee24h < row.lpFee24h)) fail("Fee 榜未按 24H Fee 降序");
+  }
   if (snapshot.candidates.some((row, index) => row.rank !== index + 1 || !OPPORTUNITY_STATUSES.has(row.opportunityStatus) || !Array.isArray(row.evidence) || !row.poolAddress || typeof row.pair !== "string" || !DISPLAY_ACTIONS.has(row.action))) fail("candidates 缺少 Opportunity 结果");
   if (snapshot.candidates.some((row) => !Number.isFinite(row.opportunityScore) || !Number.isFinite(row.confidence) || [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.grossFeeEstimate, row.netEstimate, row.coreCapital, row.coreLower, row.coreUpper, row.bufferCapital, row.bufferLower, row.bufferUpper].some((value) => value !== null && !Number.isFinite(value)))) fail("candidates 缺少有效市场、毛收益、Opportunity / Confidence 或 Core / Buffer 字段");
-  if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount) || snapshot.opportunityRanking.marketHeatCount !== snapshot.marketHeat.length) fail("快照缺少 Opportunity / Market Heat 摘要");
+  if (!snapshot.opportunityRanking || snapshot.opportunityRanking.version !== 1 || !Number.isInteger(snapshot.opportunityRanking.candidateCount) || snapshot.opportunityRanking.marketHeatCount !== snapshot.marketHeat.length || snapshot.opportunityRanking.feeLeaderboardCount !== snapshot.feeLeaderboards.overall.length || snapshot.opportunityRanking.rwaFeeLeaderboardCount !== snapshot.feeLeaderboards.rwa.length) fail("快照缺少 Opportunity / Fee 榜摘要");
   if (!snapshot.diagnostics || snapshot.diagnostics.version !== 1 || !Array.isArray(snapshot.diagnostics.matrix)) fail("快照缺少 READY / NEAR_READY / BLOCKED 诊断矩阵");
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");
   if (containsForbiddenPositionField(snapshot)) fail("证据快照包含真实钱包或真实仓位字段");

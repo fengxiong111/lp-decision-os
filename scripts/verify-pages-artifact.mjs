@@ -12,7 +12,8 @@ const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
 ]);
 
 const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["推荐机会", "手续费排行", "排名", "Pair + Fee Tier", "24H Volume", "24H LP Fee", "TVL", "手续费率", "预计 $1,000 日净收益", "建议", "详情", "更多详情"];
+const requiredLabels = ["24H Fee 总榜", "RWA Fee Top 10", "推荐机会", "DEX / Pair", "Pool Address", "TVL", "24H Volume", "24H Fee", "Fee Tier", "Pair + Fee Tier", "建议", "详情", "更多详情"];
+const forbiddenPrincipalLabels = ["$1,000", "模拟资金", "预计 $1,000", "毛收益估算", "Core / Buffer", "NET LOW"];
 const actions = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
 const opportunityStatuses = new Set(["READY", "WATCH", "BLOCKED"]);
 const snapshot = JSON.parse(top3Json);
@@ -22,13 +23,14 @@ for (const label of legacyLabels) {
   assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧列仍出现在构建产物：${label}`);
 }
 for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少主表字段：${label}`);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 14, "双榜列数不正确");
+assert.equal(runtimeJs.includes("复制 Pool"), true, "运行时缺少 Pool 复制按钮");
+for (const label of forbiddenPrincipalLabels) assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `外版仍包含本金元素：${label}`);
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 23, "Fee 总榜与推荐榜列数不正确");
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
 assert.equal(indexHtml.includes('class="optimizer-row"'), false, "index.html 不应嵌入旧排名行");
 assert.equal(runtimeJs.includes("./top3.json"), true, "runtime.js 未读取 top3.json");
-assert.equal(runtimeJs.includes("marketHeat"), true, "runtime.js 未读取 Market Heat Layer");
-assert.equal(runtimeJs.includes("Core / Buffer"), true, "详情层缺少 Core / Buffer");
+assert.equal(runtimeJs.includes("feeLeaderboards"), true, "runtime.js 未读取 Fee Leaderboards");
 assert.equal(runtimeJs.includes("Evidence"), true, "详情层缺少 Evidence");
 for (const forbiddenRuntimeToken of ["lastGoodTop3", "liveBackup", "api-v3.raydium.io", "navigator.serviceWorker", "serviceWorker", "fallback"]) {
   assert.equal(runtimeJs.includes(forbiddenRuntimeToken), false, `runtime.js 仍含旧回退或缓存逻辑：${forbiddenRuntimeToken}`);
@@ -41,6 +43,8 @@ assert.equal(manifest.legacyColumnsPresent, false);
 assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
 assert.equal(manifest.marketHeatCount, snapshot.marketHeat.length, "manifest marketHeatCount 不一致");
+assert.equal(manifest.feeLeaderboardCount, snapshot.feeLeaderboards.overall.length, "manifest feeLeaderboardCount 不一致");
+assert.equal(manifest.rwaFeeLeaderboardCount, snapshot.feeLeaderboards.rwa.length, "manifest rwaFeeLeaderboardCount 不一致");
 assert.equal(snapshot.snapshotHash, manifest.snapshotHash);
 assert.ok(Array.isArray(snapshot.candidates) && snapshot.candidates.length <= 3, "top3.json candidates 超过三行");
 assert.equal(manifest.candidateCount, snapshot.candidates.length, "manifest candidateCount 不一致");
@@ -70,6 +74,19 @@ snapshot.marketHeat.forEach((row, index) => {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Market Heat 字段非法：${field}`);
   }
 });
+for (const [key, rows] of Object.entries(snapshot.feeLeaderboards ?? {})) {
+  if (!Array.isArray(rows)) continue;
+  assert.ok(rows.length <= 10, `${key} 超过 Top 10`);
+  rows.forEach((row, index) => {
+    assert.equal(row.rank, index + 1, `${key} rank 不连续`);
+    assert.ok(["Raydium", "Meteora"].includes(row.dex), `${key} DEX 非官方源`);
+    assert.equal(typeof row.pair, "string");
+    assert.equal(typeof row.poolAddress, "string");
+    for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier"]) {
+      assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${key} 字段非法：${field}`);
+    }
+  });
+}
 assert.ok(snapshot.publicPoolCount === 0 || snapshot.candidates.length > 0, "存在公开 Pool 时机会层不得为空");
 assert.equal(snapshot.opportunityRanking?.version, 1, "缺少 Opportunity Ranking 摘要");
 assert.ok(Number.isInteger(snapshot.opportunityRanking?.candidateCount), "Opportunity candidateCount 缺失");

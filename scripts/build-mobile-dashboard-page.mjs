@@ -43,6 +43,8 @@ await writeFile(new URL("deployment-manifest.json", outputDir), JSON.stringify({
   top3Count: snapshot.candidates.length,
   candidateCount: snapshot.candidates.length,
   marketHeatCount: snapshot.marketHeat.length,
+  feeLeaderboardCount: snapshot.feeLeaderboards.overall.length,
+  rwaFeeLeaderboardCount: snapshot.feeLeaderboards.rwa.length,
   snapshotHash: snapshot.snapshotHash,
   generatedAt: snapshot.generatedAt,
   opportunityGeneratedAt: snapshot.opportunityGeneratedAt ?? snapshot.generatedAt,

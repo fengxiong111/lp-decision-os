@@ -46,6 +46,17 @@ const makeHeatRow = (rank, pair = `ASSET${rank}/USDC`) => ({
   tvl: 12_000 + rank,
   feeTier: 0.0025,
 });
+const makeFeeRow = (rank, dex, pair) => ({
+  rank,
+  dex,
+  pair,
+  poolAddress: `${dex}Pool${rank}`,
+  tvl: 100_000 + rank,
+  volume24h: 200_000 + rank,
+  lpFee24h: 2_000 - rank,
+  feeTier: 0.0025,
+  poolType: dex === "Meteora" ? "DLMM" : "CLMM",
+});
 
 let currentCandidates = [];
 const server = createServer(async (request, response) => {
@@ -65,6 +76,11 @@ const server = createServer(async (request, response) => {
       scope: { capital: 1_000, autoExecution: false },
       candidates: currentCandidates,
       marketHeat: [makeHeatRow(1, "BOT/MRNA"), makeHeatRow(2), makeHeatRow(3)],
+      feeLeaderboards: {
+        generatedAt: opportunityGeneratedAt,
+        overall: [makeFeeRow(1, "Raydium", "BOT/MRNA"), makeFeeRow(2, "Meteora", "ASSET2/USDC")],
+        rwa: [makeFeeRow(1, "Meteora", "BOT/USDC"), makeFeeRow(2, "Raydium", "ASSET2/USDC")],
+      },
       diagnostics: {
         version: 1,
         nearest: [makeDiagnostic(1, "READY"), makeDiagnostic(2, "NEAR_READY"), makeDiagnostic(3, "BLOCKED")],
@@ -104,6 +120,14 @@ try {
   for (const [fixture, expectedRows] of [[[], 0], [[makeRow(1)], 1], [[makeRow(1), makeRow(2), makeRow(3)], 3], [[makeRow(1), makeRow(2), makeRow(3), makeRow(4)], 3]]) {
     currentCandidates = fixture;
     await page.goto(`${baseUrl}/?fixture=${fixture.length}`, { waitUntil: "domcontentloaded" });
+    await page.waitForFunction(() => document.querySelectorAll("#fee-view-list .fee-row").length === 2);
+    assert.equal(await page.locator("#fee-view-list .fee-row").count(), 2, "Fee 总榜必须显示官方两家 DEX 数据");
+    assert.match(await page.locator("#fee-view-list").innerText(), /BOT \/ MRNA/);
+    assert.equal(await page.locator("#fee-view-list .copy-pool").count(), 2, "每个 Pool 必须有复制按钮");
+    await page.getByRole("tab", { name: "RWA Fee Top 10", exact: true }).click();
+    await page.waitForFunction(() => document.querySelectorAll("#rwa-fee-view-list .fee-row").length === 2);
+    assert.equal(await page.locator("#rwa-fee-view-list .fee-row").count(), 2, "RWA Fee 榜必须独立显示");
+    await page.getByRole("tab", { name: "推荐机会", exact: true }).click();
     if (expectedRows === 0) {
       await page.waitForSelector("#empty-state:not([hidden])");
     } else {
@@ -116,21 +140,14 @@ try {
       assert.equal(await page.locator("#ranking-list .pool").count(), 0, "空机会层不得出现候选行");
     } else {
       const bodyText = await page.locator("body").innerText();
-      assert.doesNotMatch(bodyText, /Opportunity Score|Candidates|Confidence|WHY|UNAVAILABLE|BLOCKED|WATCH/, "首页不应显示模型内部状态");
+      assert.doesNotMatch(bodyText, /\$1,000|模拟资金|毛收益估算|Core \/ Buffer|NET LOW/, "外版不应显示本金元素");
       assert.match(bodyText, /24H Volume|24H LP Fee/);
-      assert.match(bodyText, /毛收益估算：\$[\d,]+\.\d{2}\/天/);
-      assert.match(bodyText, /净收益：等待风险校正/);
-      assert.doesNotMatch(bodyText, /Core \/ Buffer|Evidence/);
     }
-    await page.getByRole("tab", { name: "手续费排行", exact: true }).click();
-    await page.waitForFunction(() => document.querySelectorAll("#heat-list .heat-row").length === 3);
-    assert.equal(await page.locator("#heat-list .heat-row").count(), 3, "手续费榜必须独立显示全部热度行");
-    assert.match(await page.locator("#heat-list").innerText(), /BOT \/ MRNA/);
-    assert.equal(await page.locator("#ranking-list .optimizer-row").count(), expectedRows, "切换手续费榜不应改变推荐榜");
-    await page.getByRole("tab", { name: "推荐机会", exact: true }).click();
+    assert.equal(await page.locator("#fee-view-list .fee-row").count(), 2, "切换推荐榜不应改变 Fee 总榜");
   }
   currentCandidates = [makeRow(1)];
   await page.goto(`${baseUrl}/?why=1`, { waitUntil: "domcontentloaded" });
+  await page.getByRole("tab", { name: "推荐机会", exact: true }).click();
   await page.waitForFunction(() => document.querySelectorAll("#ranking-list .optimizer-row").length === 1);
   await page.locator(".row-tools .details-trigger").click();
   await page.waitForSelector("#why-drawer:not([hidden])");
