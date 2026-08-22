@@ -50,7 +50,7 @@ const setTab=(key)=>{for(const [name,[buttonId,panelId]] of Object.entries(tabCo
 const bindTabs=()=>{for(const [name,[buttonId]] of Object.entries(tabConfig))document.querySelector('#'+buttonId)?.addEventListener('click',()=>setTab(name))};
 let requestInFlight=false;
 const refresh=async()=>{if(requestInFlight||document.hidden)return;requestInFlight=true;try{const response=await fetch(CONFIG.snapshotUrl+'?_='+Date.now(),{cache:'no-store',headers:{accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);const snapshot=await response.json();if(!validSnapshot(snapshot))throw new Error('top3.json 格式无效');setTimestamp(snapshot.feeLeaderboards?.generatedAt??snapshot.generatedAt);renderFeeBoard(snapshot,'overall','fee-view');renderFeeBoard(snapshot,'rwa','rwa-fee-view');renderVerification(snapshot);bindCopyButtons();const main=document.querySelector('main');if(main)main.dataset.snapshotHash=snapshot.snapshotHash;if(!freshSnapshot(snapshot)){setStatus('官方 Fee 已更新 · 推荐机会正在校准','fresh');renderEmpty('推荐机会快照正在更新，请稍后查看。');bindDetails(snapshot);return}renderRows(snapshot);bindDetails(snapshot);if(candidateRows(snapshot).length===0)setStatus('官方 Fee 已更新 · 暂无推荐机会','fresh');else setStatus('官方 Fee 已更新 · '+candidateRows(snapshot).length+' 个推荐池','fresh')}catch(error){setStatus('等待官方数据 · 数据读取失败','warning');renderEmpty('无法读取当前官方 Fee 数据。');const target=document.querySelector('#live-status');if(target)target.title=error instanceof Error?error.message:'读取失败'}finally{requestInFlight=false}};
-bindTabs();setTab('fee');
+bindTabs();setTab('opportunity');
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh()});
 void refresh();window.setInterval(refresh,CONFIG.refreshIntervalMs);`;
 }

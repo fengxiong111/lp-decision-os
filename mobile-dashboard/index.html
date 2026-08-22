@@ -1,65 +1,5 @@
-import { escapeHtml, formatTimestamp } from "./format.mjs";
-
-const DISPLAY_ACTIONS = Object.freeze({
-  OPEN_READY: "可考虑",
-  WATCH: "观察",
-  REVIEW: "观察",
-  BLOCKED: "暂停",
-});
-
-function numberValue(value, digits = 2) {
-  return Number.isFinite(value)
-    ? value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })
-    : "等待计算";
-}
-
-function usd(value, digits = 2) {
-  return Number.isFinite(value) ? `$${numberValue(value, digits)}` : "等待计算";
-}
-
-function feeTierLabel(value) {
-  return Number.isFinite(value) ? `${numberValue(value * 100, 2)}%` : "等待计算";
-}
-
-function pairLabel(pair) {
-  return String(pair ?? "").replace("/", " / ");
-}
-
-export function displayAction(action) {
-  return DISPLAY_ACTIONS[action] ?? "暂停";
-}
-
-function rowValues(row) {
-  return {
-    rank: row.rank,
-    pair: pairLabel(row.pair ?? `${row.symbol ?? ""}/USDC`),
-    tvl: row.tvl,
-    volume24h: row.volume24h,
-    lpFee24h: row.lpFee24h,
-    feeTier: row.feeTier,
-    action: row.action,
-  };
-}
-
-export function renderRow(row) {
-  const value = rowValues(row);
-  const actionClass = String(value.action ?? "BLOCKED").toLowerCase().replaceAll("_", "-");
-  return `<article class="optimizer-row" data-pool-address="${escapeHtml(row.poolAddress ?? "")}" role="row">
-    <div class="row-grid">
-      <div class="rank" role="cell"><strong>${escapeHtml(String(value.rank ?? "").padStart(2, "0"))}</strong></div>
-      <div class="pool" role="cell"><strong>${escapeHtml(value.pair)}</strong><small>Fee Tier ${escapeHtml(feeTierLabel(value.feeTier))}</small></div>
-      <div class="volume" role="cell"><strong>${escapeHtml(usd(value.volume24h, 0))}</strong></div>
-      <div class="lp-fee" role="cell"><strong>${escapeHtml(usd(value.lpFee24h, 2))}</strong></div>
-      <div class="tvl" role="cell"><strong>${escapeHtml(usd(value.tvl, 0))}</strong></div>
-      <div class="fee" role="cell"><strong>${escapeHtml(feeTierLabel(value.feeTier))}</strong></div>
-      <div class="action ${escapeHtml(actionClass)}" role="cell"><strong>${escapeHtml(displayAction(value.action))}</strong></div>
-    </div>
-    <div class="row-tools"><button class="details-trigger" type="button" data-pool-address="${escapeHtml(row.poolAddress ?? "")}">详情</button></div>
-  </article>`;
-}
-
-function renderStyles() {
-  return `
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><meta name="data-source" content="./top3.json"><title>Raydium · Meteora 24H Fee Terminal</title><style>
 :root{--heat-columns:minmax(42px,.35fr) minmax(210px,1.8fr) minmax(150px,1.2fr) minmax(150px,1.2fr) minmax(130px,1fr) minmax(105px,.8fr)}.tabs{display:flex;gap:24px;margin:0 10px 16px;border-bottom:1px solid var(--line)}.tab{border:0;border-bottom:2px solid transparent;margin-bottom:-1px;padding:0 0 10px;background:transparent;color:var(--soft);font:650 13px/1.2 inherit;cursor:pointer}.tab.active,.tab[aria-selected="true"]{border-bottom-color:var(--blue);color:var(--ink)}.tab:hover{color:var(--blue)}.heat-header,.heat-grid{display:grid;grid-template-columns:var(--heat-columns);column-gap:16px;align-items:center}.heat-header{position:sticky;top:0;z-index:2;padding:11px 10px 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(245,244,237,.96);color:var(--soft);font-size:11px;letter-spacing:.06em}.heat-header div:not(:first-child),.heat-grid>div:not(:first-child){text-align:right}.heat-row{padding:20px 10px 18px;border-bottom:1px solid var(--line)}
  :root{--fee-columns:minmax(42px,.35fr) minmax(150px,1.25fr) minmax(200px,1.55fr) minmax(120px,1fr) minmax(140px,1.1fr) minmax(140px,1.1fr) minmax(100px,.75fr) minmax(72px,.55fr)}.fee-header,.fee-grid{display:grid;grid-template-columns:var(--fee-columns);column-gap:16px;align-items:center}.fee-header{position:sticky;top:0;z-index:2;padding:11px 10px 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(245,244,237,.96);color:var(--soft);font-size:11px;letter-spacing:.06em}.fee-header div:not(:first-child),.fee-grid>div:not(:first-child){text-align:right}.fee-row{padding:20px 10px 18px;border-bottom:1px solid var(--line)}.fee-grid .pool strong{font-family:inherit;font-size:16px;letter-spacing:-.01em}.fee-grid .pool small,.fee-grid .address small{display:block;margin-top:4px;color:var(--muted);font-size:11px;line-height:1.2}.fee-grid .address{min-width:0}.fee-grid .address small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.copy-pool{border:1px solid var(--line);border-radius:999px;padding:5px 9px;background:transparent;color:var(--muted);font:600 11px/1.1 inherit;cursor:pointer;white-space:nowrap}.copy-pool:hover,.copy-pool[data-state="copied"]{border-color:var(--blue);color:var(--blue)}.fee-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 10px 18px;padding:14px 0;border-bottom:1px solid var(--line)}.fee-summary div{display:grid;gap:3px}.fee-summary small{color:var(--muted);font-size:11px}.fee-summary strong{font-size:16px;font-weight:700}.fee-source{margin:0 10px 12px;color:var(--muted);font-size:11px}
 @media(max-width:1000px){.heat-header{display:none!important}.heat-grid{grid-template-columns:minmax(0,1fr) minmax(170px,auto);grid-template-areas:"rank pool" "volume lpfee" "tvl fee" !important;column-gap:14px;row-gap:12px}.heat-grid>.rank{grid-area:rank!important}.heat-grid>.pool{grid-area:pool!important}.heat-grid>.volume{grid-area:volume!important}.heat-grid>.lp-fee{grid-area:lpfee!important}.heat-grid>.tvl{grid-area:tvl!important}.heat-grid>.fee{grid-area:fee!important}}
@@ -75,28 +15,13 @@ function renderStyles() {
 footer{display:flex;gap:16px;flex-wrap:wrap;margin-top:26px;padding:16px 10px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px;line-height:1.7}footer a{color:var(--blue)}[hidden]{display:none!important}
 @media(max-width:1000px){main{width:calc(100% - 28px);padding-top:20px}.table-header,.fee-header{display:none}.optimizer-row,.fee-row{padding:23px 6px 13px}.row-grid{grid-template-columns:minmax(0,1fr) minmax(170px,auto);grid-template-areas:"rank pool" "volume lpfee" "tvl fee" "action action";column-gap:14px;row-gap:12px;align-items:center}.row-grid>.rank{grid-area:rank}.row-grid>.pool{grid-area:pool}.row-grid>.volume{grid-area:volume}.row-grid>.lp-fee{grid-area:lpfee}.row-grid>.tvl{grid-area:tvl}.row-grid>.fee{grid-area:fee}.row-grid>.action{grid-area:action}.fee-grid{grid-template-columns:minmax(0,1fr) minmax(170px,auto);grid-template-areas:"rank pool" "address address" "tvl volume" "lpfee tier" "copy copy";column-gap:14px;row-gap:12px}.fee-grid>.rank{grid-area:rank}.fee-grid>.pool{grid-area:pool}.fee-grid>.address{grid-area:address;text-align:left!important}.fee-grid>.tvl{grid-area:tvl}.fee-grid>.volume{grid-area:volume}.fee-grid>.lp-fee{grid-area:lpfee}.fee-grid>.fee-tier{grid-area:tier}.fee-grid>.copy{grid-area:copy;justify-self:end}.row-tools{margin-top:9px}.verification-row{grid-template-columns:minmax(120px,1fr) 90px minmax(120px,1fr) 40px;gap:10px}}
 @media(max-width:580px){main{width:calc(100% - 20px);padding:16px 0 34px}.masthead{display:block;padding:0 4px 14px}.masthead h1{font-size:22px}.masthead p{margin-top:4px;text-align:left;font-size:11px}.status-bar{justify-content:flex-start;padding:0 4px 10px;font-size:11px}.optimizer-row,.fee-row{padding:21px 4px 12px}.row-grid,.fee-grid{grid-template-columns:minmax(0,1fr) minmax(118px,auto);column-gap:9px}.pool strong{font-size:21px}.fee-grid .pool strong{font-size:16px}.tvl strong{font-size:15px}.fee strong{font-size:13px}.fee-summary{grid-template-columns:1fr;gap:8px;margin-left:4px;margin-right:4px}.empty-state{margin-left:4px;margin-right:4px;min-height:60px}.diagnostics-section{margin-left:4px;margin-right:4px}.verification-row{grid-template-columns:minmax(88px,1fr) 70px minmax(80px,1fr) 34px;gap:7px;font-size:11px}.blocker{text-align:right}.why-drawer{padding:22px 18px}footer{padding-left:4px;padding-right:4px;font-size:11px}}
-`;
-}
-
-function renderFeeBoardMarkup(id, ariaLabel, active = false) {
-  return `<section id="${id}" class="tab-panel" role="tabpanel" aria-label="${ariaLabel}"${active ? "" : " hidden"}><div class="fee-source" id="${id}-source">官方数据源：Raydium API v3 · Meteora DLMM API</div><div id="${id}-summary" class="fee-summary" aria-label="${ariaLabel}汇总"></div><section class="fee-board" role="table"><div class="fee-header" role="row"><div role="columnheader">排名</div><div role="columnheader">DEX / Pair</div><div role="columnheader">Pool Address</div><div role="columnheader">TVL</div><div role="columnheader">24H Volume</div><div role="columnheader">24H Fee</div><div role="columnheader">Fee Tier</div><div role="columnheader">操作</div></div><div id="${id}-list" class="fee-list" aria-live="polite"></div><div id="${id}-empty" class="empty-state" hidden></div></section></section>`;
-}
-
-export function renderPage({ fetchedAt, snapshotHash = null, runtimeVersion = null }) {
-  const initialTimestamp = formatTimestamp(fetchedAt);
-  const runtimeQuery = runtimeVersion ?? snapshotHash;
-  const runtimeSrc = runtimeQuery ? `?v=${encodeURIComponent(runtimeQuery.slice(0, 12))}` : "";
-  return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><meta name="data-source" content="./top3.json"><title>Raydium · Meteora 24H Fee Terminal</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
+</style></head><body><main data-top3-source="./top3.json">
 <header class="masthead"><div><h1>Raydium · Meteora 24H Fee Terminal</h1><p>官方数据源 · 24H Fee Intelligence</p></div></header>
 <div class="status-bar" aria-live="polite"><span id="live-status" data-state="warning">等待计算</span></div>
 <nav class="tabs" role="tablist" aria-label="市场榜单切换"><button id="tab-fee" class="tab" type="button" role="tab" aria-selected="false" aria-controls="fee-view">24H Fee 总榜</button><button id="tab-rwa-fee" class="tab" type="button" role="tab" aria-selected="false" aria-controls="rwa-fee-view">RWA Fee Top 10</button><button id="tab-opportunity" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="opportunity-view">推荐机会</button></nav>
-${renderFeeBoardMarkup("fee-view", "24H Fee 总榜")}
-${renderFeeBoardMarkup("rwa-fee-view", "RWA Fee Top 10")}
+<section id="fee-view" class="tab-panel" role="tabpanel" aria-label="24H Fee 总榜" hidden><div class="fee-source" id="fee-view-source">官方数据源：Raydium API v3 · Meteora DLMM API</div><div id="fee-view-summary" class="fee-summary" aria-label="24H Fee 总榜汇总"></div><section class="fee-board" role="table"><div class="fee-header" role="row"><div role="columnheader">排名</div><div role="columnheader">DEX / Pair</div><div role="columnheader">Pool Address</div><div role="columnheader">TVL</div><div role="columnheader">24H Volume</div><div role="columnheader">24H Fee</div><div role="columnheader">Fee Tier</div><div role="columnheader">操作</div></div><div id="fee-view-list" class="fee-list" aria-live="polite"></div><div id="fee-view-empty" class="empty-state" hidden></div></section></section>
+<section id="rwa-fee-view" class="tab-panel" role="tabpanel" aria-label="RWA Fee Top 10" hidden><div class="fee-source" id="rwa-fee-view-source">官方数据源：Raydium API v3 · Meteora DLMM API</div><div id="rwa-fee-view-summary" class="fee-summary" aria-label="RWA Fee Top 10汇总"></div><section class="fee-board" role="table"><div class="fee-header" role="row"><div role="columnheader">排名</div><div role="columnheader">DEX / Pair</div><div role="columnheader">Pool Address</div><div role="columnheader">TVL</div><div role="columnheader">24H Volume</div><div role="columnheader">24H Fee</div><div role="columnheader">Fee Tier</div><div role="columnheader">操作</div></div><div id="rwa-fee-view-list" class="fee-list" aria-live="polite"></div><div id="rwa-fee-view-empty" class="empty-state" hidden></div></section></section>
 <section id="opportunity-view" class="tab-panel" role="tabpanel" aria-label="推荐机会"><section class="ranking" aria-label="RWA / USDC 推荐机会" role="table"><div class="table-header" role="row"><div role="columnheader">排名</div><div role="columnheader">Pair + Fee Tier</div><div role="columnheader">24H Volume</div><div role="columnheader">24H LP Fee</div><div role="columnheader">TVL</div><div role="columnheader">Fee Tier</div><div role="columnheader">建议</div></div><div id="ranking-list" class="ranking-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
 <section class="diagnostics-section" aria-label="更多详情"><details id="verification-panel" class="verification-panel"><summary>更多详情</summary><div id="verification-list" class="verification-list"></div></details></section></section>
 <aside id="why-drawer" class="why-drawer" aria-label="池详情" hidden></aside>
-<footer>数据源：Raydium API v3 · Meteora 官方 DLMM API · <span id="observed-wrap"${initialTimestamp ? "" : " hidden"}>读取：<span id="observed-at">${escapeHtml(initialTimestamp ?? "")}</span></span><a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;
-}
-
-export { renderStyles };
+<footer>数据源：Raydium API v3 · Meteora 官方 DLMM API · <span id="observed-wrap">读取：<span id="observed-at">2026-08-22 16:50:02</span></span><a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js?v=fecc5afc6cb8"></script></body></html>
