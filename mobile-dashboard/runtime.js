@@ -1,5 +1,4 @@
-export function renderRuntime(config) {
-  return `const CONFIG=${JSON.stringify({ snapshotUrl: "./top3.json", refreshIntervalMs: config.refreshIntervalMs })};
+const CONFIG={"snapshotUrl":"./top3.json","refreshIntervalMs":60000};
 const esc=(value)=>String(value??'').replace(/[&<>"']/g,(char)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const known=(value)=>value!==null&&value!==undefined&&Number.isFinite(Number(value));
 const fmt=(value,digits=2)=>known(value)?Number(value).toLocaleString('en-US',{minimumFractionDigits:digits,maximumFractionDigits:digits}):'等待数据';
@@ -28,5 +27,4 @@ const copyText=async(value)=>{if(navigator.clipboard?.writeText){await navigator
 let displayAll=false;let activeSnapshot=null;
 const renderRows=(snapshot)=>{activeSnapshot=snapshot;const all=snapshot.scanner.candidates;const rows=displayAll?all:all.slice(0,snapshot.scanner.defaultDisplayLimit);const list=document.querySelector('#scanner-list');const empty=document.querySelector('#empty-state');const button=document.querySelector('#show-all');if(!list||!empty)return;if(rows.length===0){renderEmpty('当前没有满足 TVL、成交量和数据质量条件的 LP Pool。');if(button)button.hidden=true;return}list.innerHTML=rows.map(renderRow).join('');empty.hidden=true;if(button){button.hidden=all.length<=snapshot.scanner.defaultDisplayLimit;button.textContent=displayAll?'只显示前 5 个候选':'显示全部 '+all.length+' 个候选'}bindWhy(snapshot)};
 const refresh=async()=>{try{const response=await fetch(CONFIG.snapshotUrl+'?_='+Date.now(),{cache:'no-store',headers:{accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);const snapshot=await response.json();if(!validSnapshot(snapshot))throw new Error('Scanner 快照格式无效');setTimestamp(snapshot.generatedAt);const count=document.querySelector('#scanner-count');if(count)count.textContent='候选 '+snapshot.scanner.candidates.length+' / 10 · 全部池 '+fmt(snapshot.scanner.allPoolCount,0)+' · 默认显示前 5';renderRows(snapshot);const sourceState=snapshot.sourceEvidence.complete?'官方双源已完成扫描':'官方源部分可用 · 请查看详情';setStatus(sourceState,'ready');if(document.querySelector('#show-all'))document.querySelector('#show-all').onclick=()=>{displayAll=!displayAll;if(activeSnapshot)renderRows(activeSnapshot)}}catch(error){setStatus('等待官方市场数据 · '+(error instanceof Error?error.message:'读取失败'),'error');renderEmpty('官方 Scanner 快照暂时不可用。')}};
-void refresh();window.setInterval(refresh,CONFIG.refreshIntervalMs);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh()});`;
-}
+void refresh();window.setInterval(refresh,CONFIG.refreshIntervalMs);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh()});

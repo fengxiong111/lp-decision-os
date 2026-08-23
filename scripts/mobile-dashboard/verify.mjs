@@ -106,3 +106,60 @@ export function verifySnapshot(snapshot, config) {
   if (snapshot.diagnostics.matrix.some((row) => !row.poolAddress || !row.pair || !["READY", "NEAR_READY", "BLOCKED"].includes(row.status) || !Array.isArray(row.evidence))) fail("诊断矩阵包含非法状态或证据项");
   if (containsForbiddenPositionField(snapshot)) fail("证据快照包含真实钱包或真实仓位字段");
 }
+
+const SCANNER_RISKS = new Set(["LOW", "MEDIUM", "HIGH"]);
+const SCANNER_RECOMMENDATIONS = new Set(["考虑", "观察"]);
+const SCANNER_DEXES = new Set(["Raydium", "Meteora"]);
+const SCANNER_POOL_TYPES = new Set(["CLMM", "DLMM"]);
+
+function validNullableNumber(value) {
+  return value === null || Number.isFinite(value);
+}
+
+function validScannerCandidate(row, index) {
+  return row && row.rank === index + 1
+    && typeof row.poolAddress === "string"
+    && typeof row.pair === "string"
+    && SCANNER_DEXES.has(row.dex)
+    && SCANNER_POOL_TYPES.has(row.poolType)
+    && [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.volumeTvl, row.feeTvl, row.priceVolatilityPct, row.activeTimeHours, row.expectedNetReturn, row.lpScore].every(validNullableNumber)
+    && row.strategy && typeof row.strategy.family === "string"
+    && row.netModel && typeof row.netModel.status === "string"
+    && [row.netModel.grossFee24h, row.netModel.outOfRangeTimeCost, row.netModel.rebalanceCost, row.netModel.gasCost, row.netModel.swapSlippage, row.netModel.impermanentLoss, row.netModel.expectedNetReturn, row.netModel.rebalanceFrequency, row.netModel.confidence].every(validNullableNumber)
+    && SCANNER_RISKS.has(row.riskLevel)
+    && SCANNER_RECOMMENDATIONS.has(row.recommendation)
+    && row.verification && typeof row.verification.replay === "string";
+}
+
+export function verifyScannerSnapshot(snapshot, config) {
+  if (snapshot?.schemaVersion !== 2) fail("Scanner 快照 schemaVersion 不正确");
+  if (snapshot.product !== "Solana LP Opportunity Scanner") fail("缺少 Scanner 产品标识");
+  if (!snapshot.generatedAt || !snapshot.snapshotHash || !/^[a-f0-9]{64}$/.test(snapshot.snapshotHash)) fail("Scanner 快照缺少有效 hash");
+  if (config.capital !== 1_000 || snapshot.scope?.capital !== 1_000) fail("Shadow Position 资金不是固定 $1,000");
+  if (snapshot.scope?.walletDependency !== false || snapshot.scope?.autoExecution !== false || snapshot.scope?.shadowPosition !== true) fail("Scanner 钱包或自动执行边界错误");
+  if (!Array.isArray(snapshot.scope?.protocols) || !snapshot.scope.protocols.includes("Raydium") || !snapshot.scope.protocols.includes("Meteora")) fail("Scanner 协议范围错误");
+  if (!snapshot.sourceEvidence?.sources?.raydium || !snapshot.sourceEvidence?.sources?.meteora) fail("缺少 Raydium/Meteora 官方源证据");
+  if (!snapshot.scanner || snapshot.scanner.version !== 1 || snapshot.scanner.defaultDisplayLimit !== 5 || snapshot.scanner.top10Count > 10) fail("Scanner Top10/Top5 配置错误");
+  if (!Array.isArray(snapshot.scanner.candidates) || snapshot.scanner.candidates.length > 10) fail("Scanner 候选超过 Top10");
+  if (snapshot.scanner.candidates.some((row, index) => !validScannerCandidate(row, index))) fail("Scanner 候选字段非法");
+  if (snapshot.scanner.candidates.some((row, index, rows) => index > 0 && (rows[index - 1].expectedNetReturn ?? -Infinity) < (row.expectedNetReturn ?? -Infinity) && rows[index - 1].expectedNetReturn !== null && row.expectedNetReturn !== null)) fail("完整净收益候选未降序");
+  if (!snapshot.scanner.filters || snapshot.scanner.filters.tvlMin !== 50_000 || snapshot.scanner.filters.volume24hMin !== 50_000) fail("Scanner 过滤阈值错误");
+  if (containsForbiddenPositionField(snapshot)) fail("Scanner 快照包含真实钱包或真实仓位字段");
+  return true;
+}
+
+export function verifyScannerPageMarkup(markup) {
+  const headerCells = markup.match(/role="columnheader"/g) ?? [];
+  if (headerCells.length !== 12) fail(`Scanner 表头列数为 ${headerCells.length}，应为 12`);
+  for (const label of ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "交易对", "DEX / 类型", "24H交易量", "24H手续费", "TVL", "费率", "模拟策略", "预计 $1000 日净收益", "风险", "建议", "WHY"]) {
+    if (!markup.includes(label)) fail(`Scanner 页面缺少字段：${label}`);
+  }
+  if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少 Scanner 浏览器运行时");
+  if (!markup.includes('data-top3-source="./top3.json"')) fail("页面没有声明唯一快照源");
+  for (const legacy of ["24H Fee 总榜", "RWA Fee Top 10", "预计手续费", "24h LP Fee"]) {
+    if (markup.includes(legacy)) fail(`页面仍包含旧版字段：${legacy}`);
+  }
+  if (markup.includes("Opportunity Score") || markup.includes("Confidence") || markup.includes("BLOCKED") || markup.includes("UNAVAILABLE")) fail("首页包含被要求隐藏的内部模型字段");
+  if (markup.includes('class="optimizer-row"') || markup.includes('class="fee-row"')) fail("页面嵌入旧榜单行");
+  return true;
+}

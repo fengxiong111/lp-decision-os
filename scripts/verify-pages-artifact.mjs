@@ -4,106 +4,77 @@ import { resolve } from "node:path";
 
 const artifactDir = resolve("mobile-dashboard");
 const read = (name) => readFile(resolve(artifactDir, name), "utf8");
-const [indexHtml, runtimeJs, top3Json, manifestJson] = await Promise.all([
+const [indexHtml, runtimeJs, snapshotJson, manifestJson] = await Promise.all([
   read("index.html"),
   read("runtime.js"),
   read("top3.json"),
   read("deployment-manifest.json"),
 ]);
-
-const legacyLabels = ["24h 成交量", "24h LP Fee", "预计手续费"];
-const requiredLabels = ["24H Fee 总榜", "RWA Fee Top 10", "推荐机会", "DEX / Pair", "Pool Address", "TVL", "24H Volume", "24H Fee", "Fee Tier", "Pair + Fee Tier", "建议", "详情", "更多详情"];
-const forbiddenPrincipalLabels = ["$1,000", "模拟资金", "预计 $1,000", "毛收益估算", "Core / Buffer", "NET LOW"];
-const actions = new Set(["OPEN_READY", "WATCH", "REVIEW", "BLOCKED"]);
-const opportunityStatuses = new Set(["READY", "WATCH", "BLOCKED"]);
-const snapshot = JSON.parse(top3Json);
+const snapshot = JSON.parse(snapshotJson);
 const manifest = JSON.parse(manifestJson);
+const legacyLabels = ["24H Fee 总榜", "RWA Fee Top 10", "预计手续费", "24h LP Fee"];
+const hiddenHomeLabels = ["Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
+const requiredLabels = ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "交易对", "DEX / 类型", "24H交易量", "24H手续费", "TVL", "费率", "模拟策略", "预计 $1000 日净收益", "风险", "建议", "WHY"];
+const riskLevels = new Set(["LOW", "MEDIUM", "HIGH"]);
+const recommendations = new Set(["考虑", "观察"]);
 
-for (const label of legacyLabels) {
-  assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧列仍出现在构建产物：${label}`);
-}
-for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少主表字段：${label}`);
-assert.equal(runtimeJs.includes("复制 Pool"), true, "运行时缺少 Pool 复制按钮");
-for (const label of forbiddenPrincipalLabels) assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `外版仍包含本金元素：${label}`);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 23, "Fee 总榜与推荐榜列数不正确");
-assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
-assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
-assert.equal(indexHtml.includes('class="optimizer-row"'), false, "index.html 不应嵌入旧排名行");
-assert.equal(runtimeJs.includes("./top3.json"), true, "runtime.js 未读取 top3.json");
-assert.equal(runtimeJs.includes("feeLeaderboards"), true, "runtime.js 未读取 Fee Leaderboards");
-assert.equal(runtimeJs.includes("Evidence"), true, "详情层缺少 Evidence");
-for (const forbiddenRuntimeToken of ["lastGoodTop3", "liveBackup", "api-v3.raydium.io", "navigator.serviceWorker", "serviceWorker", "fallback"]) {
-  assert.equal(runtimeJs.includes(forbiddenRuntimeToken), false, `runtime.js 仍含旧回退或缓存逻辑：${forbiddenRuntimeToken}`);
-}
-
+assert.equal(snapshot.schemaVersion, 2, "Scanner schemaVersion 错误");
+assert.equal(snapshot.product, "Solana LP Opportunity Scanner");
+assert.equal(snapshot.scope?.capital, 1_000);
+assert.equal(snapshot.scope?.shadowPosition, true);
+assert.equal(snapshot.scope?.walletDependency, false);
+assert.equal(snapshot.scope?.autoExecution, false);
+assert.deepEqual(new Set(snapshot.scope?.protocols), new Set(["Raydium", "Meteora"]));
+assert.equal(snapshot.scanner?.version, 1);
+assert.equal(snapshot.scanner?.defaultDisplayLimit, 5);
+assert.ok(Array.isArray(snapshot.scanner?.candidates));
+assert.ok(snapshot.scanner.candidates.length <= 10);
+assert.equal(manifest.product, snapshot.product);
 assert.equal(manifest.sourceDirectory, "mobile-dashboard");
 assert.equal(manifest.top3Json, "mobile-dashboard/top3.json");
 assert.equal(manifest.pageDataSource, "./top3.json");
+assert.equal(manifest.candidateCount, snapshot.scanner.candidates.length);
+assert.equal(manifest.defaultDisplayLimit, 5);
+assert.equal(manifest.allPoolCount, snapshot.scanner.allPoolCount);
+assert.equal(manifest.eligiblePoolCount, snapshot.scanner.eligiblePoolCount);
+assert.equal(manifest.snapshotHash, snapshot.snapshotHash);
 assert.equal(manifest.legacyColumnsPresent, false);
 assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
-assert.equal(manifest.marketHeatCount, snapshot.marketHeat.length, "manifest marketHeatCount 不一致");
-assert.equal(manifest.feeLeaderboardCount, snapshot.feeLeaderboards.overall.length, "manifest feeLeaderboardCount 不一致");
-assert.equal(manifest.rwaFeeLeaderboardCount, snapshot.feeLeaderboards.rwa.length, "manifest rwaFeeLeaderboardCount 不一致");
-assert.equal(snapshot.snapshotHash, manifest.snapshotHash);
-assert.ok(Array.isArray(snapshot.candidates) && snapshot.candidates.length <= 3, "top3.json candidates 超过三行");
-assert.equal(manifest.candidateCount, snapshot.candidates.length, "manifest candidateCount 不一致");
-assert.ok(snapshot.opportunityGeneratedAt, "缺少 opportunityGeneratedAt");
-assert.ok(snapshot.opportunityFreshness, "缺少 opportunityFreshness");
-assert.ok(Object.hasOwn(snapshot, "verificationGeneratedAt"), "缺少 verificationGeneratedAt");
-assert.ok(snapshot.verificationFreshness, "缺少 verificationFreshness");
-assert.equal(typeof snapshot.verificationReady, "boolean", "verificationReady 类型错误");
-snapshot.candidates.forEach((row, index) => {
-  assert.equal(row.rank, index + 1, "Top 3 rank 不连续");
-  assert.ok(opportunityStatuses.has(row.opportunityStatus), `Opportunity 状态不允许：${row.opportunityStatus}`);
+assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
+assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 12);
+for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少字段：${label}`);
+for (const label of legacyLabels) assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧字段存在：${label}`);
+for (const label of hiddenHomeLabels) assert.equal(indexHtml.includes(label), false, `首页内部字段存在：${label}`);
+assert.equal(indexHtml.includes('class="scanner-row"'), false, "静态页不应内嵌候选行");
+assert.equal(runtimeJs.includes("scanner.candidates"), true);
+assert.equal(runtimeJs.includes("lastGoodTop3"), false);
+assert.equal(runtimeJs.includes("fallback"), false);
+assert.equal(runtimeJs.includes("navigator.serviceWorker"), false);
+snapshot.scanner.candidates.forEach((row, index) => {
+  assert.equal(row.rank, index + 1);
+  assert.ok(["Raydium", "Meteora"].includes(row.dex));
+  assert.ok(["CLMM", "DLMM"].includes(row.poolType));
   assert.equal(typeof row.pair, "string");
   assert.equal(typeof row.poolAddress, "string");
-  assert.ok(actions.has(row.action), `Action 不允许：${row.action}`);
-  assert.equal(Number.isFinite(row.opportunityScore), true, "Opportunity Score 缺失");
-  assert.equal(Number.isFinite(row.confidence), true, "Confidence 缺失");
-  for (const field of ["netEstimate", "coreCapital", "coreLower", "coreUpper", "bufferCapital", "bufferLower", "bufferUpper"]) {
-    assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Opportunity 字段非法：${field}`);
+  for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "expectedNetReturn", "lpScore"]) {
+    assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${field} 非法`);
   }
+  assert.ok(row.strategy && row.netModel);
+  assert.ok(riskLevels.has(row.riskLevel));
+  assert.ok(recommendations.has(row.recommendation));
 });
-assert.ok(Array.isArray(snapshot.marketHeat) && snapshot.marketHeat.length > 0, "缺少 Market Heat 数据");
-snapshot.marketHeat.forEach((row, index) => {
-  assert.equal(row.rank, index + 1, "Market Heat rank 不连续");
-  assert.equal(typeof row.pair, "string");
-  assert.equal(typeof row.poolAddress, "string");
-  for (const field of ["volume24h", "lpFee24h", "tvl", "feeTier"]) {
-    assert.equal(row[field] === null || Number.isFinite(row[field]), true, `Market Heat 字段非法：${field}`);
-  }
-});
-for (const [key, rows] of Object.entries(snapshot.feeLeaderboards ?? {})) {
-  if (!Array.isArray(rows)) continue;
-  assert.ok(rows.length <= 10, `${key} 超过 Top 10`);
-  rows.forEach((row, index) => {
-    assert.equal(row.rank, index + 1, `${key} rank 不连续`);
-    assert.ok(["Raydium", "Meteora"].includes(row.dex), `${key} DEX 非官方源`);
-    assert.equal(typeof row.pair, "string");
-    assert.equal(typeof row.poolAddress, "string");
-    for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier"]) {
-      assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${key} 字段非法：${field}`);
-    }
-  });
-}
-assert.ok(snapshot.publicPoolCount === 0 || snapshot.candidates.length > 0, "存在公开 Pool 时机会层不得为空");
-assert.equal(snapshot.opportunityRanking?.version, 1, "缺少 Opportunity Ranking 摘要");
-assert.ok(Number.isInteger(snapshot.opportunityRanking?.candidateCount), "Opportunity candidateCount 缺失");
-assert.equal(snapshot.diagnostics?.version, 1, "缺少诊断版本");
-assert.ok(Array.isArray(snapshot.diagnostics?.matrix), "缺少诊断矩阵");
-for (const row of snapshot.diagnostics.matrix) {
-  assert.ok(["READY", "NEAR_READY", "BLOCKED"].includes(row.status), `诊断状态不允许：${row.status}`);
-  assert.ok(Array.isArray(row.evidence), `诊断缺少 Evidence：${row.pair}`);
-}
 
 console.log(JSON.stringify({
   status: "PASS",
+  product: snapshot.product,
   sourceDirectory: manifest.sourceDirectory,
-  top3Json: manifest.top3Json,
-  top3Count: snapshot.candidates.length,
+  allPoolCount: snapshot.scanner.allPoolCount,
+  eligiblePoolCount: snapshot.scanner.eligiblePoolCount,
+  top10Count: snapshot.scanner.candidates.length,
+  defaultDisplayLimit: snapshot.scanner.defaultDisplayLimit,
   buildHash: snapshot.snapshotHash,
-  legacyColumnsPresent: false,
-  staleFallbackRemoved: true,
-  serviceWorker: false,
+  walletDependency: false,
+  autoExecution: false,
 }, null, 2));

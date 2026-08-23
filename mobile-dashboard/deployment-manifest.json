@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 2,
+  "product": "Solana LP Opportunity Scanner",
+  "sourceDirectory": "mobile-dashboard",
+  "top3Json": "mobile-dashboard/top3.json",
+  "indexHtml": "mobile-dashboard/index.html",
+  "runtimeJs": "mobile-dashboard/runtime.js",
+  "pageDataSource": "./top3.json",
+  "candidateCount": 10,
+  "defaultDisplayLimit": 5,
+  "allPoolCount": 97314,
+  "eligiblePoolCount": 145,
+  "snapshotHash": "0914d67ae92e2bd15358c93404b504882ddf0ea526b0bf8765540c84d0d0f4bd",
+  "generatedAt": "2026-08-23T03:52:16.219Z",
+  "legacyColumnsPresent": false,
+  "staleFallbackRemoved": true,
+  "serviceWorker": false
+}
