@@ -80,9 +80,9 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
       confidence: null,
     },
     riskLevel: "UNVERIFIED",
-    decision: "CONSIDER",
+    decision: "DISCOVER",
     decisionReasonCode: "SIMULATED_GROSS_ONLY",
-    decisionReason: "市场数据与策略模拟可用，净收益等待完整 Replay",
+    decisionReason: "市场机会已发现，等待进入 Replay 验证",
     filter: { eligible: true, reasons: [], washVolume: "NOT_VERIFIED" },
     why: { positive: ["官方 24H 市场数据"], negative: ["等待真实 Replay / IL / 再平衡成本"] },
     verification: { replay: "WAITING", confidence: null, tickPath: "WAITING", markout: "WAITING", il: "WAITING" },
@@ -95,6 +95,27 @@ let currentCandidates = [];
 const server = createServer(async (request, response) => {
   if (request.url?.startsWith("/top3.json")) {
     const generatedAt = now();
+    const replayQueue = currentCandidates.slice(0, 3).map((row) => ({
+      priority: row.rank,
+      poolAddress: row.poolAddress,
+      pair: row.pair,
+      dex: row.dex,
+      poolType: row.poolType,
+      feeTier: row.feeTier,
+      status: "BACKFILLING",
+      reason: "SWAP_BACKFILL_INCOMPLETE",
+      generatedAt,
+      windows: [1, 6, 12, 24].map((windowHours) => ({
+        windowHours,
+        completedSwaps: row.rank,
+        totalSwaps: null,
+        coverageRatio: 0.25,
+        status: "BACKFILLING",
+        windowComplete: false,
+        gapCount: null,
+        unresolvedRetryableTransactions: 0,
+      })),
+    }));
     const snapshot = {
       schemaVersion: 2,
       product: "Solana LP Decision OS",
@@ -108,6 +129,7 @@ const server = createServer(async (request, response) => {
           raydium: { dex: "Raydium", poolType: "CLMM", complete: true },
           meteora: { dex: "Meteora", poolType: "DLMM", complete: true },
         },
+        replayQueue,
       },
       scope: { protocols: ["Raydium", "Meteora"], poolTypes: ["CLMM", "DLMM"], capital: 1_000, shadowPosition: true, walletDependency: false, autoExecution: false },
       scanner: {
@@ -154,37 +176,41 @@ try {
     { candidates: [makeCandidate(1)], visibleRows: 1 },
     { candidates: [1, 2, 3].map((rank) => makeCandidate(rank)), visibleRows: 3 },
     { candidates: [1, 2, 3, 4].map((rank) => makeCandidate(rank)), visibleRows: 4 },
-    { candidates: Array.from({ length: 10 }, (_, index) => makeCandidate(index + 1)), visibleRows: 5 },
+    { candidates: Array.from({ length: 50 }, (_, index) => makeCandidate(index + 1)), visibleRows: 50 },
   ];
   for (const [index, fixture] of cases.entries()) {
     currentCandidates = fixture.candidates;
     await page.goto(`${baseUrl}/?case=${index}`, { waitUntil: "domcontentloaded" });
-    await page.waitForFunction((expected) => document.querySelectorAll("#scanner-list .explorer-row").length === expected, fixture.visibleRows);
-    assert.equal(await page.locator("#scanner-list .explorer-row").count(), fixture.visibleRows);
-    assert.equal(await page.locator("#scanner-list .explorer-row").count() <= 5, true);
+    await page.waitForFunction((expected) => document.querySelectorAll("#pool-list .pool-row").length === expected, fixture.visibleRows);
+    assert.equal(await page.locator("#pool-list .pool-row").count(), fixture.visibleRows);
     if (fixture.visibleRows === 0) {
       assert.equal(await page.locator("#empty-state").isHidden(), false);
     } else {
       assert.equal(await page.locator("#empty-state").isHidden(), true);
-      assert.match(await page.locator("body").innerText(), /LP Explorer/);
-      assert.match(await page.locator("body").innerText(), /Strategy Simulation/);
+      assert.match(await page.locator("body").innerText(), /流动性池/);
+      assert.match(await page.locator("body").innerText(), /1天手续费/);
+      assert.doesNotMatch(await page.locator("body").innerText(), /Market Radar|Strategy Simulation|Fee APR/);
       assert.doesNotMatch(await page.locator("body").innerText(), /Opportunity Score|Confidence|BLOCKED|UNAVAILABLE/);
     }
   }
 
-  currentCandidates = Array.from({ length: 10 }, (_, index) => makeCandidate(index + 1));
+  currentCandidates = Array.from({ length: 50 }, (_, index) => makeCandidate(index + 1));
   await page.goto(`${baseUrl}/?drawer=1`, { waitUntil: "domcontentloaded" });
-  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .explorer-row").length === 5);
-  assert.equal(await page.locator("#show-all").isHidden(), false);
-  await page.locator("#show-all").click();
-  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .explorer-row").length === 10);
+  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);
+  assert.equal(await page.locator("#pool-list .pool-row").count(), 50);
+  await page.getByRole("tab", { name: "Raydium" }).click();
+  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 25);
+  assert.equal(await page.locator("#pool-list .pool-venue strong").allTextContents().then((values) => values.every((value) => value === "Raydium")), true);
+  await page.getByRole("tab", { name: "热门" }).click();
+  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);
   await page.locator(".detail-button").first().click();
   await page.waitForSelector("#detail-drawer:not([hidden])");
-  assert.match(await page.locator("#detail-drawer").innerText(), /市场数据/);
-  assert.match(await page.locator("#detail-drawer").innerText(), /1000U 模拟策略/);
-  assert.match(await page.locator("#detail-drawer").innerText(), /Verified Net Return/);
-  assert.match(await page.locator("#detail-drawer").innerText(), /Replay/);
-  console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 10], defaultRows: [0, 1, 3, 4, 5], showAllRows: 10 }, null, 2));
+  assert.match(await page.locator("#detail-drawer").innerText(), /市场概览/);
+  assert.match(await page.locator("#detail-drawer").innerText(), /策略建议/);
+  assert.match(await page.locator("#detail-drawer").innerText(), /高级信息/);
+  await page.locator("#detail-drawer .advanced summary").click();
+  assert.match(await page.locator("#detail-drawer").innerText(), /交易回放/);
+  console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 50], renderedRows: [0, 1, 3, 4, 50] }, null, 2));
 } finally {
   await browser.close();
   await new Promise((resolveServer) => server.close(resolveServer));

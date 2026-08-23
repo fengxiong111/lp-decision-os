@@ -1,22 +1,40 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const artifactDir = resolve("mobile-dashboard");
 const read = (name) => readFile(resolve(artifactDir, name), "utf8");
+const snapshotSource = process.env.MOBILE_DASHBOARD_SNAPSHOT_PATH
+  ? pathToFileURL(resolve(process.env.MOBILE_DASHBOARD_SNAPSHOT_PATH))
+  : new URL("mobile-dashboard/top3.json", import.meta.url);
 const [indexHtml, runtimeJs, snapshotJson, manifestJson] = await Promise.all([
   read("index.html"),
   read("runtime.js"),
-  read("top3.json"),
+  readFile(snapshotSource, "utf8"),
   read("deployment-manifest.json"),
 ]);
 const snapshot = JSON.parse(snapshotJson);
 const manifest = JSON.parse(manifestJson);
-const legacyLabels = ["24H Fee 总榜", "RWA Fee Top 10", "预计手续费", "24h LP Fee"];
+const artifactMarkup = `${indexHtml}\n${runtimeJs}`;
+const legacyLabels = [
+  "Market Radar",
+  "Strategy Simulation",
+  "Verified Net Return",
+  "Fee APR",
+  "Replay Queue",
+  "Opportunity Score",
+  "Confidence",
+  "24h 成交量",
+  "24h LP Fee",
+  "预计手续费",
+  "实时价格",
+  "复制Pool",
+];
 const hiddenHomeLabels = ["Score", "Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
-const requiredLabels = ["LP Explorer", "Raydium CLMM", "Meteora DLMM", "Market Radar", "Strategy Simulation", "Verified Net Return", "交易对", "DEX / 类型", "TVL", "24H交易量", "24H LP Fee", "Fee APR", "机会等级", "Action", "详情"];
+const requiredLabels = ["流动性池", "探索", "策略", "24H 总交易量", "候选池数量", "Raydium 池数量", "Meteora 池数量", "已验证收益池", "热门", "稳健", "高费池", "Raydium", "Meteora", "DEX / 类型", "TVL", "1天交易量", "1天手续费", "资金周转率", "机会等级", "操作", "详情"];
 const riskLevels = new Set(["LOW", "MEDIUM", "HIGH", "UNVERIFIED"]);
-const decisions = new Set(["WATCH", "CONSIDER", "ENTER"]);
+const decisions = new Set(["DISCOVER", "WATCH", "VERIFYING", "ENTER", "CONSIDER"]);
 
 assert.equal(snapshot.schemaVersion, 2, "Scanner schemaVersion 错误");
 assert.equal(snapshot.product, "Solana LP Decision OS");
@@ -28,7 +46,16 @@ assert.deepEqual(new Set(snapshot.scope?.protocols), new Set(["Raydium", "Meteor
 assert.equal(snapshot.scanner?.version, 1);
 assert.equal(snapshot.scanner?.defaultDisplayLimit, 5);
 assert.ok(Array.isArray(snapshot.scanner?.candidates));
-assert.ok(snapshot.scanner.candidates.length <= 10);
+assert.ok(snapshot.scanner.candidates.length <= 50);
+if (snapshot.scanner.marketLimit !== undefined) assert.equal(snapshot.scanner.marketLimit, 50);
+if (snapshot.scanner.replayLimit !== undefined) assert.equal(snapshot.scanner.replayLimit, 10);
+if (snapshot.scanner.verificationLimit !== undefined) assert.equal(snapshot.scanner.verificationLimit, 3);
+if (snapshot.scanner.top50Count !== undefined) assert.equal(snapshot.scanner.top50Count, snapshot.scanner.candidates.length);
+if (snapshot.scanner.top10Count !== undefined) assert.ok(snapshot.scanner.top10Count <= 10);
+if (snapshot.sourceEvidence?.replayQueue !== undefined) {
+  assert.ok(Array.isArray(snapshot.sourceEvidence.replayQueue));
+  assert.ok(snapshot.sourceEvidence.replayQueue.length <= 10);
+}
 assert.equal(manifest.product, snapshot.product);
 assert.equal(manifest.sourceDirectory, "mobile-dashboard");
 assert.equal(manifest.top3Json, "mobile-dashboard/top3.json");
@@ -44,8 +71,8 @@ assert.equal(manifest.serviceWorker, false);
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
 assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 9);
-for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少字段：${label}`);
-for (const label of legacyLabels) assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧字段存在：${label}`);
+for (const label of requiredLabels) assert.equal(artifactMarkup.includes(label), true, `缺少字段：${label}`);
+for (const label of legacyLabels) assert.equal(artifactMarkup.includes(label), false, `旧字段存在：${label}`);
 for (const label of hiddenHomeLabels) assert.equal(indexHtml.includes(label), false, `首页内部字段存在：${label}`);
 assert.equal(indexHtml.includes('class="scanner-row"'), false, "静态页不应内嵌候选行");
 assert.equal(runtimeJs.includes("scanner.candidates"), true);
@@ -78,7 +105,7 @@ console.log(JSON.stringify({
   sourceDirectory: manifest.sourceDirectory,
   allPoolCount: snapshot.scanner.allPoolCount,
   eligiblePoolCount: snapshot.scanner.eligiblePoolCount,
-  top10Count: snapshot.scanner.candidates.length,
+  top50Count: snapshot.scanner.candidates.length,
   defaultDisplayLimit: snapshot.scanner.defaultDisplayLimit,
   buildHash: snapshot.snapshotHash,
   walletDependency: false,

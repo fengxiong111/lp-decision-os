@@ -1,28 +1,173 @@
-import { escapeHtml, formatTimestamp } from "./format.mjs";
-
 function renderStyles() {
   return `
-:root{--paper:#f5f4ed;--ink:#141413;--muted:#716f68;--soft:#96938b;--line:#dedbd0;--blue:#1b365d;--pass:#3e6650;--warn:#8a6b35;--danger:#8a4e3d;--content:1380px;--explorer-columns:36px minmax(190px,1.65fr) minmax(100px,.9fr) minmax(100px,.85fr) minmax(110px,.95fr) minmax(110px,.95fr) minmax(88px,.7fr) 112px 112px}
-*{box-sizing:border-box}html{min-height:100%;background:var(--paper)}body{min-height:100%;margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;overflow-wrap:anywhere}main{width:calc(100% - 40px);max-width:var(--content);margin:0 auto;padding:34px 0 48px}.masthead{display:flex;justify-content:space-between;align-items:end;gap:24px;padding:0 10px 22px}.masthead h1{margin:0;font-size:30px;font-weight:750;letter-spacing:-.045em;line-height:1.05}.masthead p{margin:7px 0 0;color:var(--muted);font-size:13px}.scope-note{color:var(--soft);font-size:11px;text-align:right;white-space:nowrap}.status-bar{display:flex;justify-content:space-between;gap:18px;padding:0 10px 16px;color:var(--muted);font-size:12px}.status-bar [data-state="ready"]{color:var(--pass)}.status-bar [data-state="warning"]{color:var(--warn)}.status-bar [data-state="error"]{color:var(--danger)}
-.explorer-shell{border-top:1px solid var(--line)}.explorer-heading{display:flex;justify-content:space-between;align-items:baseline;gap:18px;padding:18px 10px 14px}.explorer-heading h2{margin:0;font-size:20px;font-weight:700;letter-spacing:-.03em}.explorer-heading span{color:var(--muted);font-size:12px}.scanner-filters{display:flex;gap:18px;flex-wrap:wrap;padding:0 10px 11px;color:var(--soft);font-size:11px}.layer-legend{display:flex;gap:14px;flex-wrap:wrap;padding:0 10px 15px;color:var(--muted);font-size:10px;letter-spacing:.045em}.layer-legend span{white-space:nowrap}.explorer-table{width:100%;overflow-x:auto;overflow-y:hidden}.explorer-header,.explorer-grid{display:grid;grid-template-columns:var(--explorer-columns);column-gap:8px;align-items:center}.explorer-header{padding:11px 10px 9px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--soft);font-size:10px;letter-spacing:.055em}.explorer-header div:not(:first-child),.explorer-grid>div:not(:first-child){text-align:right}.explorer-row{padding:20px 10px 18px;border-bottom:1px solid var(--line)}.explorer-grid>.rank{text-align:left!important;color:var(--soft)}.explorer-grid>.pair{text-align:left!important;min-width:0}.pair strong{display:block;overflow:hidden;font-family:"Iowan Old Style","Songti SC",STSong,Georgia,serif;font-size:20px;font-weight:750;letter-spacing:-.035em;line-height:1.08;text-overflow:ellipsis;white-space:nowrap}.pair small,.venue small{display:block;margin-top:5px;color:var(--muted);font-size:11px;line-height:1.2;white-space:nowrap}.venue{text-align:left!important}.venue strong{font-size:13px;font-weight:650}.metric strong{font-size:14px;font-weight:650;white-space:nowrap}.metric-sub{display:block;margin-top:3px;color:var(--muted);font-size:10px;font-weight:500;line-height:1.1;white-space:nowrap}.metric.fee strong{color:var(--blue);font-size:15px;font-weight:750}.decision strong{display:block;font-size:13px;font-weight:750;white-space:nowrap}.decision small{display:block;margin-top:4px;color:var(--muted);font-size:10px;white-space:nowrap}.decision-watch strong{color:var(--warn)}.decision-consider strong{color:var(--blue)}.decision-enter strong{color:var(--pass)}.detail-button{border:0;padding:0;background:transparent;color:var(--blue);font:700 11px/1 inherit;cursor:pointer}.detail-button:hover{color:var(--ink)}.explorer-tools{display:flex;justify-content:center;padding:18px 10px 3px}.show-all{border:1px solid var(--line);border-radius:999px;padding:7px 13px;background:transparent;color:var(--muted);font:650 11px/1 inherit;cursor:pointer}.show-all:hover{border-color:var(--blue);color:var(--blue)}.empty-state{padding:30px 10px;color:var(--muted);text-align:center}.empty-state strong{display:block;color:var(--ink);font-size:20px}.empty-state span{display:block;margin-top:6px;font-size:12px}
-.drawer{position:fixed;inset:0 0 0 auto;z-index:5;width:min(560px,100%);padding:28px 26px;background:rgba(250,249,243,.98);box-shadow:-12px 0 40px rgba(20,20,19,.08);overflow:auto}.drawer header{display:flex;justify-content:space-between;align-items:start;gap:20px;border-bottom:1px solid var(--line);padding-bottom:16px}.drawer h2{margin:0;font-size:22px;letter-spacing:-.03em}.drawer-meta{margin-top:6px;color:var(--muted);font-size:12px}.drawer-close{border:0;background:transparent;color:var(--muted);font-size:22px;line-height:1;cursor:pointer}.drawer-section{margin-top:22px}.drawer-section h3{margin:0 0 10px;color:var(--muted);font-size:11px;letter-spacing:.08em}.drawer-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}.drawer-grid div{padding:9px 0;border-top:1px solid rgba(222,219,208,.65)}.drawer-grid small{display:block;color:var(--muted);font-size:10px}.drawer-grid strong{display:block;margin-top:2px;font-size:14px;font-weight:650}.why-list{display:grid;gap:7px}.why-list div{font-size:12px}.why-list .positive{color:var(--pass)}.why-list .negative{color:var(--warn)}.copy-pool{border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:transparent;color:var(--muted);font:650 11px/1 inherit;cursor:pointer}.copy-pool:hover,.copy-pool[data-state="copied"]{border-color:var(--blue);color:var(--blue)}footer{display:flex;gap:16px;flex-wrap:wrap;margin-top:28px;padding:16px 10px 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px}footer a{color:var(--blue)}[hidden]{display:none!important}
-@media(max-width:1100px){:root{--explorer-columns:34px minmax(132px,1.25fr) minmax(80px,.8fr) minmax(88px,.9fr) minmax(88px,.9fr) minmax(88px,.8fr) 58px 100px 92px}.explorer-header,.explorer-grid{column-gap:6px}.pair strong{font-size:18px}}
-@media(max-width:1100px){main{width:calc(100% - 24px);padding-top:22px}.masthead{display:block;padding:0 6px 18px}.masthead h1{font-size:24px}.scope-note{margin-top:6px;text-align:left}.status-bar{padding:0 6px 12px}.explorer-heading{padding-left:6px;padding-right:6px}.explorer-heading h2{font-size:18px}.scanner-filters,.layer-legend{padding-left:6px;padding-right:6px}.explorer-header{display:none}.explorer-row{padding:18px 6px 15px}.explorer-grid{grid-template-columns:minmax(0,1fr) minmax(124px,auto);grid-template-areas:"rank pair" "venue venue" "tvl volume" "fee apr" "decision action" "detail detail";column-gap:14px;row-gap:10px}.explorer-grid>.rank{grid-area:rank;text-align:left!important}.explorer-grid>.pair{grid-area:pair}.explorer-grid>.venue{grid-area:venue}.explorer-grid>.tvl{grid-area:tvl;text-align:left!important}.explorer-grid>.volume{grid-area:volume;text-align:right!important}.explorer-grid>.lp-fee{grid-area:fee;text-align:left!important}.explorer-grid>.fee-apr{grid-area:apr}.explorer-grid>.decision{grid-area:decision;text-align:left!important}.explorer-grid>.action{grid-area:action}.explorer-grid>.detail{grid-area:detail;text-align:left!important}.explorer-grid .detail-button{padding-top:3px}.metric::before,.decision::before,.action::before{display:block;margin-bottom:3px;color:var(--soft);font-size:10px;font-weight:500}.tvl::before{content:"TVL"}.volume::before{content:"24H交易量"}.lp-fee::before{content:"24H LP Fee"}.fee-apr::before{content:"Fee APR"}.decision::before{content:"机会等级"}.action::before{content:"Action"}.drawer{padding:24px 18px}.drawer-grid{grid-template-columns:1fr 1fr}footer{padding-left:6px;padding-right:6px}}
-@media(max-width:420px){.drawer-grid{grid-template-columns:1fr}.explorer-grid{column-gap:10px}}
+:root {
+  --paper: #f6f5ef;
+  --surface: rgba(255, 255, 255, .72);
+  --ink: #181817;
+  --muted: #74726d;
+  --soft: #9a9891;
+  --line: #e2e0d8;
+  --accent: #7257a8;
+  --accent-soft: #eee9f7;
+  --positive: #4d765e;
+  --positive-soft: #eaf2ec;
+  --warm: #9b7141;
+  --warm-soft: #f5ede1;
+  --content: 1320px;
+  --pool-columns: 38px minmax(185px, 1.55fr) minmax(104px, .88fr) minmax(94px, .78fr) minmax(116px, .98fr) minmax(116px, .98fr) minmax(104px, .88fr) minmax(88px, .78fr) 64px;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; background: var(--paper); }
+body {
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; }
+main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 22px 0 44px; }
+.app-nav { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px; min-height: 62px; border-bottom: 1px solid var(--line); }
+.brand { font-size: 21px; font-weight: 750; letter-spacing: -.045em; white-space: nowrap; }
+.primary-nav { display: flex; align-items: center; gap: 6px; }
+.nav-tab, .category-tab, .nav-icon, .detail-button, .copy-pool, .drawer-close { border: 0; cursor: pointer; }
+.nav-tab { padding: 9px 12px; border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 650; }
+.nav-tab.is-active { background: var(--ink); color: #fff; }
+.nav-tab:disabled { color: #bbb9b2; cursor: not-allowed; }
+.nav-actions { display: flex; gap: 6px; }
+.nav-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: transparent; color: var(--muted); }
+.nav-icon:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
+.nav-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+.market-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 22px 0 30px; }
+.summary-card { min-height: 86px; padding: 15px 16px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+.summary-card small { display: block; color: var(--muted); font-size: 11px; }
+.summary-card strong { display: block; margin-top: 7px; font-size: 22px; font-weight: 730; letter-spacing: -.045em; }
+.market-section { padding-top: 4px; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 0 2px 16px; }
+.section-heading h1 { margin: 0; font-size: 24px; font-weight: 750; letter-spacing: -.05em; }
+.sync-state { color: var(--muted); font-size: 12px; }
+.category-tabs { display: flex; gap: 6px; padding-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
+.category-tabs::-webkit-scrollbar { display: none; }
+.category-tab { flex: 0 0 auto; padding: 8px 13px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 650; }
+.category-tab:hover { border-color: var(--line); color: var(--ink); }
+.category-tab.is-active { border-color: var(--line); background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(20, 20, 18, .03); }
+.pool-table { width: 100%; }
+.pool-table-head, .pool-grid { display: grid; grid-template-columns: var(--pool-columns); column-gap: 10px; align-items: center; }
+.pool-table-head { padding: 10px 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--soft); font-size: 10px; font-weight: 650; letter-spacing: .035em; }
+.pool-table-head > div:not(:nth-child(2)):not(:nth-child(3)), .pool-grid > div:not(.pool-rank):not(.pool-identity):not(.pool-venue):not(.pool-action) { text-align: right; }
+.pool-row { padding: 16px 12px; border-bottom: 1px solid rgba(226, 224, 216, .8); }
+.pool-row:hover { background: rgba(255, 255, 255, .42); }
+.pool-rank { color: var(--soft); font-size: 11px; }
+.pool-identity, .pool-venue { min-width: 0; text-align: left; }
+.pool-identity strong { display: block; overflow: hidden; font-size: 17px; font-weight: 730; letter-spacing: -.035em; line-height: 1.12; text-overflow: ellipsis; white-space: nowrap; }
+.pool-identity small, .pool-venue small { display: block; margin-top: 5px; overflow: hidden; color: var(--muted); font-size: 10px; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+.pool-venue strong { display: block; font-size: 12px; font-weight: 680; }
+.pool-metric strong { display: block; white-space: nowrap; font-size: 13px; font-weight: 650; }
+.pool-metric small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.pool-turnover strong { color: var(--muted); }
+.state-chip { display: inline-flex; min-width: 48px; justify-content: center; padding: 5px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.state-discover { background: #efeeea; color: #65625c; }
+.state-watch { background: var(--accent-soft); color: #725c9e; }
+.state-verifying { background: var(--warm-soft); color: #92683a; }
+.state-enter { background: var(--positive-soft); color: #477458; }
+.pool-action { text-align: right; }
+.detail-button { display: flex; width: 100%; min-height: 29px; align-items: center; justify-content: flex-end; padding: 6px 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; }
+.detail-button:hover { color: var(--ink); }
+.empty-state { padding: 48px 16px; border: 1px dashed var(--line); border-radius: 15px; color: var(--muted); text-align: center; }
+.empty-state strong { display: block; color: var(--ink); font-size: 18px; }
+.empty-state span { display: block; margin-top: 6px; font-size: 12px; }
+#detail-drawer { position: fixed; inset: 0; z-index: 8; }
+.drawer-backdrop { position: fixed; inset: 0; z-index: 9; background: rgba(20, 20, 18, .14); }
+.drawer-panel { position: fixed; inset: 0 0 0 auto; z-index: 10; width: min(560px, 100%); padding: 26px 26px 38px; overflow-y: auto; background: #fbfaf5; box-shadow: -16px 0 44px rgba(24, 24, 21, .12); }
+.drawer-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.drawer-header h2 { margin: 0; font-size: 24px; font-weight: 760; letter-spacing: -.05em; }
+.drawer-meta { margin-top: 6px; color: var(--muted); font-size: 12px; }
+.drawer-close { width: 30px; height: 30px; border-radius: 9px; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; }
+.drawer-close:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
+.drawer-section { margin-top: 24px; }
+.drawer-section h3 { margin: 0 0 11px; font-size: 13px; font-weight: 720; letter-spacing: -.01em; }
+.drawer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.drawer-card { min-height: 60px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .54); }
+.drawer-card small { display: block; color: var(--muted); font-size: 10px; }
+.drawer-card strong { display: block; margin-top: 4px; font-size: 14px; font-weight: 680; }
+.decision-list { display: grid; gap: 8px; color: var(--muted); font-size: 12px; }
+.decision-list div { padding-left: 12px; border-left: 2px solid var(--line); }
+.decision-list .positive { border-color: #aac4b2; color: #4d6e59; }
+.decision-list .attention { border-color: #d4b992; color: #84623a; }
+.advanced { border-top: 1px solid var(--line); padding-top: 14px; }
+.advanced summary { cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 700; }
+.advanced .drawer-grid { margin-top: 11px; }
+.copy-pool { margin-top: 16px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 680; }
+.copy-pool:hover, .copy-pool[data-state="copied"] { border-color: var(--accent); color: var(--accent); }
+[hidden] { display: none !important; }
+@media (max-width: 1100px) {
+  :root { --pool-columns: 30px minmax(145px, 1.5fr) minmax(82px, .88fr) minmax(72px, .78fr) minmax(90px, .98fr) minmax(90px, .98fr) minmax(80px, .88fr) minmax(76px, .78fr) 54px; }
+  main { width: min(calc(100% - 32px), var(--content)); padding-top: 16px; }
+  .app-nav { gap: 18px; }
+  .market-summary { gap: 8px; padding-top: 18px; padding-bottom: 24px; }
+  .summary-card { min-height: 78px; padding: 12px; }
+  .summary-card strong { font-size: 18px; }
+  .pool-table-head, .pool-grid { column-gap: 6px; }
+  .pool-table-head { padding-left: 8px; padding-right: 8px; font-size: 9px; }
+  .pool-row { padding: 15px 8px; }
+  .pool-identity strong { font-size: 15px; }
+  .pool-metric strong { font-size: 12px; }
+}
+@media (max-width: 820px) {
+  main { width: calc(100% - 24px); padding-top: 10px; }
+  .app-nav { grid-template-columns: 1fr auto; gap: 10px; min-height: 54px; }
+  .primary-nav { grid-column: 1 / -1; grid-row: 2; padding-bottom: 8px; }
+  .nav-actions { grid-column: 2; grid-row: 1; }
+  .brand { font-size: 20px; }
+  .market-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-card:first-child { grid-column: 1 / -1; }
+  .section-heading { display: block; }
+  .sync-state { display: block; margin-top: 5px; }
+  .pool-table-head { display: none; }
+  .pool-row { padding: 16px 4px; }
+  .pool-grid { grid-template-columns: minmax(0, 1fr) minmax(104px, auto); grid-template-areas: "rank action" "identity identity" "venue venue" "tvl volume" "fee turnover" "state state"; gap: 10px 16px; }
+  .pool-rank { grid-area: rank; }
+  .pool-identity { grid-area: identity; }
+  .pool-venue { grid-area: venue; }
+  .pool-tvl { grid-area: tvl; text-align: left !important; }
+  .pool-volume { grid-area: volume; }
+  .pool-fee { grid-area: fee; text-align: left !important; }
+  .pool-turnover { grid-area: turnover; }
+  .pool-opportunity { grid-area: state; text-align: left !important; }
+  .pool-action { grid-area: action; }
+  .pool-metric::before { display: block; margin-bottom: 2px; color: var(--soft); font-size: 10px; }
+  .pool-tvl::before { content: "TVL"; }
+  .pool-volume::before { content: "1天交易量"; }
+  .pool-fee::before { content: "1天手续费"; }
+  .pool-turnover::before { content: "资金周转率"; }
+  .pool-identity strong { font-size: 18px; }
+  .drawer-panel { padding: 22px 17px 32px; }
+}
+@media (max-width: 420px) {
+  .drawer-grid { grid-template-columns: 1fr; }
+  .nav-tab { padding-left: 9px; padding-right: 9px; }
+}
 `;
 }
 
-export function renderPage({ fetchedAt, snapshotHash = null, runtimeVersion = null }) {
-  const initialTimestamp = formatTimestamp(fetchedAt);
+function navIcon(kind) {
+  if (kind === "search") return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"></circle><path d="m16 16 5 5"></path></svg>';
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>';
+}
+
+export function renderPage({ snapshotHash = null, runtimeVersion = null }) {
   const runtimeQuery = runtimeVersion ?? snapshotHash;
   const runtimeSrc = runtimeQuery ? `?v=${encodeURIComponent(runtimeQuery.slice(0, 12))}` : "";
   return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f4ed"><meta name="data-source" content="./top3.json"><title>LP Explorer · Solana LP Decision OS</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
-<header class="masthead"><div><h1>LP Explorer</h1><p>Solana LP Decision OS · Raydium CLMM · Meteora DLMM · Shadow Position $1,000</p></div><div class="scope-note">不读取钱包 · 不自动执行</div></header>
-<div class="status-bar" aria-live="polite"><span id="live-status" data-state="warning">等待官方市场数据</span><span id="observed-wrap"${initialTimestamp ? "" : " hidden"}>读取：<span id="observed-at">${escapeHtml(initialTimestamp ?? "")}</span></span></div>
-<section class="explorer-shell" aria-label="LP Explorer"><div class="explorer-heading"><h2>LP Explorer</h2><span id="scanner-count">扫描 Raydium 与 Meteora · 默认显示前 5</span></div><div class="scanner-filters"><span>TVL &gt; 50,000</span><span>24H Volume &gt; 50,000</span><span>排除黑名单、异常费率池</span></div><div class="layer-legend" aria-label="数据层级"><span>Market Radar：官方市场事实</span><span>Strategy Simulation：模拟策略</span><span>Verified Net Return：完整 Replay 后显示</span></div><section class="explorer-table" role="table" aria-label="LP Explorer 列表"><div class="explorer-header" role="row"><div role="columnheader">排名</div><div role="columnheader">交易对</div><div role="columnheader">DEX / 类型</div><div role="columnheader">TVL</div><div role="columnheader">24H交易量</div><div role="columnheader">24H LP Fee</div><div role="columnheader">Fee APR</div><div role="columnheader">机会等级</div><div role="columnheader">Action</div></div><div id="scanner-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section><div class="explorer-tools"><button id="show-all" class="show-all" type="button" hidden>显示全部 10 个候选</button></div></section>
-<aside id="detail-drawer" class="drawer" aria-label="LP Pool 详情" hidden></aside>
-<footer>官方源：Raydium API v3 · Meteora DLMM API · <a href="https://github.com/fengxiong111/lp-decision-os">查看源码</a></footer></main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f5ef"><meta name="data-source" content="./top3.json"><title>流动性池 · Solana LP</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
+<header class="app-nav" aria-label="产品导航"><div class="brand">流动性池</div><nav class="primary-nav" aria-label="主导航"><button class="nav-tab" type="button">探索</button><button class="nav-tab is-active" type="button" aria-current="page">流动性池</button><button class="nav-tab" type="button" disabled>策略</button></nav><div class="nav-actions"><button class="nav-icon" type="button" aria-label="搜索">${navIcon("search")}</button><button class="nav-icon" type="button" aria-label="筛选">${navIcon("filter")}</button></div></header>
+<section class="market-summary" aria-label="市场概览"><article class="summary-card"><small>24H 总交易量</small><strong id="stat-volume">等待计算</strong></article><article class="summary-card"><small>候选池数量</small><strong id="stat-candidates">等待计算</strong></article><article class="summary-card"><small>Raydium 池数量</small><strong id="stat-raydium">等待计算</strong></article><article class="summary-card"><small>Meteora 池数量</small><strong id="stat-meteora">等待计算</strong></article><article class="summary-card"><small>已验证收益池</small><strong id="stat-verified">等待计算</strong></article></section>
+<section class="market-section" aria-label="流动性池市场"><div class="section-heading"><h1>流动性池</h1><span id="market-status" class="sync-state">市场数据同步中</span></div><div id="category-tabs" class="category-tabs" role="tablist" aria-label="池分类"><button class="category-tab is-active" type="button" role="tab" aria-selected="true" data-category="hot">热门</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="stable">稳健</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="fee">高费池</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="meteora">Meteora</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="raydium">Raydium</button></div><section class="pool-table" role="table" aria-label="流动性池列表"><div class="pool-table-head" role="row"><div role="columnheader">#</div><div role="columnheader">流动性池</div><div role="columnheader">DEX / 类型</div><div role="columnheader">TVL</div><div role="columnheader">1天交易量</div><div role="columnheader">1天手续费</div><div role="columnheader">资金周转率</div><div role="columnheader">机会等级</div><div role="columnheader">操作</div></div><div id="pool-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section></section>
+<aside id="detail-drawer" aria-label="流动性池详情" hidden></aside>
+</main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;
 }
 
 export { renderStyles };
