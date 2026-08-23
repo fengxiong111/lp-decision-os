@@ -465,6 +465,38 @@ function simulateNetReturn(pool, strategy) {
   };
 }
 
+function simulateGrossFee(pool, strategy, capital = 1_000) {
+  const poolFee = finite(pool.lpFee24h);
+  const tvl = finite(pool.tvl);
+  const capitalValue = finite(capital);
+  const base = {
+    status: "WAITING_MARKET_DATA",
+    method: "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+    capital: capitalValue,
+    grossFee24h: null,
+    coreGrossFee24h: null,
+    bufferGrossFee24h: null,
+    capitalShareAfterDeposit: null,
+    note: "等待官方 TVL 与 LP Fee；不代表验证净收益",
+  };
+  if (poolFee === null || tvl === null || capitalValue === null || tvl <= 0 || capitalValue <= 0) return base;
+
+  const capitalShareAfterDeposit = capitalValue / (tvl + capitalValue);
+  const grossFee24h = poolFee * capitalShareAfterDeposit;
+  const allocation = strategy?.allocation?.split?.("/").map((value) => Number(value) / 100) ?? [];
+  const coreShare = Number.isFinite(allocation[0]) ? allocation[0] : null;
+  const bufferShare = Number.isFinite(allocation[1]) ? allocation[1] : null;
+  return {
+    ...base,
+    status: Number.isFinite(grossFee24h) ? "SIMULATED" : "WAITING_MARKET_DATA",
+    grossFee24h: Number.isFinite(grossFee24h) ? grossFee24h : null,
+    coreGrossFee24h: coreShare === null ? null : grossFee24h * coreShare,
+    bufferGrossFee24h: bufferShare === null ? null : grossFee24h * bufferShare,
+    capitalShareAfterDeposit,
+    note: "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本",
+  };
+}
+
 function riskFor(pool, netModel, score) {
   if (netModel.status !== "COMPLETE") return "MEDIUM";
   if (pool.feeTvl !== null && pool.feeTvl > 0.1) return "HIGH";
@@ -495,6 +527,7 @@ export function buildScannerCandidates(pools, {
   const candidates = eligible.map((pool) => {
     const score = marketScore(pool, eligible);
     const strategy = pool.dex === "Raydium" ? buildRaydiumStrategy(pool, capital) : buildMeteoraStrategy(pool);
+    const strategySimulation = simulateGrossFee(pool, strategy, capital);
     const netModel = simulateNetReturn(pool, strategy);
     const riskLevel = riskFor(pool, netModel, score);
     const recommendation = netModel.status === "COMPLETE" && netModel.expectedNetReturn > 0 ? "考虑" : "观察";
@@ -519,6 +552,7 @@ export function buildScannerCandidates(pools, {
       apr24h: pool.apr24h,
       washVolumeStatus: pool.washVolumeStatus,
       strategy,
+      strategySimulation,
       netModel,
       expectedNetReturn: netModel.expectedNetReturn,
       riskLevel,
@@ -546,6 +580,11 @@ export function buildScannerCandidates(pools, {
     if (netLeft !== null && netRight !== null && netLeft !== netRight) return netRight - netLeft;
     if (netLeft !== null && netRight === null) return -1;
     if (netLeft === null && netRight !== null) return 1;
+    const grossLeft = left.strategySimulation?.grossFee24h;
+    const grossRight = right.strategySimulation?.grossFee24h;
+    if (grossLeft !== null && grossRight !== null && grossLeft !== undefined && grossRight !== undefined && grossLeft !== grossRight) {
+      return grossRight - grossLeft;
+    }
     return (right.lpScore ?? -Infinity) - (left.lpScore ?? -Infinity)
       || (right.feeTvl ?? -Infinity) - (left.feeTvl ?? -Infinity)
       || left.poolAddress.localeCompare(right.poolAddress);
@@ -561,7 +600,9 @@ export function buildScannerCandidates(pools, {
     candidates: candidates.slice(0, limit).map((candidate, index) => ({ ...candidate, rank: index + 1 })),
     rankingBasis: candidates.some((candidate) => candidate.expectedNetReturn !== null)
       ? "EXPECTED_NET_RETURN"
-      : "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY",
+      : candidates.some((candidate) => candidate.strategySimulation?.grossFee24h !== null)
+        ? "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY"
+        : "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY",
   };
 }
 

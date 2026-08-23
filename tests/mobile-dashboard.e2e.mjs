@@ -51,6 +51,16 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
       executionReady: false,
       executionBlocker: "fixture",
     },
+    strategySimulation: {
+      status: "SIMULATED",
+      method: "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+      capital: 1_000,
+      grossFee24h: 19.8,
+      coreGrossFee24h: isMeteora ? null : 13.86,
+      bufferGrossFee24h: isMeteora ? null : 5.94,
+      capitalShareAfterDeposit: 1_000 / (100_000 + 1_000),
+      note: "fixture simulation; not verified net return",
+    },
     netModel: {
       status: "WAITING_REPLAY",
       grossFee24h: null,
@@ -158,7 +168,8 @@ try {
     } else {
       assert.equal(await page.locator("#empty-state").isHidden(), true);
       assert.match(await page.locator("body").innerText(), /Solana LP Opportunity Scanner/);
-      assert.match(await page.locator("body").innerText(), /等待真实回放/);
+      assert.match(await page.locator("body").innerText(), /等待完整 Replay/);
+      assert.match(await page.locator("body").innerText(), /毛收益≈/);
     }
   }
 
@@ -170,6 +181,9 @@ try {
   await page.waitForFunction(() => document.querySelectorAll("#scanner-list .scanner-row").length === 10);
   await page.locator(".why-button").first().click();
   await page.waitForSelector("#why-drawer:not([hidden])");
+  assert.match(await page.locator("#why-drawer").innerText(), /Market Radar/);
+  assert.match(await page.locator("#why-drawer").innerText(), /Strategy Simulation/);
+  assert.match(await page.locator("#why-drawer").innerText(), /Verified Net Return/);
   assert.match(await page.locator("#why-drawer").innerText(), /Replay|单笔刷量检查/);
   console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 10], defaultRows: [0, 1, 3, 4, 5], showAllRows: 10 }, null, 2));
 } finally {

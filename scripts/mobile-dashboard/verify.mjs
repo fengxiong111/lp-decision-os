@@ -116,6 +116,14 @@ function validNullableNumber(value) {
   return value === null || Number.isFinite(value);
 }
 
+function validStrategySimulation(value) {
+  return value
+    && ["SIMULATED", "WAITING_MARKET_DATA"].includes(value.status)
+    && typeof value.method === "string"
+    && [value.capital, value.grossFee24h, value.coreGrossFee24h, value.bufferGrossFee24h, value.capitalShareAfterDeposit].every(validNullableNumber)
+    && typeof value.note === "string";
+}
+
 function validScannerCandidate(row, index) {
   return row && row.rank === index + 1
     && typeof row.poolAddress === "string"
@@ -124,6 +132,7 @@ function validScannerCandidate(row, index) {
     && SCANNER_POOL_TYPES.has(row.poolType)
     && [row.tvl, row.volume24h, row.lpFee24h, row.feeTier, row.volumeTvl, row.feeTvl, row.priceVolatilityPct, row.activeTimeHours, row.expectedNetReturn, row.lpScore].every(validNullableNumber)
     && row.strategy && typeof row.strategy.family === "string"
+    && validStrategySimulation(row.strategySimulation)
     && row.netModel && typeof row.netModel.status === "string"
     && [row.netModel.grossFee24h, row.netModel.outOfRangeTimeCost, row.netModel.rebalanceCost, row.netModel.gasCost, row.netModel.swapSlippage, row.netModel.impermanentLoss, row.netModel.expectedNetReturn, row.netModel.rebalanceFrequency, row.netModel.confidence].every(validNullableNumber)
     && SCANNER_RISKS.has(row.riskLevel)
@@ -142,7 +151,13 @@ export function verifyScannerSnapshot(snapshot, config) {
   if (!snapshot.scanner || snapshot.scanner.version !== 1 || snapshot.scanner.defaultDisplayLimit !== 5 || snapshot.scanner.top10Count > 10) fail("Scanner Top10/Top5 配置错误");
   if (!Array.isArray(snapshot.scanner.candidates) || snapshot.scanner.candidates.length > 10) fail("Scanner 候选超过 Top10");
   if (snapshot.scanner.candidates.some((row, index) => !validScannerCandidate(row, index))) fail("Scanner 候选字段非法");
+  if (![
+    "EXPECTED_NET_RETURN",
+    "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY",
+    "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY",
+  ].includes(snapshot.scanner.rankingBasis)) fail("Scanner 排名依据非法");
   if (snapshot.scanner.candidates.some((row, index, rows) => index > 0 && (rows[index - 1].expectedNetReturn ?? -Infinity) < (row.expectedNetReturn ?? -Infinity) && rows[index - 1].expectedNetReturn !== null && row.expectedNetReturn !== null)) fail("完整净收益候选未降序");
+  if (snapshot.scanner.rankingBasis === "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY" && snapshot.scanner.candidates.some((row, index, rows) => index > 0 && rows[index - 1].strategySimulation.grossFee24h !== null && row.strategySimulation.grossFee24h !== null && rows[index - 1].strategySimulation.grossFee24h < row.strategySimulation.grossFee24h)) fail("模拟毛收益候选未降序");
   if (!snapshot.scanner.filters || snapshot.scanner.filters.tvlMin !== 50_000 || snapshot.scanner.filters.volume24hMin !== 50_000) fail("Scanner 过滤阈值错误");
   if (containsForbiddenPositionField(snapshot)) fail("Scanner 快照包含真实钱包或真实仓位字段");
   return true;
@@ -151,7 +166,7 @@ export function verifyScannerSnapshot(snapshot, config) {
 export function verifyScannerPageMarkup(markup) {
   const headerCells = markup.match(/role="columnheader"/g) ?? [];
   if (headerCells.length !== 12) fail(`Scanner 表头列数为 ${headerCells.length}，应为 12`);
-  for (const label of ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "交易对", "DEX / 类型", "24H交易量", "24H手续费", "TVL", "费率", "模拟策略", "预计 $1000 日净收益", "风险", "建议", "WHY"]) {
+  for (const label of ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "Market Radar", "Strategy Simulation", "Verified Net Return", "交易对", "DEX / 类型", "24H交易量 · Vol/TVL", "24H手续费 · Fee/TVL", "TVL", "费率", "策略模拟 · 毛收益", "验证净收益 24H", "风险", "建议", "WHY"]) {
     if (!markup.includes(label)) fail(`Scanner 页面缺少字段：${label}`);
   }
   if (!/<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/.test(markup)) fail("缺少 Scanner 浏览器运行时");

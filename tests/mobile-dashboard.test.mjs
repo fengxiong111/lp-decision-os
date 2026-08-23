@@ -266,7 +266,8 @@ test("外版页面只展示 Solana LP Scanner 的固定 12 列与唯一快照入
   assert.match(page, /Raydium CLMM · Meteora DLMM/);
   assert.match(page, /固定模拟资金 \$1,000/);
   assert.match(page, /Top 5 LP Opportunities/);
-  assert.match(page, /预计 \$1000 日净收益/);
+  assert.match(page, /策略模拟 · 毛收益/);
+  assert.match(page, /验证净收益 24H/);
   assert.match(page, /top3\.json/);
   assert.equal((page.match(/role="columnheader"/g) ?? []).length, 12);
   assert.doesNotMatch(page, /24H Fee 总榜|RWA Fee Top 10|Opportunity Score|Confidence|UNAVAILABLE/);

@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
   "product": "Solana LP Opportunity Scanner",
-  "generatedAt": "2026-08-23T03:52:16.219Z",
+  "generatedAt": "2026-08-23T04:15:42.482Z",
   "sourceEvidence": {
     "primary": "Official Raydium API v3 + Meteora DLMM API",
-    "fetchedAt": "2026-08-23T03:52:16.219Z",
+    "fetchedAt": "2026-08-23T04:15:42.482Z",
     "sources": {
       "raydium": {
         "dex": "Raydium",
@@ -20,8 +20,8 @@
         "poolType": "DLMM",
         "endpoint": "https://dlmm.datapi.meteora.ag/pools",
         "pageCount": 124,
-        "poolCount": 123071,
-        "total": 123071,
+        "poolCount": 123086,
+        "total": 123081,
         "complete": true,
         "error": null
       }
@@ -44,17 +44,17 @@
   },
   "scanner": {
     "version": 1,
-    "generatedAt": "2026-08-23T03:52:16.219Z",
-    "allPoolCount": 97314,
-    "eligiblePoolCount": 145,
-    "excludedPoolCount": 97169,
+    "generatedAt": "2026-08-23T04:15:42.482Z",
+    "allPoolCount": 97271,
+    "eligiblePoolCount": 147,
+    "excludedPoolCount": 97124,
     "excludedByReason": {
-      "TVL_BELOW_50K": 96821,
-      "ABNORMAL_APR": 346,
-      "ABNORMAL_FEE_TVL": 911,
-      "VOLUME_BELOW_50K": 96550
+      "TVL_BELOW_50K": 96785,
+      "ABNORMAL_APR": 368,
+      "ABNORMAL_FEE_TVL": 901,
+      "VOLUME_BELOW_50K": 96508
     },
-    "rankingBasis": "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY",
+    "rankingBasis": "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY",
     "top10Count": 10,
     "defaultDisplayLimit": 5,
     "filters": {
@@ -65,85 +65,282 @@
     },
     "candidates": [
       {
-        "poolAddress": "ANCx141SujgVdbKz9NTEH8F38qWsnyyXsVju64aU3qLB",
-        "pair": "HYPE/USDC",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "98sMhvDwXj1RQi5c5Mndm3vPe9cBqPrbLaufMXFNMh5g",
-        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 5334263.282563325,
-        "volume24h": 5654454.112653076,
-        "lpFee24h": 13803.69003907456,
-        "feeTier": 0.002,
-        "feeMode": "BASE",
-        "volumeTvl": 1.060025314299051,
-        "feeTvl": 0.25877406696808825,
-        "priceVolatilityPct": null,
+        "poolAddress": "G9hjoZSrwqeY5jE4HMwaYJZeeKv77tiLeDcKCzu1wfpK",
+        "pair": "ZEC/REDACTED",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
+        "quoteMint": "Ga5ErptAQ5oHwB7G195UEq9FeJ5UNDoV9SCRCpebFeG7",
+        "tvl": 101485.07,
+        "volume24h": 341546.08610726084,
+        "lpFee24h": 13933.02372777726,
+        "feeTier": 0.04,
+        "feeMode": null,
+        "volumeTvl": 3.365481110741322,
+        "feeTvl": 0.13729136441229492,
+        "priceVolatilityPct": 212.94580655535862,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 5011.13,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 20,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 2025040.228734178,
+            "upper": 2065950.1323449695,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 1636396.144431659,
+            "upper": 2454594.2166474885,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 135.9517413392727,
+          "coreGrossFee24h": 95.16621893749088,
+          "bufferGrossFee24h": 40.78552240178181,
+          "capitalShareAfterDeposit": 0.009757518826888637,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -160,9 +357,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 87.5,
+        "lpScore": 55.4,
         "scoreBreakdown": {
-          "value": 87.5,
+          "value": 55.4,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -172,18 +369,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 90.97222222222221,
-            "capitalUtilization": 100,
+            "feeEfficiency": 83.56164383561644,
+            "capitalUtilization": 66.87338384659353,
             "rangeHitRate": null,
-            "liquiditySafety": 93.75,
-            "rebalanceCost": 36.80555555555556
+            "liquiditySafety": 16.43835616438356,
+            "rebalanceCost": 0.684931506849324
           },
           "raw": {
-            "feeEfficiency": 0.25877406696808825,
-            "capitalUtilization": 5334.263282563325,
+            "feeEfficiency": 0.13729136441229492,
+            "capitalUtilization": 101.48507000000001,
             "rangeHitRate": null,
-            "liquiditySafety": 5334263.282563325,
-            "rebalanceCost": 0.002
+            "liquiditySafety": 101485.07,
+            "rebalanceCost": 0.04
           }
         },
         "filter": {
@@ -193,18 +390,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 25.88%",
-            "Volume/TVL 1.06x",
-            "流动性安全垫较厚"
+            "Fee/TVL 13.73%",
+            "Volume/TVL 3.37x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 87.5,
+          "strategy": "Core + Buffer",
+          "score": 55.4,
           "filterReasons": []
         },
         "verification": {
@@ -214,90 +409,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 1
       },
       {
-        "poolAddress": "9DiruRpjnAnzhn6ts5HGLouHtJrT1JGsPbXNYCrFz2ad",
-        "pair": "MELANIA/USDC",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "FUAfBo2jgks6gB4Z4LfZkqSZgzNucisEHqnNebaRxM1P",
-        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 12470414.374347003,
-        "volume24h": 2670500.0616989895,
-        "lpFee24h": 32284.97919560151,
-        "feeTier": 0.015,
-        "feeMode": "BASE",
-        "volumeTvl": 0.2141468584390025,
-        "feeTvl": 0.2588925935132935,
-        "priceVolatilityPct": null,
+        "poolAddress": "987VwvJZ5FRjWCY9ZwC2tRUGL8FbMT1aF4pUrT7XjPjD",
+        "pair": "RAY/RAYCAT",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+        "quoteMint": "CFNRDaxFcvRwRSNnA5cHrCCr6AHhk9dNkHWpRUjNupFL",
+        "tvl": 69025.21,
+        "volume24h": 341798.0852075963,
+        "lpFee24h": 3435.0472406518466,
+        "feeTier": 0.01,
+        "feeMode": null,
+        "volumeTvl": 4.951786241687585,
+        "feeTvl": 0.049765111046411105,
+        "priceVolatilityPct": 167.4531472718943,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 1816.43,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 100,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 2858.009641006333,
+            "upper": 2915.7472095115113,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 2309.502740207138,
+            "upper": 3464.2541103107064,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 49.054436832847,
+          "coreGrossFee24h": 34.3381057829929,
+          "bufferGrossFee24h": 14.7163310498541,
+          "capitalShareAfterDeposit": 0.014280571239986283,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -314,9 +706,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 84.4,
+        "lpScore": 49.6,
         "scoreBreakdown": {
-          "value": 84.4,
+          "value": 49.6,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -326,18 +718,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 91.66666666666666,
-            "capitalUtilization": 100,
+            "feeEfficiency": 73.97260273972603,
+            "capitalUtilization": 61.29412786075728,
             "rangeHitRate": null,
-            "liquiditySafety": 97.91666666666666,
-            "rebalanceCost": 3.4722222222222143
+            "liquiditySafety": 8.21917808219178,
+            "rebalanceCost": 9.589041095890423
           },
           "raw": {
-            "feeEfficiency": 0.2588925935132935,
-            "capitalUtilization": 12470.414374347003,
+            "feeEfficiency": 0.049765111046411105,
+            "capitalUtilization": 69.02521,
             "rangeHitRate": null,
-            "liquiditySafety": 12470414.374347003,
-            "rebalanceCost": 0.015
+            "liquiditySafety": 69025.21,
+            "rebalanceCost": 0.01
           }
         },
         "filter": {
@@ -347,18 +739,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 25.89%",
-            "Volume/TVL 0.21x",
-            "流动性安全垫较厚"
+            "Fee/TVL 4.98%",
+            "Volume/TVL 4.95x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 84.4,
+          "strategy": "Core + Buffer",
+          "score": 49.6,
           "filterReasons": []
         },
         "verification": {
@@ -368,90 +758,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 2
       },
       {
-        "poolAddress": "C8Gr6AUuq9hEdSYJzoEpNcdjpojPZwqG5MtQbeouNNwg",
-        "pair": "JUP/SOL",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
-        "quoteMint": "So11111111111111111111111111111111111111112",
-        "tvl": 1239759.291174474,
-        "volume24h": 2175947.581627518,
-        "lpFee24h": 3256.2728814588404,
-        "feeTier": 0.0015,
-        "feeMode": "BASE",
-        "volumeTvl": 1.7551371440549197,
-        "feeTvl": 0.2626536380601788,
-        "priceVolatilityPct": null,
+        "poolAddress": "45ssPkUQs1ssbeDqxD2mZrMdJYAXF7GyQyhS5xDXuWC5",
+        "pair": "WSOL/PUMP",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "So11111111111111111111111111111111111111112",
+        "quoteMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
+        "tvl": 1166776.34,
+        "volume24h": 32935727.521232966,
+        "lpFee24h": 32935.72926105114,
+        "feeTier": 0.001,
+        "feeMode": null,
+        "volumeTvl": 28.22796999914565,
+        "feeTvl": 0.028227971490278198,
+        "priceVolatilityPct": 26.52659928933253,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 1030.32,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 80,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 19730.36521292842,
+            "upper": 20128.958449553236,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 15943.729464992663,
+            "upper": 23915.594197488994,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 28.203799077699365,
+          "coreGrossFee24h": 19.742659354389556,
+          "bufferGrossFee24h": 8.46113972330981,
+          "capitalShareAfterDeposit": 0.0008563283616450047,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -468,9 +1055,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 84.2,
+        "lpScore": 78,
         "scoreBreakdown": {
-          "value": 84.2,
+          "value": 78,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -480,18 +1067,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 92.36111111111111,
+            "feeEfficiency": 71.91780821917808,
             "capitalUtilization": 100,
             "rangeHitRate": null,
-            "liquiditySafety": 70.83333333333334,
-            "rebalanceCost": 40.27777777777778
+            "liquiditySafety": 70.54794520547945,
+            "rebalanceCost": 52.05479452054795
           },
           "raw": {
-            "feeEfficiency": 0.2626536380601788,
-            "capitalUtilization": 1239.759291174474,
+            "feeEfficiency": 0.028227971490278198,
+            "capitalUtilization": 1166.7763400000001,
             "rangeHitRate": null,
-            "liquiditySafety": 1239759.291174474,
-            "rebalanceCost": 0.0015
+            "liquiditySafety": 1166776.34,
+            "rebalanceCost": 0.001
           }
         },
         "filter": {
@@ -501,18 +1088,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 26.27%",
-            "Volume/TVL 1.76x",
+            "Fee/TVL 2.82%",
+            "Volume/TVL 28.23x",
             "流动性安全垫较厚"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 84.2,
+          "strategy": "Core + Buffer",
+          "score": 78,
           "filterReasons": []
         },
         "verification": {
@@ -522,90 +1108,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 3
       },
       {
-        "poolAddress": "7ubS3GccjhQY99AYNKXjNJqnXjaokEdfdV915xnCb96r",
-        "pair": "cbBTC/USDC",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
-        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 1514523.71998198,
-        "volume24h": 4953496.275924237,
-        "lpFee24h": 2225.2153537667855,
-        "feeTier": 0.0004389,
-        "feeMode": "DYNAMIC",
-        "volumeTvl": 3.2706627242412383,
-        "feeTvl": 0.1469250909977997,
-        "priceVolatilityPct": null,
+        "poolAddress": "G69tW3836i8oD2M5VsB4g1QPR5gNoK73oxxwXY4cMQw4",
+        "pair": "SILV/DEGS",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "SiLVFMgD3eD2rgK628NbTBq9MnuJF5FW2CRaVyTB35L",
+        "quoteMint": "8HKQfbm1Unb4aLcgrXCvP2DBLfk2wtcJ2AtR7grzpcvg",
+        "tvl": 73972.67,
+        "volume24h": 116658.18516737476,
+        "lpFee24h": 1172.4284950318086,
+        "feeTier": 0.01,
+        "feeMode": null,
+        "volumeTvl": 1.5770444025796928,
+        "feeTvl": 0.01584948191043812,
+        "priceVolatilityPct": 100.9120604353525,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 578.51,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 4,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 210291.85535244987,
+            "upper": 214540.17566260038,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 169932.81240602012,
+            "upper": 254899.21860903013,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 15.63807844954446,
+          "coreGrossFee24h": 10.946654914681123,
+          "bufferGrossFee24h": 4.691423534863338,
+          "capitalShareAfterDeposit": 0.013338193771143538,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -622,9 +1405,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 84.1,
+        "lpScore": 48.7,
         "scoreBreakdown": {
-          "value": 84.1,
+          "value": 48.7,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -634,18 +1417,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 84.72222222222221,
-            "capitalUtilization": 100,
+            "feeEfficiency": 69.17808219178082,
+            "capitalUtilization": 62.29614624863843,
             "rangeHitRate": null,
-            "liquiditySafety": 72.91666666666666,
-            "rebalanceCost": 59.02777777777778
+            "liquiditySafety": 10.95890410958904,
+            "rebalanceCost": 9.589041095890423
           },
           "raw": {
-            "feeEfficiency": 0.1469250909977997,
-            "capitalUtilization": 1514.52371998198,
+            "feeEfficiency": 0.01584948191043812,
+            "capitalUtilization": 73.97267,
             "rangeHitRate": null,
-            "liquiditySafety": 1514523.71998198,
-            "rebalanceCost": 0.0004389
+            "liquiditySafety": 73972.67,
+            "rebalanceCost": 0.01
           }
         },
         "filter": {
@@ -655,18 +1438,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 14.69%",
-            "Volume/TVL 3.27x",
-            "流动性安全垫较厚"
+            "Fee/TVL 1.58%",
+            "Volume/TVL 1.58x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 84.1,
+          "strategy": "Core + Buffer",
+          "score": 48.7,
           "filterReasons": []
         },
         "verification": {
@@ -676,90 +1457,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 4
       },
       {
-        "poolAddress": "BoeMUkCLHchTD31HdXsbDExuZZfcUppSLpYtV3LZTH6U",
-        "pair": "JitoSOL/SOL",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
-        "quoteMint": "So11111111111111111111111111111111111111112",
-        "tvl": 2603146.0151245813,
-        "volume24h": 1414400.540626329,
-        "lpFee24h": 145.14107808508098,
-        "feeTier": 0.0001,
-        "feeMode": "BASE",
-        "volumeTvl": 0.5433427600328592,
-        "feeTvl": 0.005575602645483365,
-        "priceVolatilityPct": null,
+        "poolAddress": "FDamUzyiEA7Cq1VNiQcbhuHpfCmmcJfgA6DwQQ1hhLd2",
+        "pair": "TTWO/GTA6",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
+        "quoteMint": "4kjruqGHDsSqkMdFfCjV7Vb62HPFhtXyWc2t6JpQzDnz",
+        "tvl": 184790.02,
+        "volume24h": 70809.65741883211,
+        "lpFee24h": 2884.783994473917,
+        "feeTier": 0.04,
+        "feeMode": null,
+        "volumeTvl": 0.3831898357867601,
+        "feeTvl": 0.015611146069868477,
+        "priceVolatilityPct": 50.253491445141485,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 569.81,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 1,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 125512.6624829111,
+            "upper": 128048.2718260002,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 101424.37372356452,
+            "upper": 152136.56058534677,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 15.527120318270686,
+          "coreGrossFee24h": 10.86898422278948,
+          "bufferGrossFee24h": 4.658136095481206,
+          "capitalShareAfterDeposit": 0.005382420433562578,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -776,9 +1754,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 82.3,
+        "lpScore": 54.9,
         "scoreBreakdown": {
-          "value": 82.3,
+          "value": 54.9,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -788,18 +1766,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 61.111111111111114,
-            "capitalUtilization": 100,
+            "feeEfficiency": 68.4931506849315,
+            "capitalUtilization": 75.54839482058098,
             "rangeHitRate": null,
-            "liquiditySafety": 83.33333333333334,
-            "rebalanceCost": 100
+            "liquiditySafety": 29.45205479452055,
+            "rebalanceCost": 0.684931506849324
           },
           "raw": {
-            "feeEfficiency": 0.005575602645483365,
-            "capitalUtilization": 2603.1460151245815,
+            "feeEfficiency": 0.015611146069868477,
+            "capitalUtilization": 184.79002,
             "rangeHitRate": null,
-            "liquiditySafety": 2603146.0151245813,
-            "rebalanceCost": 0.0001
+            "liquiditySafety": 184790.02,
+            "rebalanceCost": 0.04
           }
         },
         "filter": {
@@ -809,18 +1787,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 0.56%",
-            "Volume/TVL 0.54x",
-            "流动性安全垫较厚"
+            "Fee/TVL 1.56%",
+            "Volume/TVL 0.38x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 82.3,
+          "strategy": "Core + Buffer",
+          "score": 54.9,
           "filterReasons": []
         },
         "verification": {
@@ -830,90 +1806,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 5
       },
       {
-        "poolAddress": "CgqwPLSFfht89pF5RSKGUUMFj5zRxoUt4861w2SkXaqY",
-        "pair": "SOL/USDC",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "So11111111111111111111111111111111111111112",
-        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 683700.7991376214,
-        "volume24h": 1864535.0347830907,
-        "lpFee24h": 1376.5318474253324,
-        "feeTier": 0.0005,
-        "feeMode": "BASE",
-        "volumeTvl": 2.727121333096146,
-        "feeTvl": 0.20133541589560905,
-        "priceVolatilityPct": null,
+        "poolAddress": "7a8xxAJBELDo6P9dikSYctdw6ce8F4mWr3ahcAD8Ao49",
+        "pair": "SPYx/STONK",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+        "quoteMint": "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx",
+        "tvl": 401538.97,
+        "volume24h": 598663.796659524,
+        "lpFee24h": 5986.6405192513685,
+        "feeTier": 0.01,
+        "feeMode": null,
+        "volumeTvl": 1.4909232761630185,
+        "feeTvl": 0.014909239118811727,
+        "priceVolatilityPct": 47.342164435182546,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 544.19,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 80,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 93832.24282327927,
+            "upper": 95727.84368839602,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 75824.03460467012,
+            "upper": 113736.05190700518,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 14.872201116953644,
+          "coreGrossFee24h": 10.41054078186755,
+          "bufferGrossFee24h": 4.461660335086093,
+          "capitalShareAfterDeposit": 0.0024842315267016263,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -930,9 +2103,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 81.5,
+        "lpScore": 63.2,
         "scoreBreakdown": {
-          "value": 81.5,
+          "value": 63.2,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -942,18 +2115,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 87.5,
-            "capitalUtilization": 94.48608669709466,
+            "feeEfficiency": 67.8082191780822,
+            "capitalUtilization": 86.78224426216536,
             "rangeHitRate": null,
-            "liquiditySafety": 63.19444444444444,
-            "rebalanceCost": 58.33333333333333
+            "liquiditySafety": 50.68493150684932,
+            "rebalanceCost": 9.589041095890423
           },
           "raw": {
-            "feeEfficiency": 0.20133541589560905,
-            "capitalUtilization": 683.7007991376214,
+            "feeEfficiency": 0.014909239118811727,
+            "capitalUtilization": 401.53896999999995,
             "rangeHitRate": null,
-            "liquiditySafety": 683700.7991376214,
-            "rebalanceCost": 0.0005
+            "liquiditySafety": 401538.97,
+            "rebalanceCost": 0.01
           }
         },
         "filter": {
@@ -963,17 +2136,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 20.13%",
-            "Volume/TVL 2.73x"
+            "Fee/TVL 1.49%",
+            "Volume/TVL 1.49x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 81.5,
+          "strategy": "Core + Buffer",
+          "score": 63.2,
           "filterReasons": []
         },
         "verification": {
@@ -983,90 +2155,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 6
       },
       {
-        "poolAddress": "5cvcHrD2uh2CXhmZnMHsTVWJW1qtyikVaN3MCJNaCKMh",
-        "pair": "JupSOL/JitoSOL",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
-        "quoteMint": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
-        "tvl": 434523.2889127624,
-        "volume24h": 3676183.3904170785,
-        "lpFee24h": 561.8956603019376,
-        "feeTier": 0.0001,
-        "feeMode": "BASE",
-        "volumeTvl": 8.460267802021383,
-        "feeTvl": 0.1293131288101677,
-        "priceVolatilityPct": null,
+        "poolAddress": "5UUdSTWM1gv4emMEfARYYS7DTb3RPm9P5WUoYrcBimJP",
+        "pair": "CARDS/USDC",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "CARDSccUMFKoPRZxt5vt3ksUbxEFEcnZ3H2pd3dKxYjp",
+        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "tvl": 66964.02,
+        "volume24h": 69380.0157446471,
+        "lpFee24h": 693.8002428908612,
+        "feeTier": 0.01,
+        "feeMode": null,
+        "volumeTvl": 1.0360790129482533,
+        "feeTvl": 0.010360791405457157,
+        "priceVolatilityPct": 18.47443317867202,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 378.17,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 1,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 0.1959607429629025,
+            "upper": 0.19991954585104194,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 0.1583521155255778,
+            "upper": 0.23752817328836665,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 10.208346164497938,
+          "coreGrossFee24h": 7.145842315148556,
+          "bufferGrossFee24h": 3.062503849349381,
+          "capitalShareAfterDeposit": 0.014713667614128768,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -1083,9 +2452,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 81.4,
+        "lpScore": 46.4,
         "scoreBreakdown": {
-          "value": 81.4,
+          "value": 46.4,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -1095,18 +2464,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 82.63888888888889,
-            "capitalUtilization": 87.92497522507301,
+            "feeEfficiency": 66.43835616438356,
+            "capitalUtilization": 60.855297776195044,
             "rangeHitRate": null,
-            "liquiditySafety": 55.55555555555556,
-            "rebalanceCost": 100
+            "liquiditySafety": 6.8493150684931505,
+            "rebalanceCost": 9.589041095890423
           },
           "raw": {
-            "feeEfficiency": 0.1293131288101677,
-            "capitalUtilization": 434.52328891276244,
+            "feeEfficiency": 0.010360791405457157,
+            "capitalUtilization": 66.96402,
             "rangeHitRate": null,
-            "liquiditySafety": 434523.2889127624,
-            "rebalanceCost": 0.0001
+            "liquiditySafety": 66964.02,
+            "rebalanceCost": 0.01
           }
         },
         "filter": {
@@ -1116,17 +2485,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 12.93%",
-            "Volume/TVL 8.46x"
+            "Fee/TVL 1.04%",
+            "Volume/TVL 1.04x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 81.4,
+          "strategy": "Core + Buffer",
+          "score": 46.4,
           "filterReasons": []
         },
         "verification": {
@@ -1136,90 +2504,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 7
       },
       {
-        "poolAddress": "CGYxcqLiJEoYapZrU7uVGBGfEE15pXDV4mB9AQ8Fsuff",
-        "pair": "tKalshi/USDC",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "TKLSidmLVt3cqGaaodG8tyRzoANfQwoh67AccjmubeZ",
-        "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 638192.2494556607,
-        "volume24h": 532725.5054000895,
-        "lpFee24h": 171.58519461543807,
-        "feeTier": 0.0001,
-        "feeMode": "BASE",
-        "volumeTvl": 0.8347414213420362,
-        "feeTvl": 0.02688612949495859,
-        "priceVolatilityPct": null,
+        "poolAddress": "9NJ7rtJzEnfwvoM6HyB2v6YHcsfS6ZY9DFGprphVX6W",
+        "pair": "WSOL/COINx",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "So11111111111111111111111111111111111111112",
+        "quoteMint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
+        "tvl": 284486.24,
+        "volume24h": 334658.6133565939,
+        "lpFee24h": 2677.2692700733674,
+        "feeTier": 0.008,
+        "feeMode": null,
+        "volumeTvl": 1.1763613359879688,
+        "feeTvl": 0.009410891964663624,
+        "priceVolatilityPct": 10.167358830756722,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 343.5,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 80,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 0.5038025261027523,
+            "upper": 0.5139803549129089,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 0.40711315240626456,
+            "upper": 0.6106697286093967,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 9.377927531895644,
+          "coreGrossFee24h": 6.56454927232695,
+          "bufferGrossFee24h": 2.813378259568693,
+          "capitalShareAfterDeposit": 0.003502795791488935,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -1236,9 +2801,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 80.4,
+        "lpScore": 58.9,
         "scoreBreakdown": {
-          "value": 80.4,
+          "value": 58.9,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -1248,18 +2813,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 72.22222222222221,
-            "capitalUtilization": 93.48903434783298,
+            "feeEfficiency": 65.06849315068493,
+            "capitalUtilization": 81.79386197345133,
             "rangeHitRate": null,
-            "liquiditySafety": 61.80555555555556,
-            "rebalanceCost": 100
+            "liquiditySafety": 40.41095890410959,
+            "rebalanceCost": 10.958904109589042
           },
           "raw": {
-            "feeEfficiency": 0.02688612949495859,
-            "capitalUtilization": 638.1922494556607,
+            "feeEfficiency": 0.009410891964663624,
+            "capitalUtilization": 284.48624,
             "rangeHitRate": null,
-            "liquiditySafety": 638192.2494556607,
-            "rebalanceCost": 0.0001
+            "liquiditySafety": 284486.24,
+            "rebalanceCost": 0.008
           }
         },
         "filter": {
@@ -1269,17 +2834,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 2.69%",
-            "Volume/TVL 0.83x"
+            "Fee/TVL 0.94%",
+            "Volume/TVL 1.18x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 80.4,
+          "strategy": "Core + Buffer",
+          "score": 58.9,
           "filterReasons": []
         },
         "verification": {
@@ -1289,90 +2853,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 8
       },
       {
-        "poolAddress": "54Vp27uLaw4wNLo5n7r4fcC6zLamoQc28xBARjss4EUJ",
-        "pair": "ANTFUN/USDT",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "CWZ6BsdnjkDVTGkmL6bGbJXXig6ceef12KvyGQW14cMt",
-        "quoteMint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-        "tvl": 38810581.0189868,
-        "volume24h": 6606899.772844623,
-        "lpFee24h": 1820.210339813577,
-        "feeTier": 0.0003,
-        "feeMode": "BASE",
-        "volumeTvl": 0.17023449789665387,
-        "feeTvl": 0.004689984772253472,
-        "priceVolatilityPct": null,
+        "poolAddress": "9n3dSLrERZQp95dHXywft7xV8D8xnGFLaUHtEhQVaXaC",
+        "pair": "WSOL/PYTH",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "So11111111111111111111111111111111111111112",
+        "quoteMint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+        "tvl": 367111.4,
+        "volume24h": 1147944.935811855,
+        "lpFee24h": 2869.8626203648596,
+        "feeTier": 0.0025,
+        "feeMode": null,
+        "volumeTvl": 3.126966190131537,
+        "feeTvl": 0.007817416240315227,
+        "priceVolatilityPct": 9.183265515202859,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 285.34,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 16,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 1889.7777953585492,
+            "upper": 1927.9551245577118,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 1527.0931679665046,
+            "upper": 2290.6397519497564,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 7.796179690074416,
+          "coreGrossFee24h": 5.457325783052091,
+          "bufferGrossFee24h": 2.3388539070223247,
+          "capitalShareAfterDeposit": 0.0027165689516814744,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -1389,9 +3150,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 80.3,
+        "lpScore": 63.5,
         "scoreBreakdown": {
-          "value": 80.3,
+          "value": 63.5,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -1401,18 +3162,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 59.72222222222222,
-            "capitalUtilization": 100,
+            "feeEfficiency": 63.6986301369863,
+            "capitalUtilization": 85.48471303929824,
             "rangeHitRate": null,
-            "liquiditySafety": 99.30555555555556,
-            "rebalanceCost": 63.88888888888889
+            "liquiditySafety": 45.20547945205479,
+            "rebalanceCost": 35.61643835616438
           },
           "raw": {
-            "feeEfficiency": 0.004689984772253472,
-            "capitalUtilization": 38810.5810189868,
+            "feeEfficiency": 0.007817416240315227,
+            "capitalUtilization": 367.1114,
             "rangeHitRate": null,
-            "liquiditySafety": 38810581.0189868,
-            "rebalanceCost": 0.0003
+            "liquiditySafety": 367111.4,
+            "rebalanceCost": 0.0025
           }
         },
         "filter": {
@@ -1422,18 +3183,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 0.47%",
-            "Volume/TVL 0.17x",
-            "流动性安全垫较厚"
+            "Fee/TVL 0.78%",
+            "Volume/TVL 3.13x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 80.3,
+          "strategy": "Core + Buffer",
+          "score": 63.5,
           "filterReasons": []
         },
         "verification": {
@@ -1443,90 +3202,287 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 9
       },
       {
-        "poolAddress": "H1tk6dsTZniLopJPnHnNQ4L2PDSp7he1vS7sTLeNLZMo",
-        "pair": "JupSOL/INF",
-        "dex": "Meteora",
-        "poolType": "DLMM",
-        "programId": null,
-        "baseMint": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
-        "quoteMint": "5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm",
-        "tvl": 259236.83436337532,
-        "volume24h": 3875571.1168457703,
-        "lpFee24h": 811.1046977560854,
-        "feeTier": 0.0001,
-        "feeMode": "BASE",
-        "volumeTvl": 14.949924559768911,
-        "feeTvl": 0.31288173216123694,
-        "priceVolatilityPct": null,
+        "poolAddress": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
+        "pair": "WSOL/SPYx",
+        "dex": "Raydium",
+        "poolType": "CLMM",
+        "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
+        "baseMint": "So11111111111111111111111111111111111111112",
+        "quoteMint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
+        "tvl": 121936.48,
+        "volume24h": 301119.6982791126,
+        "lpFee24h": 752.8059369535305,
+        "feeTier": 0.0025,
+        "feeMode": null,
+        "volumeTvl": 2.469479997119095,
+        "feeTvl": 0.006173754867727283,
+        "priceVolatilityPct": 14.48331765541512,
         "activeTimeHours": null,
-        "activeTimeSource": "官方 DLMM Pool 列表未提供逐小时活跃时长",
-        "apr24h": null,
+        "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
+        "apr24h": 225.34,
         "washVolumeStatus": "NOT_VERIFIED",
         "strategy": {
-          "family": "Curve",
-          "optimizer": "Meteora DLMM",
-          "core": null,
-          "buffer": null,
-          "allocation": null,
-          "binDistribution": {
-            "mode": "Curve",
-            "binStep": 1,
-            "candidates": [
-              20,
-              50,
-              100
-            ],
-            "searchCandidates": [
-              {
-                "mode": "Spot",
-                "binStep": 20
-              },
-              {
-                "mode": "Spot",
-                "binStep": 50
-              },
-              {
-                "mode": "Spot",
-                "binStep": 100
-              },
-              {
-                "mode": "Curve",
-                "binStep": 20
-              },
-              {
-                "mode": "Curve",
-                "binStep": 50
-              },
-              {
-                "mode": "Curve",
-                "binStep": 100
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 20
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 50
-              },
-              {
-                "mode": "Bid Ask",
-                "binStep": 100
-              }
-            ]
+          "family": "Core + Buffer",
+          "optimizer": "Raydium CLMM",
+          "core": {
+            "widthPct": 1,
+            "lower": 0.12047456228427204,
+            "upper": 0.12290839182536846,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 700
           },
-          "regime": "UNKNOWN_VOL",
+          "buffer": {
+            "widthPct": 20,
+            "lower": 0.0973531816438562,
+            "upper": 0.1460297724657843,
+            "tickLower": null,
+            "tickUpper": null,
+            "capital": 300
+          },
+          "allocation": "70/30",
+          "binDistribution": null,
+          "regime": "HIGH_VOL",
           "search": {
-            "candidateCount": 9,
-            "selectedBy": "VOLATILITY_REGIME"
+            "candidateCount": 36,
+            "candidates": [
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.0025-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.25,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.005-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 0.5,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.01-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 1,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.05-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 5,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.1-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 10,
+                "allocation": "60/40"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.8",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "80/20"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.7",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "70/30"
+              },
+              {
+                "id": "core-0.02-buffer-0.2-allocation-0.6",
+                "coreWidthPct": 2,
+                "bufferWidthPct": 20,
+                "allocation": "60/40"
+              }
+            ],
+            "selectedBy": "VOLATILITY_PRIOR_WAITING_REPLAY",
+            "selectedId": "core-0.01-buffer-0.2-allocation-0.7"
           },
           "executionReady": false,
-          "executionBlocker": "等待 Bin path 与逐笔成交回放"
+          "executionBlocker": "等待当前 Tick 与 TickArray"
+        },
+        "strategySimulation": {
+          "status": "SIMULATED",
+          "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
+          "capital": 1000,
+          "grossFee24h": 6.123535804453898,
+          "coreGrossFee24h": 4.286475063117728,
+          "bufferGrossFee24h": 1.8370607413361693,
+          "capitalShareAfterDeposit": 0.008134282029223547,
+          "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
         "netModel": {
           "status": "WAITING_REPLAY",
@@ -1543,9 +3499,9 @@
         "expectedNetReturn": null,
         "riskLevel": "MEDIUM",
         "recommendation": "观察",
-        "lpScore": 80.2,
+        "lpScore": 53.7,
         "scoreBreakdown": {
-          "value": 80.2,
+          "value": 53.7,
           "usedWeight": 0.8,
           "weights": {
             "feeEfficiency": 0.3,
@@ -1555,18 +3511,18 @@
             "rebalanceCost": 0.1
           },
           "score": {
-            "feeEfficiency": 95.13888888888889,
-            "capitalUtilization": 80.44851132708008,
+            "feeEfficiency": 63.013698630136986,
+            "capitalUtilization": 69.53083468367565,
             "rangeHitRate": null,
-            "liquiditySafety": 36.80555555555556,
-            "rebalanceCost": 100
+            "liquiditySafety": 20.54794520547945,
+            "rebalanceCost": 35.61643835616438
           },
           "raw": {
-            "feeEfficiency": 0.31288173216123694,
-            "capitalUtilization": 259.23683436337535,
+            "feeEfficiency": 0.006173754867727283,
+            "capitalUtilization": 121.93647999999999,
             "rangeHitRate": null,
-            "liquiditySafety": 259236.83436337532,
-            "rebalanceCost": 0.0001
+            "liquiditySafety": 121936.48,
+            "rebalanceCost": 0.0025
           }
         },
         "filter": {
@@ -1576,17 +3532,16 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 31.29%",
-            "Volume/TVL 14.95x"
+            "Fee/TVL 0.62%",
+            "Volume/TVL 2.47x"
           ],
           "negative": [
-            "价格波动率等待历史路径",
             "单笔刷量尚未由逐笔成交验证",
             "等待真实 Replay / IL / 再平衡成本",
             "成交活跃时间尚未由逐笔数据证明"
           ],
-          "strategy": "Curve",
-          "score": 80.2,
+          "strategy": "Core + Buffer",
+          "score": 53.7,
           "filterReasons": []
         },
         "verification": {
@@ -1596,11 +3551,11 @@
           "markout": "WAITING",
           "il": "WAITING"
         },
-        "source": "Meteora DLMM API",
+        "source": "Raydium API v3",
         "shadowCapital": 1000,
         "rank": 10
       }
     ]
   },
-  "snapshotHash": "0914d67ae92e2bd15358c93404b504882ddf0ea526b0bf8765540c84d0d0f4bd"
+  "snapshotHash": "f3a3f6769eab1fc41ab8b368772c31707f62b455318d63cc219e55b710d9282f"
 }

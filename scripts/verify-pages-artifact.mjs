@@ -14,7 +14,7 @@ const snapshot = JSON.parse(snapshotJson);
 const manifest = JSON.parse(manifestJson);
 const legacyLabels = ["24H Fee 总榜", "RWA Fee Top 10", "预计手续费", "24h LP Fee"];
 const hiddenHomeLabels = ["Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
-const requiredLabels = ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "交易对", "DEX / 类型", "24H交易量", "24H手续费", "TVL", "费率", "模拟策略", "预计 $1000 日净收益", "风险", "建议", "WHY"];
+const requiredLabels = ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "Market Radar", "Strategy Simulation", "Verified Net Return", "交易对", "DEX / 类型", "24H交易量 · Vol/TVL", "24H手续费 · Fee/TVL", "TVL", "费率", "策略模拟 · 毛收益", "验证净收益 24H", "风险", "建议", "WHY"];
 const riskLevels = new Set(["LOW", "MEDIUM", "HIGH"]);
 const recommendations = new Set(["考虑", "观察"]);
 
@@ -61,7 +61,9 @@ snapshot.scanner.candidates.forEach((row, index) => {
   for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "expectedNetReturn", "lpScore"]) {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${field} 非法`);
   }
-  assert.ok(row.strategy && row.netModel);
+  assert.ok(row.strategy && row.strategySimulation && row.netModel);
+  assert.ok(["SIMULATED", "WAITING_MARKET_DATA"].includes(row.strategySimulation.status));
+  assert.equal(typeof row.strategySimulation.method, "string");
   assert.ok(riskLevels.has(row.riskLevel));
   assert.ok(recommendations.has(row.recommendation));
 });

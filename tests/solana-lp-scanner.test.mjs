@@ -71,7 +71,8 @@ test("机会扫描生成 Top10，默认展示限制由页面而不是数据层�
   assert.equal(result.candidates.length, 10);
   assert.deepEqual(result.candidates.map((row) => row.rank), Array.from({ length: 10 }, (_, index) => index + 1));
   assert.equal(result.candidates[0].shadowCapital, 1_000);
-  assert.equal(result.rankingBasis, "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY");
+  assert.ok(result.candidates[0].strategySimulation.grossFee24h >= result.candidates[1].strategySimulation.grossFee24h);
+  assert.equal(result.rankingBasis, "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY");
 });
 
 test("缺少真实 Replay 时不把官方 Fee 伪装成可执行净收益", () => {
@@ -80,8 +81,20 @@ test("缺少真实 Replay 时不把官方 Fee 伪装成可执行净收益", () =
   assert.equal(row.lpFee24h, 1_000);
   assert.equal(row.netModel.status, "WAITING_REPLAY");
   assert.equal(row.expectedNetReturn, null);
+  assert.equal(row.strategySimulation.status, "SIMULATED");
+  assert.equal(row.strategySimulation.grossFee24h, 1_000 * (1_000 / 101_000));
   assert.equal(row.recommendation, "观察");
   assert.ok(row.why.negative.some((reason) => reason.includes("Replay")));
+});
+
+test("策略模拟只输出官方 LP Fee 的投入后毛收益基准，不冒充净收益", () => {
+  const [pool] = [normalizeRaydiumPool(rayPool({ tvl: 200_000, day: { ...rayPool().day, volumeFee: 900 } }))];
+  const [row] = buildScannerCandidates([pool]).candidates;
+  assert.equal(row.strategySimulation.method, "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION");
+  assert.equal(row.strategySimulation.grossFee24h, 900 * (1_000 / 201_000));
+  assert.equal(row.strategySimulation.coreGrossFee24h, 900 * (1_000 / 201_000) * 0.7);
+  assert.equal(row.netModel.expectedNetReturn, null);
+  assert.equal(row.expectedNetReturn, null);
 });
 
 test("完整 Replay 才计算 Gross Fee 减成本，并使用固定 $1,000 Core/Buffer", () => {
