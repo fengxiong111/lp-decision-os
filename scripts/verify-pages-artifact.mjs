@@ -7,7 +7,7 @@ const artifactDir = resolve("mobile-dashboard");
 const read = (name) => readFile(resolve(artifactDir, name), "utf8");
 const snapshotSource = process.env.MOBILE_DASHBOARD_SNAPSHOT_PATH
   ? pathToFileURL(resolve(process.env.MOBILE_DASHBOARD_SNAPSHOT_PATH))
-  : new URL("mobile-dashboard/top3.json", import.meta.url);
+  : new URL("../mobile-dashboard/top3.json", import.meta.url);
 const [indexHtml, runtimeJs, snapshotJson, manifestJson] = await Promise.all([
   read("index.html"),
   read("runtime.js"),
