@@ -13,13 +13,13 @@ const [indexHtml, runtimeJs, snapshotJson, manifestJson] = await Promise.all([
 const snapshot = JSON.parse(snapshotJson);
 const manifest = JSON.parse(manifestJson);
 const legacyLabels = ["24H Fee 总榜", "RWA Fee Top 10", "预计手续费", "24h LP Fee"];
-const hiddenHomeLabels = ["Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
-const requiredLabels = ["Solana LP Opportunity Scanner", "Top 5 LP Opportunities", "Raydium CLMM", "Meteora DLMM", "Market Radar", "Strategy Simulation", "Verified Net Return", "交易对", "DEX / 类型", "24H交易量 · Vol/TVL", "24H手续费 · Fee/TVL", "TVL", "费率", "策略模拟 · 毛收益", "验证净收益 24H", "风险", "建议", "WHY"];
-const riskLevels = new Set(["LOW", "MEDIUM", "HIGH"]);
-const recommendations = new Set(["考虑", "观察"]);
+const hiddenHomeLabels = ["Score", "Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
+const requiredLabels = ["LP Explorer", "Raydium CLMM", "Meteora DLMM", "Market Radar", "Strategy Simulation", "Verified Net Return", "交易对", "DEX / 类型", "TVL", "24H交易量", "24H LP Fee", "Fee APR", "机会等级", "Action", "详情"];
+const riskLevels = new Set(["LOW", "MEDIUM", "HIGH", "UNVERIFIED"]);
+const decisions = new Set(["WATCH", "CONSIDER", "ENTER"]);
 
 assert.equal(snapshot.schemaVersion, 2, "Scanner schemaVersion 错误");
-assert.equal(snapshot.product, "Solana LP Opportunity Scanner");
+assert.equal(snapshot.product, "Solana LP Decision OS");
 assert.equal(snapshot.scope?.capital, 1_000);
 assert.equal(snapshot.scope?.shadowPosition, true);
 assert.equal(snapshot.scope?.walletDependency, false);
@@ -43,7 +43,7 @@ assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 12);
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 9);
 for (const label of requiredLabels) assert.equal(indexHtml.includes(label), true, `缺少字段：${label}`);
 for (const label of legacyLabels) assert.equal(indexHtml.includes(label) || runtimeJs.includes(label), false, `旧字段存在：${label}`);
 for (const label of hiddenHomeLabels) assert.equal(indexHtml.includes(label), false, `首页内部字段存在：${label}`);
@@ -58,14 +58,18 @@ snapshot.scanner.candidates.forEach((row, index) => {
   assert.ok(["CLMM", "DLMM"].includes(row.poolType));
   assert.equal(typeof row.pair, "string");
   assert.equal(typeof row.poolAddress, "string");
-  for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "expectedNetReturn", "lpScore"]) {
+  for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "feeApr24h", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "currentPrice", "verifiedNetReturn"]) {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${field} 非法`);
   }
-  assert.ok(row.strategy && row.strategySimulation && row.netModel);
+  assert.equal(row.poolSchemaVersion, 1);
+  assert.ok(row.strategy && row.strategySimulation && row.riskModel);
   assert.ok(["SIMULATED", "WAITING_MARKET_DATA"].includes(row.strategySimulation.status));
   assert.equal(typeof row.strategySimulation.method, "string");
-  assert.ok(riskLevels.has(row.riskLevel));
-  assert.ok(recommendations.has(row.recommendation));
+  assert.ok(riskLevels.has(row.riskModel.riskLevel));
+  assert.ok(decisions.has(row.decision));
+  assert.equal(Object.hasOwn(row, "lpScore"), false);
+  assert.equal(Object.hasOwn(row, "scoreBreakdown"), false);
+  assert.equal(Object.hasOwn(row, "netModel"), false);
 });
 
 console.log(JSON.stringify({

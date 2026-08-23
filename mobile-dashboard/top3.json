@@ -1,10 +1,10 @@
 {
   "schemaVersion": 2,
-  "product": "Solana LP Opportunity Scanner",
-  "generatedAt": "2026-08-23T04:15:42.482Z",
+  "product": "Solana LP Decision OS",
+  "generatedAt": "2026-08-23T05:19:20.907Z",
   "sourceEvidence": {
     "primary": "Official Raydium API v3 + Meteora DLMM API",
-    "fetchedAt": "2026-08-23T04:15:42.482Z",
+    "fetchedAt": "2026-08-23T05:19:20.907Z",
     "sources": {
       "raydium": {
         "dex": "Raydium",
@@ -20,8 +20,8 @@
         "poolType": "DLMM",
         "endpoint": "https://dlmm.datapi.meteora.ag/pools",
         "pageCount": 124,
-        "poolCount": 123086,
-        "total": 123081,
+        "poolCount": 123031,
+        "total": 123031,
         "complete": true,
         "error": null
       }
@@ -44,17 +44,17 @@
   },
   "scanner": {
     "version": 1,
-    "generatedAt": "2026-08-23T04:15:42.482Z",
-    "allPoolCount": 97271,
+    "generatedAt": "2026-08-23T05:19:20.907Z",
+    "allPoolCount": 99724,
     "eligiblePoolCount": 147,
-    "excludedPoolCount": 97124,
+    "excludedPoolCount": 99577,
     "excludedByReason": {
-      "TVL_BELOW_50K": 96785,
-      "ABNORMAL_APR": 368,
-      "ABNORMAL_FEE_TVL": 901,
-      "VOLUME_BELOW_50K": 96508
+      "TVL_BELOW_50K": 99240,
+      "ABNORMAL_APR": 492,
+      "ABNORMAL_FEE_TVL": 801,
+      "VOLUME_BELOW_50K": 98975
     },
-    "rankingBasis": "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY",
+    "rankingBasis": "STRATEGY_SIMULATION_GROSS_PREVIEW",
     "top10Count": 10,
     "defaultDisplayLimit": 5,
     "filters": {
@@ -65,6 +65,7 @@
     },
     "candidates": [
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "G9hjoZSrwqeY5jE4HMwaYJZeeKv77tiLeDcKCzu1wfpK",
         "pair": "ZEC/REDACTED",
         "dex": "Raydium",
@@ -72,33 +73,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS",
         "quoteMint": "Ga5ErptAQ5oHwB7G195UEq9FeJ5UNDoV9SCRCpebFeG7",
-        "tvl": 101485.07,
-        "volume24h": 341546.08610726084,
-        "lpFee24h": 13933.02372777726,
+        "tvl": 95929.05,
+        "volume24h": 326587.6567738978,
+        "lpFee24h": 13324.653181572241,
         "feeTier": 0.04,
         "feeMode": null,
-        "volumeTvl": 3.365481110741322,
-        "feeTvl": 0.13729136441229492,
-        "priceVolatilityPct": 212.94580655535862,
+        "feeApr24h": 5069.89,
+        "apr24h": 5069.89,
+        "volumeTvl": 3.4044708748173553,
+        "feeTvl": 0.13890112725573994,
+        "currentPrice": 2217555.261622306,
+        "priceVolatilityPct": 196.42334446558036,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 5011.13,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 3.4044708748173553,
+          "feeTvl": 0.13890112725573994,
+          "tvl": 95929.05,
+          "volume24h": 326587.6567738978,
+          "lpFee24h": 13324.653181572241,
+          "feeApr24h": 5069.89,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 2025040.228734178,
-            "upper": 2065950.1323449695,
+            "lower": 2195379.7090060827,
+            "upper": 2239730.814238529,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 1636396.144431659,
-            "upper": 2454594.2166474885,
+            "lower": 1774044.209297845,
+            "upper": 2661066.3139467672,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -336,14 +350,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 135.9517413392727,
-          "coreGrossFee24h": 95.16621893749088,
-          "bufferGrossFee24h": 40.78552240178181,
-          "capitalShareAfterDeposit": 0.009757518826888637,
+          "grossFee24h": 137.46810869984014,
+          "coreGrossFee24h": 96.22767608988809,
+          "bufferGrossFee24h": 41.240432609952045,
+          "capitalShareAfterDeposit": 0.010316824522679216,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -354,35 +370,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 55.4,
-        "scoreBreakdown": {
-          "value": 55.4,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 83.56164383561644,
-            "capitalUtilization": 66.87338384659353,
-            "rangeHitRate": null,
-            "liquiditySafety": 16.43835616438356,
-            "rebalanceCost": 0.684931506849324
-          },
-          "raw": {
-            "feeEfficiency": 0.13729136441229492,
-            "capitalUtilization": 101.48507000000001,
-            "rangeHitRate": null,
-            "liquiditySafety": 101485.07,
-            "rebalanceCost": 0.04
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -390,16 +382,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 13.73%",
-            "Volume/TVL 3.37x"
+            "Fee/TVL 13.89%",
+            "Volume/TVL 3.40x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 55.4,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -414,6 +407,7 @@
         "rank": 1
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "987VwvJZ5FRjWCY9ZwC2tRUGL8FbMT1aF4pUrT7XjPjD",
         "pair": "RAY/RAYCAT",
         "dex": "Raydium",
@@ -421,33 +415,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
         "quoteMint": "CFNRDaxFcvRwRSNnA5cHrCCr6AHhk9dNkHWpRUjNupFL",
-        "tvl": 69025.21,
-        "volume24h": 341798.0852075963,
-        "lpFee24h": 3435.0472406518466,
+        "tvl": 71013.84,
+        "volume24h": 327848.7326771906,
+        "lpFee24h": 3294.780301044895,
         "feeTier": 0.01,
         "feeMode": null,
-        "volumeTvl": 4.951786241687585,
-        "feeTvl": 0.049765111046411105,
-        "priceVolatilityPct": 167.4531472718943,
+        "feeApr24h": 1693.47,
+        "apr24h": 1693.47,
+        "volumeTvl": 4.616687855172888,
+        "feeTvl": 0.0463963123391848,
+        "currentPrice": 2636.886763093459,
+        "priceVolatilityPct": 183.3286453051237,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 1816.43,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 4.616687855172888,
+          "feeTvl": 0.0463963123391848,
+          "tvl": 71013.84,
+          "volume24h": 327848.7326771906,
+          "lpFee24h": 3294.780301044895,
+          "feeApr24h": 1693.47,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 2858.009641006333,
-            "upper": 2915.7472095115113,
+            "lower": 2610.5178954625244,
+            "upper": 2663.255630724394,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 2309.502740207138,
-            "upper": 3464.2541103107064,
+            "lower": 2109.5094104747673,
+            "upper": 3164.264115712151,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -685,14 +692,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 49.054436832847,
-          "coreGrossFee24h": 34.3381057829929,
-          "bufferGrossFee24h": 14.7163310498541,
-          "capitalShareAfterDeposit": 0.014280571239986283,
+          "grossFee24h": 45.75204295514439,
+          "coreGrossFee24h": 32.02643006860107,
+          "bufferGrossFee24h": 13.725612886543317,
+          "capitalShareAfterDeposit": 0.013886219648889715,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -703,35 +712,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 49.6,
-        "scoreBreakdown": {
-          "value": 49.6,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 73.97260273972603,
-            "capitalUtilization": 61.29412786075728,
-            "rangeHitRate": null,
-            "liquiditySafety": 8.21917808219178,
-            "rebalanceCost": 9.589041095890423
-          },
-          "raw": {
-            "feeEfficiency": 0.049765111046411105,
-            "capitalUtilization": 69.02521,
-            "rangeHitRate": null,
-            "liquiditySafety": 69025.21,
-            "rebalanceCost": 0.01
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -739,16 +724,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 4.98%",
-            "Volume/TVL 4.95x"
+            "Fee/TVL 4.64%",
+            "Volume/TVL 4.62x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 49.6,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -763,6 +749,7 @@
         "rank": 2
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "45ssPkUQs1ssbeDqxD2mZrMdJYAXF7GyQyhS5xDXuWC5",
         "pair": "WSOL/PUMP",
         "dex": "Raydium",
@@ -770,33 +757,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "So11111111111111111111111111111111111111112",
         "quoteMint": "pumpCmXqMfrsAkQ5r49WcJnRayYRqmXz6ae8H7H9Dfn",
-        "tvl": 1166776.34,
-        "volume24h": 32935727.521232966,
-        "lpFee24h": 32935.72926105114,
+        "tvl": 1178518.95,
+        "volume24h": 33233286.13200837,
+        "lpFee24h": 33233.28786644617,
         "feeTier": 0.001,
         "feeMode": null,
-        "volumeTvl": 28.22796999914565,
-        "feeTvl": 0.028227971490278198,
-        "priceVolatilityPct": 26.52659928933253,
+        "feeApr24h": 1029.27,
+        "apr24h": 1029.27,
+        "volumeTvl": 28.199195381634187,
+        "feeTvl": 0.02819919685334391,
+        "currentPrice": 18883.43658142101,
+        "priceVolatilityPct": 27.996289292457142,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 1030.32,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 28.199195381634187,
+          "feeTvl": 0.02819919685334391,
+          "tvl": 1178518.95,
+          "volume24h": 33233286.13200837,
+          "lpFee24h": 33233.28786644617,
+          "feeApr24h": 1029.27,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 19730.36521292842,
-            "upper": 20128.958449553236,
+            "lower": 18694.6022156068,
+            "upper": 19072.27094723522,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 15943.729464992663,
-            "upper": 23915.594197488994,
+            "lower": 15106.749265136808,
+            "upper": 22660.123897705213,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -1034,14 +1034,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 28.203799077699365,
-          "coreGrossFee24h": 19.742659354389556,
-          "bufferGrossFee24h": 8.46113972330981,
-          "capitalShareAfterDeposit": 0.0008563283616450047,
+          "grossFee24h": 28.175289482586244,
+          "coreGrossFee24h": 19.722702637810368,
+          "bufferGrossFee24h": 8.452586844775873,
+          "capitalShareAfterDeposit": 0.0008478032506387456,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -1052,35 +1054,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 78,
-        "scoreBreakdown": {
-          "value": 78,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 71.91780821917808,
-            "capitalUtilization": 100,
-            "rangeHitRate": null,
-            "liquiditySafety": 70.54794520547945,
-            "rebalanceCost": 52.05479452054795
-          },
-          "raw": {
-            "feeEfficiency": 0.028227971490278198,
-            "capitalUtilization": 1166.7763400000001,
-            "rangeHitRate": null,
-            "liquiditySafety": 1166776.34,
-            "rebalanceCost": 0.001
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -1089,16 +1067,17 @@
         "why": {
           "positive": [
             "Fee/TVL 2.82%",
-            "Volume/TVL 28.23x",
-            "流动性安全垫较厚"
+            "Volume/TVL 28.20x",
+            "流动性安全垫较厚",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 78,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -1113,40 +1092,54 @@
         "rank": 3
       },
       {
-        "poolAddress": "G69tW3836i8oD2M5VsB4g1QPR5gNoK73oxxwXY4cMQw4",
-        "pair": "SILV/DEGS",
+        "poolSchemaVersion": 1,
+        "poolAddress": "FDamUzyiEA7Cq1VNiQcbhuHpfCmmcJfgA6DwQQ1hhLd2",
+        "pair": "TTWO/GTA6",
         "dex": "Raydium",
         "poolType": "CLMM",
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
-        "baseMint": "SiLVFMgD3eD2rgK628NbTBq9MnuJF5FW2CRaVyTB35L",
-        "quoteMint": "8HKQfbm1Unb4aLcgrXCvP2DBLfk2wtcJ2AtR7grzpcvg",
-        "tvl": 73972.67,
-        "volume24h": 116658.18516737476,
-        "lpFee24h": 1172.4284950318086,
-        "feeTier": 0.01,
+        "baseMint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
+        "quoteMint": "4kjruqGHDsSqkMdFfCjV7Vb62HPFhtXyWc2t6JpQzDnz",
+        "tvl": 182905.13,
+        "volume24h": 68732.04851613677,
+        "lpFee24h": 2800.7933225215647,
+        "feeTier": 0.04,
         "feeMode": null,
-        "volumeTvl": 1.5770444025796928,
-        "feeTvl": 0.01584948191043812,
-        "priceVolatilityPct": 100.9120604353525,
+        "feeApr24h": 558.92,
+        "apr24h": 558.92,
+        "volumeTvl": 0.37577977455381795,
+        "feeTvl": 0.015312819943987163,
+        "currentPrice": 130527.57231985262,
+        "priceVolatilityPct": 48.81084515955909,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 578.51,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 0.37577977455381795,
+          "feeTvl": 0.015312819943987163,
+          "tvl": 182905.13,
+          "volume24h": 68732.04851613677,
+          "lpFee24h": 2800.7933225215647,
+          "feeApr24h": 558.92,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 210291.85535244987,
-            "upper": 214540.17566260038,
+            "lower": 129222.2965966541,
+            "upper": 131832.84804305114,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 169932.81240602012,
-            "upper": 254899.21860903013,
+            "lower": 104422.0578558821,
+            "upper": 156633.08678382315,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -1384,14 +1377,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 15.63807844954446,
-          "coreGrossFee24h": 10.946654914681123,
-          "bufferGrossFee24h": 4.691423534863338,
-          "capitalShareAfterDeposit": 0.013338193771143538,
+          "grossFee24h": 15.229555165326627,
+          "coreGrossFee24h": 10.660688615728638,
+          "bufferGrossFee24h": 4.568866549597987,
+          "capitalShareAfterDeposit": 0.0054375862163279515,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -1402,35 +1397,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 48.7,
-        "scoreBreakdown": {
-          "value": 48.7,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 69.17808219178082,
-            "capitalUtilization": 62.29614624863843,
-            "rangeHitRate": null,
-            "liquiditySafety": 10.95890410958904,
-            "rebalanceCost": 9.589041095890423
-          },
-          "raw": {
-            "feeEfficiency": 0.01584948191043812,
-            "capitalUtilization": 73.97267,
-            "rangeHitRate": null,
-            "liquiditySafety": 73972.67,
-            "rebalanceCost": 0.01
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -1438,16 +1409,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 1.58%",
-            "Volume/TVL 1.58x"
+            "Fee/TVL 1.53%",
+            "Volume/TVL 0.38x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 48.7,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -1462,40 +1434,54 @@
         "rank": 4
       },
       {
-        "poolAddress": "FDamUzyiEA7Cq1VNiQcbhuHpfCmmcJfgA6DwQQ1hhLd2",
-        "pair": "TTWO/GTA6",
+        "poolSchemaVersion": 1,
+        "poolAddress": "G69tW3836i8oD2M5VsB4g1QPR5gNoK73oxxwXY4cMQw4",
+        "pair": "SILV/DEGS",
         "dex": "Raydium",
         "poolType": "CLMM",
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
-        "baseMint": "TTWofwAge91oFhZs7kpQdyrVRkmevgM88xijGvQFbKo",
-        "quoteMint": "4kjruqGHDsSqkMdFfCjV7Vb62HPFhtXyWc2t6JpQzDnz",
-        "tvl": 184790.02,
-        "volume24h": 70809.65741883211,
-        "lpFee24h": 2884.783994473917,
-        "feeTier": 0.04,
+        "baseMint": "SiLVFMgD3eD2rgK628NbTBq9MnuJF5FW2CRaVyTB35L",
+        "quoteMint": "8HKQfbm1Unb4aLcgrXCvP2DBLfk2wtcJ2AtR7grzpcvg",
+        "tvl": 76174.48,
+        "volume24h": 114005.36771392298,
+        "lpFee24h": 1145.7327590200966,
+        "feeTier": 0.01,
         "feeMode": null,
-        "volumeTvl": 0.3831898357867601,
-        "feeTvl": 0.015611146069868477,
-        "priceVolatilityPct": 50.253491445141485,
+        "feeApr24h": 548.99,
+        "apr24h": 548.99,
+        "volumeTvl": 1.4966346696941415,
+        "feeTvl": 0.015040900299156577,
+        "currentPrice": 205639.07663793286,
+        "priceVolatilityPct": 104.23766798016305,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 569.81,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 1.4966346696941415,
+          "feeTvl": 0.015040900299156577,
+          "tvl": 76174.48,
+          "volume24h": 114005.36771392298,
+          "lpFee24h": 1145.7327590200966,
+          "feeApr24h": 548.99,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 125512.6624829111,
-            "upper": 128048.2718260002,
+            "lower": 203582.68587155352,
+            "upper": 207695.4674043122,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 101424.37372356452,
-            "upper": 152136.56058534677,
+            "lower": 164511.2613103463,
+            "upper": 246766.8919655194,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -1733,14 +1719,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 15.527120318270686,
-          "coreGrossFee24h": 10.86898422278948,
-          "bufferGrossFee24h": 4.658136095481206,
-          "capitalShareAfterDeposit": 0.005382420433562578,
+          "grossFee24h": 14.846005558056197,
+          "coreGrossFee24h": 10.392203890639337,
+          "bufferGrossFee24h": 4.453801667416859,
+          "capitalShareAfterDeposit": 0.012957651285761823,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -1751,35 +1739,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 54.9,
-        "scoreBreakdown": {
-          "value": 54.9,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 68.4931506849315,
-            "capitalUtilization": 75.54839482058098,
-            "rangeHitRate": null,
-            "liquiditySafety": 29.45205479452055,
-            "rebalanceCost": 0.684931506849324
-          },
-          "raw": {
-            "feeEfficiency": 0.015611146069868477,
-            "capitalUtilization": 184.79002,
-            "rangeHitRate": null,
-            "liquiditySafety": 184790.02,
-            "rebalanceCost": 0.04
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -1787,16 +1751,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 1.56%",
-            "Volume/TVL 0.38x"
+            "Fee/TVL 1.50%",
+            "Volume/TVL 1.50x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 54.9,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -1811,6 +1776,7 @@
         "rank": 5
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "7a8xxAJBELDo6P9dikSYctdw6ce8F4mWr3ahcAD8Ao49",
         "pair": "SPYx/STONK",
         "dex": "Raydium",
@@ -1818,33 +1784,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
         "quoteMint": "6GmAFSYs4gk3FDao5FzzySQpPZaWsa4rUJHacpMpUNgx",
-        "tvl": 401538.97,
-        "volume24h": 598663.796659524,
-        "lpFee24h": 5986.6405192513685,
+        "tvl": 402764.88,
+        "volume24h": 580605.6333708416,
+        "lpFee24h": 5806.058830445154,
         "feeTier": 0.01,
         "feeMode": null,
-        "volumeTvl": 1.4909232761630185,
-        "feeTvl": 0.014909239118811727,
-        "priceVolatilityPct": 47.342164435182546,
+        "feeApr24h": 526.17,
+        "apr24h": 526.17,
+        "volumeTvl": 1.4415498028796394,
+        "feeTvl": 0.014415504227789557,
+        "currentPrice": 94174.37972924917,
+        "priceVolatilityPct": 47.646636015994446,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 544.19,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 1.4415498028796394,
+          "feeTvl": 0.014415504227789557,
+          "tvl": 402764.88,
+          "volume24h": 580605.6333708416,
+          "lpFee24h": 5806.058830445154,
+          "feeApr24h": 526.17,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 93832.24282327927,
-            "upper": 95727.84368839602,
+            "lower": 93232.63593195667,
+            "upper": 95116.12352654166,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 75824.03460467012,
-            "upper": 113736.05190700518,
+            "lower": 75339.50378339934,
+            "upper": 113009.25567509899,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -2082,14 +2061,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 14.872201116953644,
-          "coreGrossFee24h": 10.41054078186755,
-          "bufferGrossFee24h": 4.461660335086093,
-          "capitalShareAfterDeposit": 0.0024842315267016263,
+          "grossFee24h": 14.379801508355937,
+          "coreGrossFee24h": 10.065861055849156,
+          "bufferGrossFee24h": 4.313940452506781,
+          "capitalShareAfterDeposit": 0.002476688908653967,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -2100,35 +2081,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 63.2,
-        "scoreBreakdown": {
-          "value": 63.2,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 67.8082191780822,
-            "capitalUtilization": 86.78224426216536,
-            "rangeHitRate": null,
-            "liquiditySafety": 50.68493150684932,
-            "rebalanceCost": 9.589041095890423
-          },
-          "raw": {
-            "feeEfficiency": 0.014909239118811727,
-            "capitalUtilization": 401.53896999999995,
-            "rangeHitRate": null,
-            "liquiditySafety": 401538.97,
-            "rebalanceCost": 0.01
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -2136,16 +2093,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 1.49%",
-            "Volume/TVL 1.49x"
+            "Fee/TVL 1.44%",
+            "Volume/TVL 1.44x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 63.2,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -2160,6 +2118,7 @@
         "rank": 6
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "5UUdSTWM1gv4emMEfARYYS7DTb3RPm9P5WUoYrcBimJP",
         "pair": "CARDS/USDC",
         "dex": "Raydium",
@@ -2167,33 +2126,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "CARDSccUMFKoPRZxt5vt3ksUbxEFEcnZ3H2pd3dKxYjp",
         "quoteMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-        "tvl": 66964.02,
-        "volume24h": 69380.0157446471,
-        "lpFee24h": 693.8002428908612,
+        "tvl": 66046.14,
+        "volume24h": 67788.44270669387,
+        "lpFee24h": 677.8845087587729,
         "feeTier": 0.01,
         "feeMode": null,
-        "volumeTvl": 1.0360790129482533,
-        "feeTvl": 0.010360791405457157,
-        "priceVolatilityPct": 18.47443317867202,
+        "feeApr24h": 374.63,
+        "apr24h": 374.63,
+        "volumeTvl": 1.0263800837822448,
+        "feeTvl": 0.010263802074712813,
+        "currentPrice": 0.1942947788132609,
+        "priceVolatilityPct": 20.819162518161807,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 378.17,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 1.0263800837822448,
+          "feeTvl": 0.010263802074712813,
+          "tvl": 66046.14,
+          "volume24h": 67788.44270669387,
+          "lpFee24h": 677.8845087587729,
+          "feeApr24h": 374.63,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 0.1959607429629025,
-            "upper": 0.19991954585104194,
+            "lower": 0.1923518310251283,
+            "upper": 0.19623772660139352,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 0.1583521155255778,
-            "upper": 0.23752817328836665,
+            "lower": 0.15543582305060874,
+            "upper": 0.23315373457591307,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -2431,14 +2403,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 10.208346164497938,
-          "coreGrossFee24h": 7.145842315148556,
-          "bufferGrossFee24h": 3.062503849349381,
-          "capitalShareAfterDeposit": 0.014713667614128768,
+          "grossFee24h": 10.110716422433459,
+          "coreGrossFee24h": 7.07750149570342,
+          "bufferGrossFee24h": 3.0332149267300377,
+          "capitalShareAfterDeposit": 0.014915101749332624,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -2449,35 +2423,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 46.4,
-        "scoreBreakdown": {
-          "value": 46.4,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 66.43835616438356,
-            "capitalUtilization": 60.855297776195044,
-            "rangeHitRate": null,
-            "liquiditySafety": 6.8493150684931505,
-            "rebalanceCost": 9.589041095890423
-          },
-          "raw": {
-            "feeEfficiency": 0.010360791405457157,
-            "capitalUtilization": 66.96402,
-            "rangeHitRate": null,
-            "liquiditySafety": 66964.02,
-            "rebalanceCost": 0.01
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -2485,16 +2435,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 1.04%",
-            "Volume/TVL 1.04x"
+            "Fee/TVL 1.03%",
+            "Volume/TVL 1.03x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 46.4,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -2509,6 +2460,7 @@
         "rank": 7
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "9NJ7rtJzEnfwvoM6HyB2v6YHcsfS6ZY9DFGprphVX6W",
         "pair": "WSOL/COINx",
         "dex": "Raydium",
@@ -2516,33 +2468,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "So11111111111111111111111111111111111111112",
         "quoteMint": "Xs7ZdzSHLU9ftNJsii5fCeJhoRWSC32SQGzGQtePxNu",
-        "tvl": 284486.24,
-        "volume24h": 334658.6133565939,
-        "lpFee24h": 2677.2692700733674,
+        "tvl": 281762.35,
+        "volume24h": 328847.6766769772,
+        "lpFee24h": 2630.7817610941356,
         "feeTier": 0.008,
         "feeMode": null,
-        "volumeTvl": 1.1763613359879688,
-        "feeTvl": 0.009410891964663624,
-        "priceVolatilityPct": 10.167358830756722,
+        "feeApr24h": 340.8,
+        "apr24h": 340.8,
+        "volumeTvl": 1.1671100722895633,
+        "feeTvl": 0.009336881812258224,
+        "currentPrice": 0.5061222814115038,
+        "priceVolatilityPct": 10.222987747376019,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 343.5,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 1.1671100722895633,
+          "feeTvl": 0.009336881812258224,
+          "tvl": 281762.35,
+          "volume24h": 328847.6766769772,
+          "lpFee24h": 2630.7817610941356,
+          "feeApr24h": 340.8,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 0.5038025261027523,
-            "upper": 0.5139803549129089,
+            "lower": 0.5010610585973888,
+            "upper": 0.5111835042256189,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 0.40711315240626456,
-            "upper": 0.6106697286093967,
+            "lower": 0.4048978251292031,
+            "upper": 0.6073467376938045,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -2780,14 +2745,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 9.377927531895644,
-          "coreGrossFee24h": 6.56454927232695,
-          "bufferGrossFee24h": 2.813378259568693,
-          "capitalShareAfterDeposit": 0.003502795791488935,
+          "grossFee24h": 9.30386156818309,
+          "coreGrossFee24h": 6.512703097728163,
+          "bufferGrossFee24h": 2.791158470454927,
+          "capitalShareAfterDeposit": 0.0035365387223581925,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -2798,35 +2765,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 58.9,
-        "scoreBreakdown": {
-          "value": 58.9,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 65.06849315068493,
-            "capitalUtilization": 81.79386197345133,
-            "rangeHitRate": null,
-            "liquiditySafety": 40.41095890410959,
-            "rebalanceCost": 10.958904109589042
-          },
-          "raw": {
-            "feeEfficiency": 0.009410891964663624,
-            "capitalUtilization": 284.48624,
-            "rangeHitRate": null,
-            "liquiditySafety": 284486.24,
-            "rebalanceCost": 0.008
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -2834,16 +2777,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 0.94%",
-            "Volume/TVL 1.18x"
+            "Fee/TVL 0.93%",
+            "Volume/TVL 1.17x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 58.9,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -2858,6 +2802,7 @@
         "rank": 8
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "9n3dSLrERZQp95dHXywft7xV8D8xnGFLaUHtEhQVaXaC",
         "pair": "WSOL/PYTH",
         "dex": "Raydium",
@@ -2865,33 +2810,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "So11111111111111111111111111111111111111112",
         "quoteMint": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
-        "tvl": 367111.4,
-        "volume24h": 1147944.935811855,
-        "lpFee24h": 2869.8626203648596,
+        "tvl": 366197.33,
+        "volume24h": 1109583.5599839813,
+        "lpFee24h": 2773.9591729940435,
         "feeTier": 0.0025,
         "feeMode": null,
-        "volumeTvl": 3.126966190131537,
-        "feeTvl": 0.007817416240315227,
-        "priceVolatilityPct": 9.183265515202859,
+        "feeApr24h": 276.49,
+        "apr24h": 276.49,
+        "volumeTvl": 3.030015429069298,
+        "feeTvl": 0.007575039318266038,
+        "currentPrice": 1887.870556098629,
+        "priceVolatilityPct": 9.285396966562493,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 285.34,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 3.030015429069298,
+          "feeTvl": 0.007575039318266038,
+          "tvl": 366197.33,
+          "volume24h": 1109583.5599839813,
+          "lpFee24h": 2773.9591729940435,
+          "feeApr24h": 276.49,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 1889.7777953585492,
-            "upper": 1927.9551245577118,
+            "lower": 1868.9918505376427,
+            "upper": 1906.7492616596155,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 1527.0931679665046,
-            "upper": 2290.6397519497564,
+            "lower": 1510.2964448789035,
+            "upper": 2265.4446673183547,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -3129,14 +3087,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 7.796179690074416,
-          "coreGrossFee24h": 5.457325783052091,
-          "bufferGrossFee24h": 2.3388539070223247,
-          "capitalShareAfterDeposit": 0.0027165689516814744,
+          "grossFee24h": 7.554409976221896,
+          "coreGrossFee24h": 5.288086983355327,
+          "bufferGrossFee24h": 2.2663229928665687,
+          "capitalShareAfterDeposit": 0.0027233313488417795,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -3147,35 +3107,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 63.5,
-        "scoreBreakdown": {
-          "value": 63.5,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 63.6986301369863,
-            "capitalUtilization": 85.48471303929824,
-            "rangeHitRate": null,
-            "liquiditySafety": 45.20547945205479,
-            "rebalanceCost": 35.61643835616438
-          },
-          "raw": {
-            "feeEfficiency": 0.007817416240315227,
-            "capitalUtilization": 367.1114,
-            "rangeHitRate": null,
-            "liquiditySafety": 367111.4,
-            "rebalanceCost": 0.0025
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -3183,16 +3119,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 0.78%",
-            "Volume/TVL 3.13x"
+            "Fee/TVL 0.76%",
+            "Volume/TVL 3.03x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 63.5,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -3207,6 +3144,7 @@
         "rank": 9
       },
       {
+        "poolSchemaVersion": 1,
         "poolAddress": "BS9uyGV6XmNnPkM4f3xgxCdQEaFv7RSKs6fwrpvYHxfL",
         "pair": "WSOL/SPYx",
         "dex": "Raydium",
@@ -3214,33 +3152,46 @@
         "programId": "CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK",
         "baseMint": "So11111111111111111111111111111111111111112",
         "quoteMint": "XsoCS1TfEyfFhfvj8EtZ528L3CaKBDBRqRapnBbDF2W",
-        "tvl": 121936.48,
-        "volume24h": 301119.6982791126,
-        "lpFee24h": 752.8059369535305,
+        "tvl": 121676.09,
+        "volume24h": 299120.49714877387,
+        "lpFee24h": 747.807777623872,
         "feeTier": 0.0025,
         "feeMode": null,
-        "volumeTvl": 2.469479997119095,
-        "feeTvl": 0.006173754867727283,
-        "priceVolatilityPct": 14.48331765541512,
+        "feeApr24h": 224.32,
+        "apr24h": 224.32,
+        "volumeTvl": 2.458334231061944,
+        "feeTvl": 0.0061458892837851055,
+        "currentPrice": 0.11967128429603756,
+        "priceVolatilityPct": 14.727813180158044,
         "activeTimeHours": null,
         "activeTimeSource": "官方 Pool 列表未提供逐小时活跃时长",
-        "apr24h": 225.34,
         "washVolumeStatus": "NOT_VERIFIED",
+        "market": {
+          "status": "PASS",
+          "volumeTvl": 2.458334231061944,
+          "feeTvl": 0.0061458892837851055,
+          "tvl": 121676.09,
+          "volume24h": 299120.49714877387,
+          "lpFee24h": 747.807777623872,
+          "feeApr24h": 224.32,
+          "reasons": []
+        },
         "strategy": {
+          "kind": "CORE_BUFFER",
           "family": "Core + Buffer",
           "optimizer": "Raydium CLMM",
           "core": {
             "widthPct": 1,
-            "lower": 0.12047456228427204,
-            "upper": 0.12290839182536846,
+            "lower": 0.11847457145307719,
+            "upper": 0.12086799713899793,
             "tickLower": null,
             "tickUpper": null,
             "capital": 700
           },
           "buffer": {
             "widthPct": 20,
-            "lower": 0.0973531816438562,
-            "upper": 0.1460297724657843,
+            "lower": 0.09573702743683005,
+            "upper": 0.14360554115524507,
             "tickLower": null,
             "tickUpper": null,
             "capital": 300
@@ -3478,14 +3429,16 @@
           "status": "SIMULATED",
           "method": "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION",
           "capital": 1000,
-          "grossFee24h": 6.123535804453898,
-          "coreGrossFee24h": 4.286475063117728,
-          "bufferGrossFee24h": 1.8370607413361693,
-          "capitalShareAfterDeposit": 0.008134282029223547,
+          "grossFee24h": 6.095790774093566,
+          "coreGrossFee24h": 4.267053541865496,
+          "bufferGrossFee24h": 1.8287372322280697,
+          "capitalShareAfterDeposit": 0.00815154770583249,
           "note": "基于官方池级 LP Fee 与投入后资金占比的毛收益基准；未计区间外、IL、滑点、再平衡或交易成本"
         },
-        "netModel": {
+        "riskModel": {
           "status": "WAITING_REPLAY",
+          "riskLevel": "UNVERIFIED",
+          "reason": "REPLAY_REQUIRED",
           "grossFee24h": null,
           "outOfRangeTimeCost": null,
           "rebalanceCost": null,
@@ -3496,35 +3449,11 @@
           "rebalanceFrequency": null,
           "confidence": null
         },
-        "expectedNetReturn": null,
-        "riskLevel": "MEDIUM",
-        "recommendation": "观察",
-        "lpScore": 53.7,
-        "scoreBreakdown": {
-          "value": 53.7,
-          "usedWeight": 0.8,
-          "weights": {
-            "feeEfficiency": 0.3,
-            "capitalUtilization": 0.25,
-            "rangeHitRate": 0.2,
-            "liquiditySafety": 0.15,
-            "rebalanceCost": 0.1
-          },
-          "score": {
-            "feeEfficiency": 63.013698630136986,
-            "capitalUtilization": 69.53083468367565,
-            "rangeHitRate": null,
-            "liquiditySafety": 20.54794520547945,
-            "rebalanceCost": 35.61643835616438
-          },
-          "raw": {
-            "feeEfficiency": 0.006173754867727283,
-            "capitalUtilization": 121.93647999999999,
-            "rangeHitRate": null,
-            "liquiditySafety": 121936.48,
-            "rebalanceCost": 0.0025
-          }
-        },
+        "riskLevel": "UNVERIFIED",
+        "verifiedNetReturn": null,
+        "decision": "CONSIDER",
+        "decisionReasonCode": "SIMULATED_GROSS_ONLY",
+        "decisionReason": "市场数据与策略模拟可用，净收益等待完整 Replay",
         "filter": {
           "eligible": true,
           "reasons": [],
@@ -3532,16 +3461,17 @@
         },
         "why": {
           "positive": [
-            "Fee/TVL 0.62%",
-            "Volume/TVL 2.47x"
+            "Fee/TVL 0.61%",
+            "Volume/TVL 2.46x",
+            "1000U 投入后资金占比已完成毛收益模拟"
           ],
           "negative": [
-            "单笔刷量尚未由逐笔成交验证",
-            "等待真实 Replay / IL / 再平衡成本",
-            "成交活跃时间尚未由逐笔数据证明"
+            "单笔成交尚未完成逐笔验证",
+            "等待完整 Replay / IL / 再平衡 / 滑点成本",
+            "成交质量尚未由逐笔数据证明"
           ],
           "strategy": "Core + Buffer",
-          "score": 53.7,
+          "decision": "CONSIDER",
           "filterReasons": []
         },
         "verification": {
@@ -3557,5 +3487,5 @@
       }
     ]
   },
-  "snapshotHash": "f3a3f6769eab1fc41ab8b368772c31707f62b455318d63cc219e55b710d9282f"
+  "snapshotHash": "23acbba27bafeebc6603614465872fab3c42631dc8f46624ba6a52d1ad688add"
 }

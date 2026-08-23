@@ -258,18 +258,19 @@ test("Fee 总榜跨 DEX 排序并限制 Top 10，RWA 榜不吞掉独立 Pool", (
   assert.equal(rows[0].dex, "Meteora");
 });
 
-test("外版页面只展示 Solana LP Scanner 的固定 12 列与唯一快照入口", () => {
+test("外版页面只展示 LP Explorer 的固定 9 列与唯一快照入口", () => {
   const fetchedAt = new Date().toISOString();
   const page = renderPage({ fetchedAt, snapshotHash: "a".repeat(64), runtimeVersion: "b".repeat(64) });
   verifyScannerPageMarkup(page);
-  assert.match(page, /Solana LP Opportunity Scanner/);
+  assert.match(page, /LP Explorer/);
+  assert.match(page, /Solana LP Decision OS/);
   assert.match(page, /Raydium CLMM · Meteora DLMM/);
-  assert.match(page, /固定模拟资金 \$1,000/);
-  assert.match(page, /Top 5 LP Opportunities/);
-  assert.match(page, /策略模拟 · 毛收益/);
-  assert.match(page, /验证净收益 24H/);
+  assert.match(page, /Shadow Position \$1,000/);
+  assert.match(page, /Market Radar：官方市场事实/);
+  assert.match(page, /Strategy Simulation：模拟策略/);
+  assert.match(page, /Verified Net Return：完整 Replay 后显示/);
   assert.match(page, /top3\.json/);
-  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 12);
+  assert.equal((page.match(/role="columnheader"/g) ?? []).length, 9);
   assert.doesNotMatch(page, /24H Fee 总榜|RWA Fee Top 10|Opportunity Score|Confidence|UNAVAILABLE/);
 });
 
@@ -277,7 +278,7 @@ test("外版空状态只由运行时渲染，不在静态 HTML 嵌入候选行",
   const page = renderPage({ fetchedAt: new Date().toISOString(), snapshotHash: "a".repeat(64) });
   verifyScannerPageMarkup(page);
   assert.match(page, /id="empty-state"/);
-  assert.doesNotMatch(page, /class="scanner-row"/);
+  assert.doesNotMatch(page, /class="explorer-row"/);
 });
 
 test("浏览器运行时读取证据快照，而不是直接调用 Raydium API", () => {

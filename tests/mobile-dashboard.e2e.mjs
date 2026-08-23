@@ -11,8 +11,9 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
   const isMeteora = dex === "Meteora";
   return {
     rank,
+    poolSchemaVersion: 1,
     poolAddress: `${dex}Pool${rank}`,
-    pair: `ASSET${rank}/${isMeteora ? "USDC" : "SOL"}`,
+    pair: `ASSET${rank}/USDC`,
     dex,
     poolType: isMeteora ? "DLMM" : "CLMM",
     programId: isMeteora ? null : "RaydiumCLMMProgram",
@@ -29,6 +30,9 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
     activeTimeHours: null,
     activeTimeSource: "fixture",
     apr24h: null,
+    feeApr24h: 4.2,
+    currentPrice: 100 + rank,
+    verifiedNetReturn: null,
     washVolumeStatus: "NOT_VERIFIED",
     strategy: isMeteora ? {
       family: "Curve",
@@ -61,8 +65,10 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
       capitalShareAfterDeposit: 1_000 / (100_000 + 1_000),
       note: "fixture simulation; not verified net return",
     },
-    netModel: {
+    riskModel: {
       status: "WAITING_REPLAY",
+      riskLevel: "UNVERIFIED",
+      reason: "REPLAY_REQUIRED",
       grossFee24h: null,
       outOfRangeTimeCost: null,
       rebalanceCost: null,
@@ -73,17 +79,10 @@ function makeCandidate(rank, dex = rank % 2 === 0 ? "Meteora" : "Raydium") {
       rebalanceFrequency: null,
       confidence: null,
     },
-    expectedNetReturn: null,
-    riskLevel: "MEDIUM",
-    recommendation: "观察",
-    lpScore: 80 - rank,
-    scoreBreakdown: {
-      value: 80 - rank,
-      usedWeight: 0.8,
-      weights: { feeEfficiency: 0.3, capitalUtilization: 0.25, rangeHitRate: 0.2, liquiditySafety: 0.15, rebalanceCost: 0.1 },
-      score: { feeEfficiency: 75, capitalUtilization: 70, rangeHitRate: null, liquiditySafety: 80, rebalanceCost: 65 },
-      raw: {},
-    },
+    riskLevel: "UNVERIFIED",
+    decision: "CONSIDER",
+    decisionReasonCode: "SIMULATED_GROSS_ONLY",
+    decisionReason: "市场数据与策略模拟可用，净收益等待完整 Replay",
     filter: { eligible: true, reasons: [], washVolume: "NOT_VERIFIED" },
     why: { positive: ["官方 24H 市场数据"], negative: ["等待真实 Replay / IL / 再平衡成本"] },
     verification: { replay: "WAITING", confidence: null, tickPath: "WAITING", markout: "WAITING", il: "WAITING" },
@@ -98,7 +97,7 @@ const server = createServer(async (request, response) => {
     const generatedAt = now();
     const snapshot = {
       schemaVersion: 2,
-      product: "Solana LP Opportunity Scanner",
+      product: "Solana LP Decision OS",
       generatedAt,
       snapshotHash: "a".repeat(64),
       sourceEvidence: {
@@ -118,7 +117,7 @@ const server = createServer(async (request, response) => {
         eligiblePoolCount: currentCandidates.length,
         excludedPoolCount: 0,
         excludedByReason: {},
-        rankingBasis: "LP_SCORE_MARKET_PREVIEW_WAITING_REPLAY",
+        rankingBasis: "STRATEGY_SIMULATION_GROSS_PREVIEW",
         top10Count: currentCandidates.length,
         defaultDisplayLimit: 5,
         filters: { tvlMin: 50_000, volume24hMin: 50_000, maxApr24h: 10_000, maxFeeTvlRatio24h: 0.5 },
@@ -160,31 +159,31 @@ try {
   for (const [index, fixture] of cases.entries()) {
     currentCandidates = fixture.candidates;
     await page.goto(`${baseUrl}/?case=${index}`, { waitUntil: "domcontentloaded" });
-    await page.waitForFunction((expected) => document.querySelectorAll("#scanner-list .scanner-row").length === expected, fixture.visibleRows);
-    assert.equal(await page.locator("#scanner-list .scanner-row").count(), fixture.visibleRows);
-    assert.equal(await page.locator("#scanner-list .scanner-row").count() <= 5, true);
+    await page.waitForFunction((expected) => document.querySelectorAll("#scanner-list .explorer-row").length === expected, fixture.visibleRows);
+    assert.equal(await page.locator("#scanner-list .explorer-row").count(), fixture.visibleRows);
+    assert.equal(await page.locator("#scanner-list .explorer-row").count() <= 5, true);
     if (fixture.visibleRows === 0) {
       assert.equal(await page.locator("#empty-state").isHidden(), false);
     } else {
       assert.equal(await page.locator("#empty-state").isHidden(), true);
-      assert.match(await page.locator("body").innerText(), /Solana LP Opportunity Scanner/);
-      assert.match(await page.locator("body").innerText(), /等待完整 Replay/);
-      assert.match(await page.locator("body").innerText(), /毛收益≈/);
+      assert.match(await page.locator("body").innerText(), /LP Explorer/);
+      assert.match(await page.locator("body").innerText(), /Strategy Simulation/);
+      assert.doesNotMatch(await page.locator("body").innerText(), /Opportunity Score|Confidence|BLOCKED|UNAVAILABLE/);
     }
   }
 
   currentCandidates = Array.from({ length: 10 }, (_, index) => makeCandidate(index + 1));
   await page.goto(`${baseUrl}/?drawer=1`, { waitUntil: "domcontentloaded" });
-  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .scanner-row").length === 5);
+  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .explorer-row").length === 5);
   assert.equal(await page.locator("#show-all").isHidden(), false);
   await page.locator("#show-all").click();
-  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .scanner-row").length === 10);
-  await page.locator(".why-button").first().click();
-  await page.waitForSelector("#why-drawer:not([hidden])");
-  assert.match(await page.locator("#why-drawer").innerText(), /Market Radar/);
-  assert.match(await page.locator("#why-drawer").innerText(), /Strategy Simulation/);
-  assert.match(await page.locator("#why-drawer").innerText(), /Verified Net Return/);
-  assert.match(await page.locator("#why-drawer").innerText(), /Replay|单笔刷量检查/);
+  await page.waitForFunction(() => document.querySelectorAll("#scanner-list .explorer-row").length === 10);
+  await page.locator(".detail-button").first().click();
+  await page.waitForSelector("#detail-drawer:not([hidden])");
+  assert.match(await page.locator("#detail-drawer").innerText(), /市场数据/);
+  assert.match(await page.locator("#detail-drawer").innerText(), /1000U 模拟策略/);
+  assert.match(await page.locator("#detail-drawer").innerText(), /Verified Net Return/);
+  assert.match(await page.locator("#detail-drawer").innerText(), /Replay/);
   console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 10], defaultRows: [0, 1, 3, 4, 5], showAllRows: 10 }, null, 2));
 } finally {
   await browser.close();

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "product": "Solana LP Opportunity Scanner",
+  "product": "Solana LP Decision OS",
   "sourceDirectory": "mobile-dashboard",
   "top3Json": "mobile-dashboard/top3.json",
   "indexHtml": "mobile-dashboard/index.html",
@@ -8,10 +8,10 @@
   "pageDataSource": "./top3.json",
   "candidateCount": 10,
   "defaultDisplayLimit": 5,
-  "allPoolCount": 97271,
+  "allPoolCount": 99724,
   "eligiblePoolCount": 147,
-  "snapshotHash": "f3a3f6769eab1fc41ab8b368772c31707f62b455318d63cc219e55b710d9282f",
-  "generatedAt": "2026-08-23T04:15:42.482Z",
+  "snapshotHash": "23acbba27bafeebc6603614465872fab3c42631dc8f46624ba6a52d1ad688add",
+  "generatedAt": "2026-08-23T05:19:20.907Z",
   "legacyColumnsPresent": false,
   "staleFallbackRemoved": true,
   "serviceWorker": false

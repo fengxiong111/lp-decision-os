@@ -13,7 +13,7 @@ const scanner = buildScannerCandidates(universe.pools, {
 });
 const snapshotBase = {
   schemaVersion: 2,
-  product: "Solana LP Opportunity Scanner",
+  product: "Solana LP Decision OS",
   generatedAt: fetchedAt,
   sourceEvidence: {
     primary: "Official Raydium API v3 + Meteora DLMM API",

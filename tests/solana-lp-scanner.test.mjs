@@ -9,6 +9,12 @@ import {
   normalizeRaydiumPool,
   SCANNER_FILTERS,
 } from "../scripts/mobile-dashboard/scanner.mjs";
+import { MeteoraAdapter, RaydiumAdapter, normalizeScannerPools } from "../scripts/mobile-dashboard/adapters.mjs";
+import { MarketScanner } from "../scripts/mobile-dashboard/market-scanner.mjs";
+import { decidePool, DecisionEngine } from "../scripts/mobile-dashboard/decision-engine.mjs";
+import { RiskEngine } from "../scripts/mobile-dashboard/risk-engine.mjs";
+import { StrategyEngine } from "../scripts/mobile-dashboard/strategy-engine.mjs";
+import { finite, PoolSchema } from "../scripts/mobile-dashboard/pool-schema.mjs";
 
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
@@ -72,18 +78,19 @@ test("机会扫描生成 Top10，默认展示限制由页面而不是数据层�
   assert.deepEqual(result.candidates.map((row) => row.rank), Array.from({ length: 10 }, (_, index) => index + 1));
   assert.equal(result.candidates[0].shadowCapital, 1_000);
   assert.ok(result.candidates[0].strategySimulation.grossFee24h >= result.candidates[1].strategySimulation.grossFee24h);
-  assert.equal(result.rankingBasis, "STRATEGY_SIMULATION_GROSS_PREVIEW_WAITING_REPLAY");
+  assert.equal(result.rankingBasis, "STRATEGY_SIMULATION_GROSS_PREVIEW");
 });
 
 test("缺少真实 Replay 时不把官方 Fee 伪装成可执行净收益", () => {
   const [pool] = [normalizeRaydiumPool(rayPool())];
   const [row] = buildScannerCandidates([pool]).candidates;
   assert.equal(row.lpFee24h, 1_000);
-  assert.equal(row.netModel.status, "WAITING_REPLAY");
-  assert.equal(row.expectedNetReturn, null);
+  assert.equal(row.riskModel.status, "WAITING_REPLAY");
+  assert.equal(row.verifiedNetReturn, null);
   assert.equal(row.strategySimulation.status, "SIMULATED");
   assert.equal(row.strategySimulation.grossFee24h, 1_000 * (1_000 / 101_000));
-  assert.equal(row.recommendation, "观察");
+  assert.equal(row.decision, "CONSIDER");
+  assert.equal(Object.hasOwn(row, "lpScore"), false);
   assert.ok(row.why.negative.some((reason) => reason.includes("Replay")));
 });
 
@@ -93,8 +100,8 @@ test("策略模拟只输出官方 LP Fee 的投入后毛收益基准，不冒充
   assert.equal(row.strategySimulation.method, "OFFICIAL_POOL_LP_FEE_PRO_RATA_WITH_SELF_DILUTION");
   assert.equal(row.strategySimulation.grossFee24h, 900 * (1_000 / 201_000));
   assert.equal(row.strategySimulation.coreGrossFee24h, 900 * (1_000 / 201_000) * 0.7);
-  assert.equal(row.netModel.expectedNetReturn, null);
-  assert.equal(row.expectedNetReturn, null);
+  assert.equal(row.riskModel.expectedNetReturn, null);
+  assert.equal(row.verifiedNetReturn, null);
 });
 
 test("完整 Replay 才计算 Gross Fee 减成本，并使用固定 $1,000 Core/Buffer", () => {
@@ -109,12 +116,13 @@ test("完整 Replay 才计算 Gross Fee 减成本，并使用固定 $1,000 Core/
     confidence: 0.92,
   } }))];
   const [row] = buildScannerCandidates([pool]).candidates;
-  assert.equal(row.netModel.status, "COMPLETE");
-  assert.equal(row.expectedNetReturn, 15.3);
+  assert.equal(row.riskModel.status, "COMPLETE");
+  assert.equal(row.riskModel.expectedNetReturn, 15.3);
+  assert.equal(row.verifiedNetReturn, 15.3);
   assert.equal(row.strategy.core.capital, 700);
   assert.equal(row.strategy.buffer.capital, 300);
   assert.equal(row.strategy.search.candidateCount, 36);
-  assert.equal(row.recommendation, "考虑");
+  assert.equal(row.decision, "CONSIDER");
 });
 
 test("Raydium 使用 Core + Buffer，Meteora 使用波动 regime 对应的 DLMM 策略", () => {
@@ -161,4 +169,50 @@ test("Raydium cursor 与 Meteora page 分页都完整读取官方源", async () 
   assert.equal(meteora.complete, true);
   assert.equal(meteora.pools.length, 2);
   assert.deepEqual(meteoraCalls.map((url) => Number(new URL(url).searchParams.get("page"))).sort(), [1, 2]);
+});
+
+test("Adapter 层输出统一 PoolSchema，MarketScanner 不携带策略或风险结论", () => {
+  assert.equal(finite(null), null);
+  assert.equal(finite(undefined), null);
+  assert.equal(finite(0), 0);
+  const rayAdapter = new RaydiumAdapter();
+  const metAdapter = new MeteoraAdapter();
+  const ray = rayAdapter.normalize(rayPool());
+  const met = metAdapter.normalize(meteoraPool());
+  assert.equal(PoolSchema.validate(ray), true);
+  assert.equal(PoolSchema.validate(met), true);
+  assert.equal(ray.dex, "Raydium");
+  assert.equal(ray.poolType, "CLMM");
+  assert.equal(met.dex, "Meteora");
+  assert.equal(met.poolType, "DLMM");
+  assert.deepEqual(normalizeScannerPools({ raydium: [rayPool(), rayPool()], meteora: [meteoraPool()] }).map((row) => row.poolAddress), ["ray-pool", "meteora-pool"]);
+
+  const market = new MarketScanner().discover([ray, met]);
+  assert.equal(market.eligible.length, 2);
+  assert.equal(Object.hasOwn(market.eligible[0], "strategy"), false);
+  assert.equal(Object.hasOwn(market.eligible[0], "risk"), false);
+});
+
+test("Strategy、Risk、Decision 可以独立测试，且 Decision 不输出 Score", () => {
+  const pool = normalizeRaydiumPool(rayPool());
+  const strategyEngine = new StrategyEngine({ capital: 1_000 });
+  const strategyRun = strategyEngine.run(pool);
+  const riskEngine = new RiskEngine();
+  const waitingRisk = riskEngine.evaluate(pool, strategyRun.strategy);
+  assert.equal(waitingRisk.status, "WAITING_REPLAY");
+
+  const watch = decidePool({ strategy: strategyRun.strategy, simulation: { status: "WAITING_MARKET_DATA" }, risk: waitingRisk });
+  assert.equal(watch.decision, "WATCH");
+
+  const consider = new DecisionEngine().decide({ strategy: strategyRun.strategy, simulation: strategyRun.simulation, risk: waitingRisk });
+  assert.equal(consider.decision, "CONSIDER");
+
+  const enter = decidePool({
+    strategy: { ...strategyRun.strategy, executionReady: true },
+    simulation: strategyRun.simulation,
+    risk: { ...waitingRisk, status: "COMPLETE", riskLevel: "LOW", expectedNetReturn: 1 },
+  });
+  assert.equal(enter.decision, "ENTER");
+  assert.equal(Object.hasOwn(enter, "score"), false);
+  assert.equal(Object.hasOwn(enter, "lpScore"), false);
 });
