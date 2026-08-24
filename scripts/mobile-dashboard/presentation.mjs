@@ -8,13 +8,8 @@ function renderStyles() {
   --soft: #9a9891;
   --line: #e2e0d8;
   --accent: #7257a8;
-  --accent-soft: #eee9f7;
-  --positive: #4d765e;
-  --positive-soft: #eaf2ec;
-  --warm: #9b7141;
-  --warm-soft: #f5ede1;
-  --content: 1320px;
-  --pool-columns: 38px minmax(185px, 1.55fr) minmax(104px, .88fr) minmax(94px, .78fr) minmax(116px, .98fr) minmax(116px, .98fr) minmax(104px, .88fr) minmax(88px, .78fr) 64px;
+  --content: 1180px;
+  --pool-columns: 42px minmax(260px, 2fr) minmax(126px, .9fr) minmax(126px, .9fr) minmax(150px, 1fr) minmax(150px, 1fr);
 }
 * { box-sizing: border-box; }
 html { min-height: 100%; background: var(--paper); }
@@ -28,64 +23,35 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
-button { font: inherit; }
-main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 22px 0 44px; }
-.app-nav { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px; min-height: 62px; border-bottom: 1px solid var(--line); }
-.brand { font-size: 21px; font-weight: 750; letter-spacing: -.045em; white-space: nowrap; }
-.primary-nav { display: flex; align-items: center; gap: 6px; }
-.nav-tab, .category-tab, .nav-icon, .detail-button, .copy-pool, .drawer-close { border: 0; cursor: pointer; }
-.nav-tab { padding: 9px 12px; border-radius: 10px; background: transparent; color: var(--muted); font-size: 13px; font-weight: 650; }
-.nav-tab.is-active { background: var(--ink); color: #fff; }
-.nav-tab:disabled { color: #bbb9b2; cursor: not-allowed; }
-.nav-actions { display: flex; gap: 6px; }
-.nav-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: transparent; color: var(--muted); }
-.nav-icon:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
-.nav-icon svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
-.market-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 22px 0 30px; }
-.summary-card { min-height: 86px; padding: 15px 16px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
-.summary-card small { display: block; color: var(--muted); font-size: 11px; }
-.summary-card strong { display: block; margin-top: 7px; font-size: 22px; font-weight: 730; letter-spacing: -.045em; }
-.market-section { padding-top: 4px; }
-.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 0 2px 16px; }
-.section-heading h1 { margin: 0; font-size: 24px; font-weight: 750; letter-spacing: -.05em; }
-.sync-state { color: var(--muted); font-size: 12px; }
-.category-tabs { display: flex; gap: 6px; padding-bottom: 16px; overflow-x: auto; scrollbar-width: none; }
-.category-tabs::-webkit-scrollbar { display: none; }
-.category-tab { flex: 0 0 auto; padding: 8px 13px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 650; }
-.category-tab:hover { border-color: var(--line); color: var(--ink); }
-.category-tab.is-active { border-color: var(--line); background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(20, 20, 18, .03); }
+main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 54px 0 64px; }
+.radar-header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 0 2px 22px; border-bottom: 1px solid var(--line); }
+.radar-header h1 { margin: 0; font-size: 28px; font-weight: 760; letter-spacing: -.055em; }
+.radar-status { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .pool-table { width: 100%; }
-.pool-table-head, .pool-grid { display: grid; grid-template-columns: var(--pool-columns); column-gap: 10px; align-items: center; }
-.pool-table-head { padding: 10px 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--soft); font-size: 10px; font-weight: 650; letter-spacing: .035em; }
-.pool-table-head > div:not(:nth-child(2)):not(:nth-child(3)), .pool-grid > div:not(.pool-rank):not(.pool-identity):not(.pool-venue):not(.pool-action) { text-align: right; }
-.pool-row { padding: 16px 12px; border-bottom: 1px solid rgba(226, 224, 216, .8); }
+.pool-table-head, .pool-grid { display: grid; grid-template-columns: var(--pool-columns); column-gap: 12px; align-items: center; }
+.pool-table-head { padding: 13px 12px 11px; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+.pool-table-head > div:nth-child(-n+3) { text-align: left; }
+.pool-table-head > div:nth-child(n+4) { text-align: right; }
+.pool-row { padding: 20px 12px; border-bottom: 1px solid rgba(226, 224, 216, .78); }
 .pool-row:hover { background: rgba(255, 255, 255, .42); }
-.pool-rank { color: var(--soft); font-size: 11px; }
+.pool-rank { color: var(--soft); font-size: 12px; }
 .pool-identity, .pool-venue { min-width: 0; text-align: left; }
-.pool-identity strong { display: block; overflow: hidden; font-size: 17px; font-weight: 730; letter-spacing: -.035em; line-height: 1.12; text-overflow: ellipsis; white-space: nowrap; }
-.pool-identity small, .pool-venue small { display: block; margin-top: 5px; overflow: hidden; color: var(--muted); font-size: 10px; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
-.pool-venue strong { display: block; font-size: 12px; font-weight: 680; }
-.pool-metric strong { display: block; white-space: nowrap; font-size: 13px; font-weight: 650; }
-.pool-metric small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; white-space: nowrap; }
-.pool-turnover strong { color: var(--muted); }
-.state-chip { display: inline-flex; min-width: 48px; justify-content: center; padding: 5px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-.state-discover { background: #efeeea; color: #65625c; }
-.state-watch { background: var(--accent-soft); color: #725c9e; }
-.state-verifying { background: var(--warm-soft); color: #92683a; }
-.state-enter { background: var(--positive-soft); color: #477458; }
-.pool-action { text-align: right; }
-.detail-button { display: flex; width: 100%; min-height: 29px; align-items: center; justify-content: flex-end; padding: 6px 0; background: transparent; color: var(--accent); font-size: 12px; font-weight: 700; }
-.detail-button:hover { color: var(--ink); }
-.empty-state { padding: 48px 16px; border: 1px dashed var(--line); border-radius: 15px; color: var(--muted); text-align: center; }
+.pool-identity strong { display: block; overflow: hidden; font-size: 18px; font-weight: 740; letter-spacing: -.04em; line-height: 1.12; text-overflow: ellipsis; white-space: nowrap; }
+.pool-venue strong { display: block; font-size: 14px; font-weight: 680; }
+.pool-metric { min-width: 0; text-align: right; }
+.pool-metric strong { display: block; overflow: hidden; font-size: 15px; font-weight: 680; white-space: nowrap; text-overflow: ellipsis; }
+.pool-fee strong { color: var(--ink); font-size: 17px; font-weight: 750; }
+.empty-state { padding: 54px 16px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); text-align: center; }
 .empty-state strong { display: block; color: var(--ink); font-size: 18px; }
 .empty-state span { display: block; margin-top: 6px; font-size: 12px; }
 #detail-drawer { position: fixed; inset: 0; z-index: 8; }
 .drawer-backdrop { position: fixed; inset: 0; z-index: 9; background: rgba(20, 20, 18, .14); }
 .drawer-panel { position: fixed; inset: 0 0 0 auto; z-index: 10; width: min(560px, 100%); padding: 26px 26px 38px; overflow-y: auto; background: #fbfaf5; box-shadow: -16px 0 44px rgba(24, 24, 21, .12); }
 .drawer-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.drawer-kicker { margin-bottom: 7px; color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
 .drawer-header h2 { margin: 0; font-size: 24px; font-weight: 760; letter-spacing: -.05em; }
 .drawer-meta { margin-top: 6px; color: var(--muted); font-size: 12px; }
-.drawer-close { width: 30px; height: 30px; border-radius: 9px; background: transparent; color: var(--muted); font-size: 22px; line-height: 1; }
+.drawer-close { width: 30px; height: 30px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; }
 .drawer-close:hover { background: rgba(0, 0, 0, .045); color: var(--ink); }
 .drawer-section { margin-top: 24px; }
 .drawer-section h3 { margin: 0 0 11px; font-size: 13px; font-weight: 720; letter-spacing: -.01em; }
@@ -100,73 +66,51 @@ main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 2
 .advanced { border-top: 1px solid var(--line); padding-top: 14px; }
 .advanced summary { cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 700; }
 .advanced .drawer-grid { margin-top: 11px; }
-.copy-pool { margin-top: 16px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 680; }
+.copy-pool { margin-top: 16px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 680; }
 .copy-pool:hover, .copy-pool[data-state="copied"] { border-color: var(--accent); color: var(--accent); }
 [hidden] { display: none !important; }
 @media (max-width: 1100px) {
-  :root { --pool-columns: 30px minmax(145px, 1.5fr) minmax(82px, .88fr) minmax(72px, .78fr) minmax(90px, .98fr) minmax(90px, .98fr) minmax(80px, .88fr) minmax(76px, .78fr) 54px; }
-  main { width: min(calc(100% - 32px), var(--content)); padding-top: 16px; }
-  .app-nav { gap: 18px; }
-  .market-summary { gap: 8px; padding-top: 18px; padding-bottom: 24px; }
-  .summary-card { min-height: 78px; padding: 12px; }
-  .summary-card strong { font-size: 18px; }
-  .pool-table-head, .pool-grid { column-gap: 6px; }
-  .pool-table-head { padding-left: 8px; padding-right: 8px; font-size: 9px; }
-  .pool-row { padding: 15px 8px; }
-  .pool-identity strong { font-size: 15px; }
-  .pool-metric strong { font-size: 12px; }
+  :root { --pool-columns: 32px minmax(180px, 1.65fr) minmax(100px, .85fr) minmax(96px, .85fr) minmax(118px, 1fr) minmax(124px, 1fr); }
+  main { width: min(calc(100% - 32px), var(--content)); padding-top: 36px; }
+  .pool-table-head, .pool-grid { column-gap: 8px; }
+  .pool-table-head { padding-left: 8px; padding-right: 8px; }
+  .pool-row { padding: 17px 8px; }
 }
-@media (max-width: 820px) {
-  main { width: calc(100% - 24px); padding-top: 10px; }
-  .app-nav { grid-template-columns: 1fr auto; gap: 10px; min-height: 54px; }
-  .primary-nav { grid-column: 1 / -1; grid-row: 2; padding-bottom: 8px; }
-  .nav-actions { grid-column: 2; grid-row: 1; }
-  .brand { font-size: 20px; }
-  .market-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .summary-card:first-child { grid-column: 1 / -1; }
-  .section-heading { display: block; }
-  .sync-state { display: block; margin-top: 5px; }
+@media (max-width: 720px) {
+  main { width: calc(100% - 24px); padding-top: 24px; }
+  .radar-header { display: block; padding-bottom: 17px; }
+  .radar-header h1 { font-size: 25px; }
+  .radar-status { display: block; margin-top: 7px; }
   .pool-table-head { display: none; }
-  .pool-row { padding: 16px 4px; }
-  .pool-grid { grid-template-columns: minmax(0, 1fr) minmax(104px, auto); grid-template-areas: "rank action" "identity identity" "venue venue" "tvl volume" "fee turnover" "state state"; gap: 10px 16px; }
+  .pool-row { padding: 17px 4px; }
+  .pool-grid { grid-template-columns: minmax(0, 1fr) minmax(120px, auto); grid-template-areas: "rank rank" "identity venue" "tvl volume" "fee fee"; gap: 11px 18px; }
   .pool-rank { grid-area: rank; }
   .pool-identity { grid-area: identity; }
-  .pool-venue { grid-area: venue; }
-  .pool-tvl { grid-area: tvl; text-align: left !important; }
+  .pool-venue { grid-area: venue; text-align: right; }
+  .pool-tvl { grid-area: tvl; text-align: left; }
   .pool-volume { grid-area: volume; }
-  .pool-fee { grid-area: fee; text-align: left !important; }
-  .pool-turnover { grid-area: turnover; }
-  .pool-opportunity { grid-area: state; text-align: left !important; }
-  .pool-action { grid-area: action; }
+  .pool-fee { grid-area: fee; text-align: left; }
   .pool-metric::before { display: block; margin-bottom: 2px; color: var(--soft); font-size: 10px; }
   .pool-tvl::before { content: "TVL"; }
-  .pool-volume::before { content: "1天交易量"; }
-  .pool-fee::before { content: "1天手续费"; }
-  .pool-turnover::before { content: "资金周转率"; }
+  .pool-volume::before { content: "Volume"; }
+  .pool-fee::before { content: "Fee"; }
   .pool-identity strong { font-size: 18px; }
+  .pool-venue strong { font-size: 13px; }
   .drawer-panel { padding: 22px 17px 32px; }
 }
 @media (max-width: 420px) {
   .drawer-grid { grid-template-columns: 1fr; }
-  .nav-tab { padding-left: 9px; padding-right: 9px; }
 }
 `;
-}
-
-function navIcon(kind) {
-  if (kind === "search") return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.5"></circle><path d="m16 16 5 5"></path></svg>';
-  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>';
 }
 
 export function renderPage({ snapshotHash = null, runtimeVersion = null }) {
   const runtimeQuery = runtimeVersion ?? snapshotHash;
   const runtimeSrc = runtimeQuery ? `?v=${encodeURIComponent(runtimeQuery.slice(0, 12))}` : "";
   return `<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f5ef"><meta name="data-source" content="./top3.json"><title>流动性池 · Solana LP</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
-<header class="app-nav" aria-label="产品导航"><div class="brand">流动性池</div><nav class="primary-nav" aria-label="主导航"><button class="nav-tab" type="button">探索</button><button class="nav-tab is-active" type="button" aria-current="page">流动性池</button><button class="nav-tab" type="button" disabled>策略</button></nav><div class="nav-actions"><button class="nav-icon" type="button" aria-label="搜索">${navIcon("search")}</button><button class="nav-icon" type="button" aria-label="筛选">${navIcon("filter")}</button></div></header>
-<section class="market-summary" aria-label="市场概览"><article class="summary-card"><small>24H 总交易量</small><strong id="stat-volume">等待计算</strong></article><article class="summary-card"><small>候选池数量</small><strong id="stat-candidates">等待计算</strong></article><article class="summary-card"><small>Raydium 池数量</small><strong id="stat-raydium">等待计算</strong></article><article class="summary-card"><small>Meteora 池数量</small><strong id="stat-meteora">等待计算</strong></article><article class="summary-card"><small>已验证收益池</small><strong id="stat-verified">等待计算</strong></article></section>
-<section class="market-section" aria-label="流动性池市场"><div class="section-heading"><h1>流动性池</h1><span id="market-status" class="sync-state">市场数据同步中</span></div><div id="category-tabs" class="category-tabs" role="tablist" aria-label="池分类"><button class="category-tab is-active" type="button" role="tab" aria-selected="true" data-category="hot">热门</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="stable">稳健</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="fee">高费池</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="meteora">Meteora</button><button class="category-tab" type="button" role="tab" aria-selected="false" data-category="raydium">Raydium</button></div><section class="pool-table" role="table" aria-label="流动性池列表"><div class="pool-table-head" role="row"><div role="columnheader">#</div><div role="columnheader">流动性池</div><div role="columnheader">DEX / 类型</div><div role="columnheader">TVL</div><div role="columnheader">1天交易量</div><div role="columnheader">1天手续费</div><div role="columnheader">资金周转率</div><div role="columnheader">机会等级</div><div role="columnheader">操作</div></div><div id="pool-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section></section>
-<aside id="detail-drawer" aria-label="流动性池详情" hidden></aside>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f5ef"><meta name="data-source" content="./top3.json"><title>LP Fee Ranking · Solana</title><style>${renderStyles()}</style></head><body><main data-top3-source="./top3.json">
+<header class="radar-header"><h1>LP Fee Ranking</h1><span id="market-status" class="radar-status">官方 API · 24H LP Fee DESC</span></header><section class="pool-table" role="table" aria-label="LP Fee Ranking"><div class="pool-table-head" role="row"><div role="columnheader">#</div><div role="columnheader">池</div><div role="columnheader">DEX</div><div role="columnheader">TVL</div><div role="columnheader">Volume</div><div role="columnheader">Fee</div></div><div id="pool-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
+<aside id="detail-drawer" hidden></aside>
 </main><script type="module" src="./runtime.js${runtimeSrc}"></script></body></html>`;
 }
 

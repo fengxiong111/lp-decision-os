@@ -139,7 +139,7 @@ const server = createServer(async (request, response) => {
         eligiblePoolCount: currentCandidates.length,
         excludedPoolCount: 0,
         excludedByReason: {},
-        rankingBasis: "STRATEGY_SIMULATION_GROSS_PREVIEW",
+        rankingBasis: "OPPORTUNITY_RISK_ADJUSTED",
         top10Count: currentCandidates.length,
         defaultDisplayLimit: 5,
         filters: { tvlMin: 50_000, volume24hMin: 50_000, maxApr24h: 10_000, maxFeeTvlRatio24h: 0.5 },
@@ -187,30 +187,42 @@ try {
       assert.equal(await page.locator("#empty-state").isHidden(), false);
     } else {
       assert.equal(await page.locator("#empty-state").isHidden(), true);
-      assert.match(await page.locator("body").innerText(), /流动性池/);
-      assert.match(await page.locator("body").innerText(), /1天手续费/);
-      assert.doesNotMatch(await page.locator("body").innerText(), /Market Radar|Strategy Simulation|Fee APR/);
-      assert.doesNotMatch(await page.locator("body").innerText(), /Opportunity Score|Confidence|BLOCKED|UNAVAILABLE/);
+      const bodyText = await page.locator("body").innerText();
+      assert.match(bodyText, /LP Fee Ranking/);
+      assert.match(bodyText, /TVL/);
+      assert.match(bodyText, /Volume/);
+      assert.match(bodyText, /Fee/);
+      assert.doesNotMatch(bodyText, /流动性池|探索|策略|Strategy Lab|Replay|ENTER|Risk|操作|详情|Fee \/ TVL|Volume \/ TVL/);
     }
   }
 
+  const marketOnly = makeCandidate(1);
+  delete marketOnly.strategy;
+  delete marketOnly.strategySimulation;
+  delete marketOnly.riskModel;
+  delete marketOnly.decision;
+  currentCandidates = [marketOnly];
+  await page.goto(`${baseUrl}/?market-only=1`, { waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 1);
+  assert.match(await page.locator("#pool-list").innerText(), /ASSET1 \/ USDC/);
+  assert.match(await page.locator("#pool-list").innerText(), /\$1,999/);
+
   currentCandidates = Array.from({ length: 50 }, (_, index) => makeCandidate(index + 1));
-  await page.goto(`${baseUrl}/?drawer=1`, { waitUntil: "domcontentloaded" });
+  await page.goto(`${baseUrl}/?mixed-dex=1`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);
   assert.equal(await page.locator("#pool-list .pool-row").count(), 50);
-  await page.getByRole("tab", { name: "Raydium" }).click();
-  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 25);
-  assert.equal(await page.locator("#pool-list .pool-venue strong").allTextContents().then((values) => values.every((value) => value === "Raydium")), true);
-  await page.getByRole("tab", { name: "热门" }).click();
-  await page.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);
-  await page.locator(".detail-button").first().click();
-  await page.waitForSelector("#detail-drawer:not([hidden])");
-  assert.match(await page.locator("#detail-drawer").innerText(), /市场概览/);
-  assert.match(await page.locator("#detail-drawer").innerText(), /策略建议/);
-  assert.match(await page.locator("#detail-drawer").innerText(), /高级信息/);
-  await page.locator("#detail-drawer .advanced summary").click();
-  assert.match(await page.locator("#detail-drawer").innerText(), /交易回放/);
-  console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 50], renderedRows: [0, 1, 3, 4, 50] }, null, 2));
+  assert.deepEqual(await page.locator("#pool-list .pool-fee strong").first().textContent(), "$1,999.00");
+  assert.deepEqual(await page.locator("#pool-list .pool-fee strong").last().textContent(), "$1,950.00");
+  assert.deepEqual(await page.locator("#pool-list .pool-venue strong").allTextContents().then((values) => new Set(values)), new Set(["Raydium", "Meteora"]));
+  assert.equal(await page.locator(".detail-button").count(), 0);
+  assert.equal(await page.getByRole("columnheader").count(), 6);
+  assert.equal(await page.locator("#market-status").textContent(), "官方 API · 24H LP Fee DESC");
+  const ipad = await browser.newPage({ viewport: { width: 1024, height: 1366 } });
+  await ipad.goto(`${baseUrl}/?ipad=1`, { waitUntil: "domcontentloaded" });
+  await ipad.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);
+  assert.equal(await ipad.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
+  await ipad.close();
+  console.log(JSON.stringify({ status: "PASS", cases: [0, 1, 3, 4, 50], renderedRows: [0, 1, 3, 4, 50], defaultSort: "24H LP Fee DESC", mixedDex: true, ipadNoHorizontalScroll: true }, null, 2));
 } finally {
   await browser.close();
   await new Promise((resolveServer) => server.close(resolveServer));

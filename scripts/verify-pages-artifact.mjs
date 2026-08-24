@@ -18,7 +18,6 @@ const snapshot = JSON.parse(snapshotJson);
 const manifest = JSON.parse(manifestJson);
 const artifactMarkup = `${indexHtml}\n${runtimeJs}`;
 const legacyLabels = [
-  "Market Radar",
   "Strategy Simulation",
   "Verified Net Return",
   "Fee APR",
@@ -31,8 +30,32 @@ const legacyLabels = [
   "实时价格",
   "复制Pool",
 ];
-const hiddenHomeLabels = ["Score", "Opportunity Score", "Confidence", "BLOCKED", "UNAVAILABLE"];
-const requiredLabels = ["流动性池", "探索", "策略", "24H 总交易量", "候选池数量", "Raydium 池数量", "Meteora 池数量", "已验证收益池", "热门", "稳健", "高费池", "Raydium", "Meteora", "DEX / 类型", "TVL", "1天交易量", "1天手续费", "资金周转率", "机会等级", "操作", "详情"];
+const hiddenHomeLabels = [
+  "Score",
+  "Opportunity Score",
+  "Confidence",
+  "BLOCKED",
+  "UNAVAILABLE",
+  "LP Market Radar",
+  "流动性池",
+  "探索",
+  "策略",
+  "Replay",
+  "ENTER",
+  "Strategy",
+  "Risk",
+  "操作",
+  "详情",
+  "候选池数量",
+  "已验证收益池",
+  "机会等级",
+  "验证状态",
+  "热门",
+  "稳健",
+  "高费池",
+  "发现",
+];
+const requiredLabels = ["LP Fee Ranking", "官方 API", "24H LP Fee DESC", "池", "DEX", "TVL", "Volume", "Fee"];
 const riskLevels = new Set(["LOW", "MEDIUM", "HIGH", "UNVERIFIED"]);
 const decisions = new Set(["DISCOVER", "WATCH", "VERIFYING", "ENTER", "CONSIDER"]);
 
@@ -70,7 +93,7 @@ assert.equal(manifest.staleFallbackRemoved, true);
 assert.equal(manifest.serviceWorker, false);
 assert.match(indexHtml, /data-top3-source="\.\/top3\.json"/);
 assert.match(indexHtml, /<script type="module" src="\.\/runtime\.js(?:\?[^\"]+)?"><\/script>/);
-assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 9);
+assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 6);
 for (const label of requiredLabels) assert.equal(artifactMarkup.includes(label), true, `缺少字段：${label}`);
 for (const label of legacyLabels) assert.equal(artifactMarkup.includes(label), false, `旧字段存在：${label}`);
 for (const label of hiddenHomeLabels) assert.equal(indexHtml.includes(label), false, `首页内部字段存在：${label}`);
