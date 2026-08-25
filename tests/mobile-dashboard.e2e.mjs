@@ -188,11 +188,10 @@ try {
     } else {
       assert.equal(await page.locator("#empty-state").isHidden(), true);
       const bodyText = await page.locator("body").innerText();
-      assert.match(bodyText, /LP Fee Ranking/);
       assert.match(bodyText, /TVL/);
       assert.match(bodyText, /Volume/);
       assert.match(bodyText, /Fee/);
-      assert.doesNotMatch(bodyText, /流动性池|探索|策略|Strategy Lab|Replay|ENTER|Risk|操作|详情|Fee \/ TVL|Volume \/ TVL/);
+      assert.doesNotMatch(bodyText, /LP Fee Ranking|官方 API · 24H LP Fee DESC|流动性池|探索|策略|Strategy Lab|Replay|ENTER|Risk|操作|详情|Fee \/ TVL|Volume \/ TVL/);
     }
   }
 
@@ -216,7 +215,10 @@ try {
   assert.deepEqual(await page.locator("#pool-list .pool-venue strong").allTextContents().then((values) => new Set(values)), new Set(["Raydium", "Meteora"]));
   assert.equal(await page.locator(".detail-button").count(), 0);
   assert.equal(await page.getByRole("columnheader").count(), 6);
-  assert.equal(await page.locator("#market-status").textContent(), "官方 API · 24H LP Fee DESC");
+  assert.equal(await page.locator("h1").count(), 0);
+  assert.equal(await page.locator("#market-status").count(), 0);
+  assert.equal(await page.locator(".pool-fee strong").first().evaluate((node) => Number.parseFloat(getComputedStyle(node).fontSize) >= 24), true);
+  assert.equal(await page.locator("main").evaluate((node) => node.getBoundingClientRect().width > 1100), true);
   const ipad = await browser.newPage({ viewport: { width: 1024, height: 1366 } });
   await ipad.goto(`${baseUrl}/?ipad=1`, { waitUntil: "domcontentloaded" });
   await ipad.waitForFunction(() => document.querySelectorAll("#pool-list .pool-row").length === 50);

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f5ef"><meta name="data-source" content="./top3.json"><title>LP Fee Ranking · Solana</title><style>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f6f5ef"><meta name="data-source" content="./top3.json"><title>Solana LP Market</title><style>
 :root {
   --paper: #f6f5ef;
   --surface: rgba(255, 255, 255, .72);
@@ -8,8 +8,8 @@
   --soft: #9a9891;
   --line: #e2e0d8;
   --accent: #7257a8;
-  --content: 1180px;
-  --pool-columns: 42px minmax(260px, 2fr) minmax(126px, .9fr) minmax(126px, .9fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  --content: 100%;
+  --pool-columns: 64px minmax(360px, 2.4fr) minmax(180px, .9fr) minmax(220px, 1fr) minmax(220px, 1fr) minmax(220px, 1fr);
 }
 * { box-sizing: border-box; }
 html { min-height: 100%; background: var(--paper); }
@@ -19,28 +19,25 @@ body {
   overflow-x: hidden;
   background: var(--paper);
   color: var(--ink);
-  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font: 17px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
-main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 54px 0 64px; }
-.radar-header { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 0 2px 22px; border-bottom: 1px solid var(--line); }
-.radar-header h1 { margin: 0; font-size: 28px; font-weight: 760; letter-spacing: -.055em; }
-.radar-status { color: var(--muted); font-size: 12px; white-space: nowrap; }
+main { width: calc(100% - 96px); margin: 0 auto; padding: 26px 0 72px; }
 .pool-table { width: 100%; }
 .pool-table-head, .pool-grid { display: grid; grid-template-columns: var(--pool-columns); column-gap: 12px; align-items: center; }
-.pool-table-head { padding: 13px 12px 11px; border-bottom: 1px solid var(--line); color: var(--soft); font-size: 10px; font-weight: 650; letter-spacing: .04em; }
+.pool-table-head { padding: 18px 20px 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--soft); font-size: 13px; font-weight: 680; letter-spacing: .04em; }
 .pool-table-head > div:nth-child(-n+3) { text-align: left; }
 .pool-table-head > div:nth-child(n+4) { text-align: right; }
-.pool-row { padding: 20px 12px; border-bottom: 1px solid rgba(226, 224, 216, .78); }
+.pool-row { padding: 28px 20px; border-bottom: 1px solid rgba(226, 224, 216, .78); }
 .pool-row:hover { background: rgba(255, 255, 255, .42); }
-.pool-rank { color: var(--soft); font-size: 12px; }
+.pool-rank { color: var(--soft); font-size: 15px; }
 .pool-identity, .pool-venue { min-width: 0; text-align: left; }
-.pool-identity strong { display: block; overflow: hidden; font-size: 18px; font-weight: 740; letter-spacing: -.04em; line-height: 1.12; text-overflow: ellipsis; white-space: nowrap; }
-.pool-venue strong { display: block; font-size: 14px; font-weight: 680; }
+.pool-identity strong { display: block; overflow: hidden; font-size: 24px; font-weight: 760; letter-spacing: -.04em; line-height: 1.12; text-overflow: ellipsis; white-space: nowrap; }
+.pool-venue strong { display: block; font-size: 18px; font-weight: 700; }
 .pool-metric { min-width: 0; text-align: right; }
-.pool-metric strong { display: block; overflow: hidden; font-size: 15px; font-weight: 680; white-space: nowrap; text-overflow: ellipsis; }
-.pool-fee strong { color: var(--ink); font-size: 17px; font-weight: 750; }
+.pool-metric strong { display: block; overflow: hidden; font-size: 21px; font-weight: 700; white-space: nowrap; text-overflow: ellipsis; }
+.pool-fee strong { color: var(--ink); font-size: 24px; font-weight: 800; }
 .empty-state { padding: 54px 16px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); text-align: center; }
 .empty-state strong { display: block; color: var(--ink); font-size: 18px; }
 .empty-state span { display: block; margin-top: 6px; font-size: 12px; }
@@ -76,11 +73,15 @@ main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 5
   .pool-table-head { padding-left: 8px; padding-right: 8px; }
   .pool-row { padding: 17px 8px; }
 }
+@media (min-width: 1101px) and (max-width: 1400px) {
+  :root { --pool-columns: 52px minmax(260px, 1.75fr) minmax(140px, .9fr) minmax(170px, 1fr) minmax(170px, 1fr) minmax(170px, 1fr); }
+  main { width: calc(100% - 64px); }
+  .pool-table-head, .pool-grid { column-gap: 10px; }
+  .pool-table-head { padding-left: 14px; padding-right: 14px; }
+  .pool-row { padding-left: 14px; padding-right: 14px; }
+}
 @media (max-width: 720px) {
   main { width: calc(100% - 24px); padding-top: 24px; }
-  .radar-header { display: block; padding-bottom: 17px; }
-  .radar-header h1 { font-size: 25px; }
-  .radar-status { display: block; margin-top: 7px; }
   .pool-table-head { display: none; }
   .pool-row { padding: 17px 4px; }
   .pool-grid { grid-template-columns: minmax(0, 1fr) minmax(120px, auto); grid-template-areas: "rank rank" "identity venue" "tvl volume" "fee fee"; gap: 11px 18px; }
@@ -94,14 +95,14 @@ main { width: min(calc(100% - 48px), var(--content)); margin: 0 auto; padding: 5
   .pool-tvl::before { content: "TVL"; }
   .pool-volume::before { content: "Volume"; }
   .pool-fee::before { content: "Fee"; }
-  .pool-identity strong { font-size: 18px; }
-  .pool-venue strong { font-size: 13px; }
+  .pool-identity strong { font-size: 19px; }
+  .pool-venue strong { font-size: 14px; }
   .drawer-panel { padding: 22px 17px 32px; }
 }
 @media (max-width: 420px) {
   .drawer-grid { grid-template-columns: 1fr; }
 }
 </style></head><body><main data-top3-source="./top3.json">
-<header class="radar-header"><h1>LP Fee Ranking</h1><span id="market-status" class="radar-status">官方 API · 24H LP Fee DESC</span></header><section class="pool-table" role="table" aria-label="LP Fee Ranking"><div class="pool-table-head" role="row"><div role="columnheader">#</div><div role="columnheader">池</div><div role="columnheader">DEX</div><div role="columnheader">TVL</div><div role="columnheader">Volume</div><div role="columnheader">Fee</div></div><div id="pool-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
+<section class="pool-table" role="table" aria-label="Solana LP fee market"><div class="pool-table-head" role="row"><div role="columnheader">#</div><div role="columnheader">池</div><div role="columnheader">DEX</div><div role="columnheader">TVL</div><div role="columnheader">Volume</div><div role="columnheader">Fee</div></div><div id="pool-list" aria-live="polite"></div><div id="empty-state" class="empty-state" hidden></div></section>
 <aside id="detail-drawer" hidden></aside>
-</main><script type="module" src="./runtime.js?v=89130f28b2f8"></script></body></html>
+</main><script type="module" src="./runtime.js?v=0115c0e7aee1"></script></body></html>

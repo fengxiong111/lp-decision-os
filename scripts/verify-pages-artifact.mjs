@@ -29,6 +29,8 @@ const legacyLabels = [
   "预计手续费",
   "实时价格",
   "复制Pool",
+  "LP Fee Ranking",
+  "官方 API · 24H LP Fee DESC",
 ];
 const hiddenHomeLabels = [
   "Score",
@@ -54,11 +56,10 @@ const hiddenHomeLabels = [
   "稳健",
   "高费池",
   "发现",
+  "LP Fee Ranking",
+  "官方 API · 24H LP Fee DESC",
 ];
-const requiredLabels = ["LP Fee Ranking", "官方 API", "24H LP Fee DESC", "池", "DEX", "TVL", "Volume", "Fee"];
-const riskLevels = new Set(["LOW", "MEDIUM", "HIGH", "UNVERIFIED"]);
-const decisions = new Set(["DISCOVER", "WATCH", "VERIFYING", "ENTER", "CONSIDER"]);
-
+const requiredLabels = ["池", "DEX", "TVL", "Volume", "Fee"];
 assert.equal(snapshot.schemaVersion, 2, "Scanner schemaVersion 错误");
 assert.equal(snapshot.product, "Solana LP Decision OS");
 assert.equal(snapshot.scope?.capital, 1_000);
@@ -97,6 +98,8 @@ assert.equal((indexHtml.match(/role="columnheader"/g) ?? []).length, 6);
 for (const label of requiredLabels) assert.equal(artifactMarkup.includes(label), true, `缺少字段：${label}`);
 for (const label of legacyLabels) assert.equal(artifactMarkup.includes(label), false, `旧字段存在：${label}`);
 for (const label of hiddenHomeLabels) assert.equal(indexHtml.includes(label), false, `首页内部字段存在：${label}`);
+assert.equal(indexHtml.includes("<h1"), false, "首页不应保留大标题");
+assert.equal(indexHtml.includes("market-status"), false, "首页不应保留状态标题");
 assert.equal(indexHtml.includes('class="scanner-row"'), false, "静态页不应内嵌候选行");
 assert.equal(runtimeJs.includes("scanner.candidates"), true);
 assert.equal(runtimeJs.includes("lastGoodTop3"), false);
@@ -108,18 +111,15 @@ snapshot.scanner.candidates.forEach((row, index) => {
   assert.ok(["CLMM", "DLMM"].includes(row.poolType));
   assert.equal(typeof row.pair, "string");
   assert.equal(typeof row.poolAddress, "string");
-  for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "feeApr24h", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "currentPrice", "verifiedNetReturn"]) {
+  for (const field of ["tvl", "volume24h", "lpFee24h", "feeTier", "feeApr24h", "volumeTvl", "feeTvl", "priceVolatilityPct", "activeTimeHours", "currentPrice"]) {
     assert.equal(row[field] === null || Number.isFinite(row[field]), true, `${field} 非法`);
   }
+  for (const field of ["verifiedNetReturn", "strategy", "strategySimulation", "riskModel", "decision"]) {
+    if (Object.hasOwn(row, field)) assert.equal(row[field] === null || typeof row[field] === "object" || typeof row[field] === "string" || Number.isFinite(row[field]), true, `${field} 非法`);
+  }
   assert.equal(row.poolSchemaVersion, 1);
-  assert.ok(row.strategy && row.strategySimulation && row.riskModel);
-  assert.ok(["SIMULATED", "WAITING_MARKET_DATA"].includes(row.strategySimulation.status));
-  assert.equal(typeof row.strategySimulation.method, "string");
-  assert.ok(riskLevels.has(row.riskModel.riskLevel));
-  assert.ok(decisions.has(row.decision));
-  assert.equal(Object.hasOwn(row, "lpScore"), false);
-  assert.equal(Object.hasOwn(row, "scoreBreakdown"), false);
-  assert.equal(Object.hasOwn(row, "netModel"), false);
+  assert.equal(Object.hasOwn(row, "walletAddress"), false);
+  assert.equal(Object.hasOwn(row, "positionNft"), false);
 });
 
 console.log(JSON.stringify({

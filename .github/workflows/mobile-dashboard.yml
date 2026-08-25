@@ -38,13 +38,15 @@ jobs:
       - name: Install external dashboard dependencies
         run: npm ci --ignore-scripts
       - uses: actions/configure-pages@v5
-      - name: Package committed Solana LP scanner snapshot
+      - name: Refresh official Raydium and Meteora market snapshot
+        run: node scripts/refresh-mobile-dashboard-market.mjs
+      - name: Package refreshed Solana LP market snapshot
         run: node scripts/build-mobile-dashboard-page.mjs
       - name: Verify GitHub Pages artifact
         run: node scripts/verify-pages-artifact.mjs
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
-      - name: Verify Top 3 rendering contract
+      - name: Verify LP market rendering contract
         run: npm run test:e2e:mobile-dashboard
       - uses: actions/upload-pages-artifact@v3
         with:
