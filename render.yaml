@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: lp-oracle-v3-cloud
+    runtime: node
+    plan: free
+    branch: feat/lp-oracle-v3-cloud
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/oracle-health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
