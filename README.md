@@ -1,5 +1,7 @@
 # Raydium RWA 流动性决策系统
 
+> LP Oracle 已迁移到独立仓库：[fengxiong111/lp-range-oracle](https://github.com/fengxiong111/lp-range-oracle)。本仓库继续维护 Raydium RWA 系统；旧 Oracle bootstrap 已停用，详见 [`docs/lp-oracle-v3-deprecated.md`](docs/lp-oracle-v3-deprecated.md)。
+
 这是一个围绕 Raydium Protocol 的 LP Operating System。前端不直接拼接 REST 请求，而是消费 Connector、发现、链上校验、指标、市场时段、数据质量和决策服务输出的统一快照。后续接入 Orca、Meteora、Jupiter、Phoenix 或 OpenBook 时，只增加 Connector、指标适配器和执行适配器。
 
 ## 界面预览
