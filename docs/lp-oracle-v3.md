@@ -1,6 +1,8 @@
 # LP Oracle V3.0 云端接口
 
-本模块位于 `cloud-oracle/`，与现有 Raydium/SQLite worker 隔离。Vercel 通过 Next.js Route Handler 提供：
+本模块位于 `cloud-oracle/`，与现有 Raydium/SQLite worker 隔离。首选云执行模式是 GitHub Actions Issue Queue：创建标题为 `[LP_ORACLE] 0x...` 的 issue，workflow 会调用本模块并自动评论结果。
+
+现有 HTTP endpoint 仍保留，便于兼容和调试，但不是首选生产入口：
 
 `GET /api/analyze?address=0x...`
 
@@ -17,3 +19,10 @@
 - `EVM_RPC_URL`：启用 RPC 配置状态。
 
 密钥不应提交到仓库；Vercel 环境变量只保存运行时凭据。
+
+## Issue Queue 使用方式
+
+1. 在仓库创建标题严格为 `[LP_ORACLE] <EVM 地址>` 的 issue。
+2. `.github/workflows/lp-oracle-issue.yml` 在 `opened` 或带 `lp-oracle` 标签时运行。
+3. workflow 使用仓库内 `GITHUB_TOKEN` 读取公开 API，并在 issue 评论 JSON 结果；不需要第三方账号、常驻机器或自建服务。
+4. 评论中的 `7d`、selected pool 等没有证据的值保持 `null`，原因保存在 `blocked`。

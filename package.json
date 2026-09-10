@@ -16,6 +16,7 @@
     "build:frontend": "vite build --config apps/frontend/vite.config.ts",
     "frontend:dev": "vite --config apps/frontend/vite.config.ts",
     "typecheck": "tsc --noEmit",
+    "lp-oracle:issue": "tsx scripts/lp-oracle-issue-runner.ts",
     "test:unit": "node --test tests/*.test.mjs && tsx --test tests/*.test.ts",
     "test": "npm run build && npm run build:frontend && npm run test:unit",
     "test:e2e": "node tests/playwright.e2e.mjs",
