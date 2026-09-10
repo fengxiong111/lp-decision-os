@@ -11,9 +11,12 @@
   },
   "scripts": {
     "build": "next build",
+    "start": "next start -p ${PORT:-3000}",
+    "build:cloud-worker": "mkdir -p dist/server && esbuild site-worker/index.ts --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/server/index.js",
     "build:frontend": "vite build --config apps/frontend/vite.config.ts",
     "frontend:dev": "vite --config apps/frontend/vite.config.ts",
     "typecheck": "tsc --noEmit",
+    "lp-oracle:issue": "tsx scripts/lp-oracle-issue-runner.ts",
     "test:unit": "node --test tests/*.test.mjs && tsx --test tests/*.test.ts",
     "test": "npm run build && npm run build:frontend && npm run test:unit",
     "test:e2e": "node tests/playwright.e2e.mjs",
