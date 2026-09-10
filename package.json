@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build": "next build",
+    "build:cloud-worker": "mkdir -p dist/server && esbuild site-worker/index.ts --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/server/index.js",
     "build:frontend": "vite build --config apps/frontend/vite.config.ts",
     "frontend:dev": "vite --config apps/frontend/vite.config.ts",
     "typecheck": "tsc --noEmit",

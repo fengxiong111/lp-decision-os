@@ -34,8 +34,9 @@ export async function fetchGecko(address: string): Promise<SourceArtifact> {
 
 export async function fetchOptionalAuthSources(address: string): Promise<SourceArtifact[]> {
   const out: SourceArtifact[] = [];
-  out.push(process.env.OKX_API_KEY ? { source: "okx", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "OKX_ADAPTER_REQUIRES_CONFIGURED_ENDPOINT" } : blocked("okx", address, "BLOCKED_AUTH"));
-  out.push(process.env.UNISWAP_API_KEY ? { source: "uniswap", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "UNISWAP_ADAPTER_REQUIRES_CONFIGURED_ENDPOINT" } : blocked("uniswap", address, "BLOCKED_AUTH"));
-  out.push(process.env.EVM_RPC_URL ? { source: "rpc", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "RPC_ADAPTER_REQUIRES_CHAIN_CONFIGURATION" } : blocked("rpc", address, "BLOCKED_AUTH"));
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
+  out.push(env.OKX_API_KEY ? { source: "okx", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "OKX_ADAPTER_REQUIRES_CONFIGURED_ENDPOINT" } : blocked("okx", address, "BLOCKED_AUTH"));
+  out.push(env.UNISWAP_API_KEY ? { source: "uniswap", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "UNISWAP_ADAPTER_REQUIRES_CONFIGURED_ENDPOINT" } : blocked("uniswap", address, "BLOCKED_AUTH"));
+  out.push(env.EVM_RPC_URL ? { source: "rpc", status: "UNAVAILABLE", fetchedAt: now(), chainId: null, tokenAddress: address, payload: null, blockedReasons: ["BLOCKED_SOURCE_UNAVAILABLE"], error: "RPC_ADAPTER_REQUIRES_CHAIN_CONFIGURATION" } : blocked("rpc", address, "BLOCKED_AUTH"));
   return out;
 }
